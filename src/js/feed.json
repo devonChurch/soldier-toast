@@ -1,0 +1,73 @@
+{
+    "directory": "/",
+    "title": "Home page title",
+    "desc": "Home page description",
+    "children": [
+        {
+            "directory": "fruit",
+            "title": "Fruit title",
+            "desc": "Fruit description",
+            "children": [
+                {
+                    "directory": "banana",
+                    "title": "Banana title",
+                    "desc": "Banana description"
+                },
+                {
+                    "directory": "apple",
+                    "title": "Apple title",
+                    "desc": "Apple description"
+                },
+                {
+                    "directory": "grape",
+                    "title": "Grape title",
+                    "desc": "Grape description"
+                }
+            ]
+        },
+        {
+            "directory": "vegetable",
+            "title": "Vegetable title",
+            "desc": "Vegetable description",
+            "children": [
+                {
+                    "directory": "carrot",
+                    "title": "Carrot title",
+                    "desc": "Carrot description"
+                },
+                {
+                    "directory": "potato",
+                    "title": "Potato title",
+                    "desc": "Potato description"
+                },
+                {
+                    "directory": "pumpkin",
+                    "title": "Pumpkin title",
+                    "desc": "Pumpkin description"
+                }
+            ]
+        },
+        {
+            "directory": "drink",
+            "title": "Drink title",
+            "desc": "Drink description",
+            "children": [
+                {
+                    "directory": "coke",
+                    "title": "Coke title",
+                    "desc": "Coke description"
+                },
+                {
+                    "directory": "sprite",
+                    "title": "Sprite title",
+                    "desc": "Sprite description"
+                },
+                {
+                    "directory": "redbull",
+                    "title": "Redbull title",
+                    "desc": "Redbull description"
+                }
+            ]
+        }
+    ]
+}

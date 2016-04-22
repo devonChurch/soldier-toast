@@ -1,0 +1,60 @@
+$space: (
+    tiny: 5px,
+    small: 15px,
+    medium: 30px,
+    large: 60px
+);
+
+@function space($type: medium) {
+    @return map-get($space, $type);
+}
+
+$speed: (
+    slow: 1s,
+    medium: 0.5s,
+    fast: 0.25s
+);
+
+@function speed($type: medium) {
+    @return map-get($speed, $type);
+}
+
+@function delay($type: medium) {
+    @return map-get($speed, $type);
+}
+
+$ease: (
+    out: ease-out
+);
+
+@function ease($type: out) {
+    @return map-get($ease, $type);
+}
+
+// https://www.google.com/design/spec/style/color.html#color-color-palette
+$color: (
+    teal: (
+        light: #80CBC4,
+        medium: #009688,
+        dark: #004D40
+    ),
+    gray: (
+        light: #cccccc,
+        medium: #989898,
+        dark: #4c4c4c
+    )
+);
+
+@function color($type, $tint: medium) {
+    $type: map-get($color, $type);
+    @return map-get($type, $tint);
+}
+
+$zIndex: (
+    cap: 200,
+    player: 100
+);
+
+@function zIndex($type) {
+    @return map-get($zIndex, $type);
+}

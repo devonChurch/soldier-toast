@@ -1,0 +1,12 @@
+@mixin ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+@mixin resetButton {
+    background: transparent;
+    border: 0;
+    padding: 0;
+}
