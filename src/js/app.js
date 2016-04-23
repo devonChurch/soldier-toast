@@ -8,9 +8,46 @@
 // const Redux = require('redux');
 // const deepFreeze = require('deep-freeze');
 // const mountNode = document.getElementById('app');
-const render = require('./render');
 
-render();
+// const render = require('./render');
+//
+// render();
+
+
+
+
+console.log('sending request.....');
+
+var request = new XMLHttpRequest();
+request.open('GET', '/api/banana/heading-three/', true);
+
+request.onload = function() {
+    console.log('request is back...');
+    console.log(request);
+    console.log('');
+    console.log(request.responseText);
+  if (request.status >= 200 && request.status < 400) {
+    // Success!
+    console.log('success');
+
+    // var resp = request.responseText;
+  } else {
+    // We reached our target server, but it returned an error
+    console.log('error');
+  }
+};
+
+request.onerror = function() {
+  // There was a connection error of some sort
+};
+
+request.send();
+
+
+
+
+
+
 
 // Home
 //   -- Show

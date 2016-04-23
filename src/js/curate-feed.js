@@ -124,6 +124,8 @@ function curate(path) {
 
     // Raw path example /fruit OR /fruit/banana OR /app?/fruit/banana
 
+    console.log(`curate ${path}`);
+
     const {category, question} = extrapolatePath(distillPath(path));
     const keys = Object.keys(feed);
     let json;

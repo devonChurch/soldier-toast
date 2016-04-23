@@ -41,28 +41,45 @@ app.get('*', (req, res) => {
 
         if (error) {
 
+            console.log('MATCH ERROR 500');
             res.status(500).send(error.message);
 
-        } else if (req.url.indexOf('/api') === 0) {
+        } else if (req.url.indexOf('/api/') >= 0) {
 
             console.log('Ping API');
             console.log(req.url);
-            json = curate(req.url);
+            const request = req.url.substr(4);
+            console.log('request = ', request);
+            json = curate(request);
+            json = JSON.stringify(json);
             console.log(json);
 
             res.status(200).send(json);
 
         } else if (renderProps) {
 
+            if (req.url.indexOf('/api/') >= 0) {
 
-            const html = '<h1>Hello world</h1>';
+                console.log('/api/');
+
+            } else {
+
+                console.log('/...');
+
+            }
+
+
+            const content = '<h1>Hello world</h1>';
+            const store = [0, 1, 2, 3, 4];
+            const html = scaffold({content, store});
             json = curate(req.url);
             console.log(json);
             // res.status(200).send(html);
-            res.status(200).send(json);
+            res.status(200).send(html);
 
         } else {
 
+            console.log('MATCH ERROR 404');
             res.status(404).send('Not found');
 
         }

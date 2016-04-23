@@ -90,24 +90,39 @@
 	
 	        if (error) {
 	
+	            console.log('MATCH ERROR 500');
 	            res.status(500).send(error.message);
-	        } else if (req.url.indexOf('/api') === 0) {
+	        } else if (req.url.indexOf('/api/') >= 0) {
 	
 	            console.log('Ping API');
 	            console.log(req.url);
-	            json = curate(req.url);
+	            var request = req.url.substr(4);
+	            console.log('request = ', request);
+	            json = curate(request);
+	            json = JSON.stringify(json);
 	            console.log(json);
 	
 	            res.status(200).send(json);
 	        } else if (renderProps) {
 	
-	            var html = '<h1>Hello world</h1>';
+	            if (req.url.indexOf('/api/') >= 0) {
+	
+	                console.log('/api/');
+	            } else {
+	
+	                console.log('/...');
+	            }
+	
+	            var content = '<h1>Hello world</h1>';
+	            var store = [0, 1, 2, 3, 4];
+	            var html = scaffold({ content: content, store: store });
 	            json = curate(req.url);
 	            console.log(json);
 	            // res.status(200).send(html);
-	            res.status(200).send(json);
+	            res.status(200).send(html);
 	        } else {
 	
+	            console.log('MATCH ERROR 404');
 	            res.status(404).send('Not found');
 	        }
 	    });
@@ -49575,6 +49590,8 @@
 	function curate(path) {
 	
 	    // Raw path example /fruit OR /fruit/banana OR /app?/fruit/banana
+	
+	    console.log('curate ' + path);
 	
 	    var _extrapolatePath = extrapolatePath(distillPath(path));
 	
