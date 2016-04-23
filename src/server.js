@@ -4,11 +4,23 @@ const {match, RouterContext} = require('react-router');
 const routes = require('./js/routes');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
-const fetchData = require('./js/page-data');
+const curate = require('./js/curate-feed');
 const scaffold = require('./js/scaffold');
-// const HomePage = require('./js/home-page');
-// const ShowPage = require('./js/show-page');
-// const EpisodePage = require('./js/episode-page');
+
+
+// A URL is pinged
+
+// We have the following as categories...
+// /all (replaces / )
+// /apple
+// /banana
+// /orange
+
+// If there is no URL match to our JSON file...
+// Redirect the user back to /all and give them a message
+
+
+
 
 const app = express();
 
@@ -19,17 +31,11 @@ app.get('*', (req, res) => {
 
     match({routes, location: req.url}, (error, redirectLocation, renderProps) => {
 
-        // console.log('  -------------------------------------  ');
-        // console.log('routes', routes);
         console.log('  -------------------------------------  ');
         console.log('req.url', req.url);
         console.log('  -------------------------------------  ');
-        // console.log('error', error);
-        // console.log('  -------------------------------------  ');
-        // console.log('redirectLocation', redirectLocation);
-        // console.log('  -------------------------------------  ');
-        // console.log('renderProps', renderProps);
-        // console.log('  -------------------------------------  ');
+
+            // MAKE AJAX REQUEST VIA FULL URL NOT VIA ADDITIONAL QUERY STRING IF COMING FROM THE API ROUTE!
 
         let json;
 
@@ -41,41 +47,19 @@ app.get('*', (req, res) => {
 
             console.log('Ping API');
             console.log(req.url);
-            json = fetchData(req.url);
+            json = curate(req.url);
+            console.log(json);
 
             res.status(200).send(json);
 
-        } else if (redirectLocation) {
-
-            res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-
         } else if (renderProps) {
 
-            // You can also check renderProps.components or renderProps.routes for
-            // your "not found" component or route respectively, and send a 404 as
-            // below, if you're using a catch-all route.
 
-            json = fetchData(req.url);
-            const store = {foo: 1, bar: 2, baz: 3};
-            const content = ReactDOMServer.renderToString(
-                /* <Provider store={store}> */
-                    <RouterContext {...renderProps} />
-                /* </Provider> */
-            );
-            const html = scaffold({content, store});
-            // RouterContext
-
-            // res.status(200).send(renderToString(<RouterContext {...renderProps} />));
-
-
-
-            // res.send("<!DOCTYPE html>"+
-            //     ReactDOMServer.renderToString(
-            //         Provider({store: store}, RouterContext(renderProps))
-            //     )
-            // );
-
-            res.status(200).send(html);
+            const html = '<h1>Hello world</h1>';
+            json = curate(req.url);
+            console.log(json);
+            // res.status(200).send(html);
+            res.status(200).send(json);
 
         } else {
 

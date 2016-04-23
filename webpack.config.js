@@ -37,16 +37,12 @@ module.exports = [{
     target: 'web',
     context: __dirname + '/src',
     devtool: 'source-map',
-    entry: './entry.js',
+    entry: './client.js',
     output: {
         path: __dirname + '/dist/static',
         filename: 'client.js'
     },
     plugins: [
-        // new CopyWebpackPlugin([
-        //     { from: './index.html', to: 'index.html' }
-        //     // { from: './node', to: 'node' }
-        // ]),
         new ExtractTextPlugin('style.css')
     ],
     module: {
