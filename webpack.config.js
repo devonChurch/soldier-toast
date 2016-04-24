@@ -18,7 +18,7 @@ var loaderJs = {
     exclude: /node_modules/,
     loader: 'babel', // Automatically generates source maps without the sourceMaps config
     query: {
-        presets: ['react', 'es2015']
+        presets: ['react', 'es2015', 'stage-2', 'stage-3']
     }
 };
 
