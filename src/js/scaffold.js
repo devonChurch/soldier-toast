@@ -21,7 +21,7 @@ const scaffold = ({
 				</script>
 	        </head>
 	        <body>
-	            <div id="app" class="app"></div>
+	            <div id="app" class="app">${content}</div>
 	            <script src="/client.js"></script>
 	        </body>
 	    </html>`
