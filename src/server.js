@@ -91,7 +91,10 @@ app.get('*', (req, res) => {
                     request: '/',
                     loading: true
                 },
-                foo: [1, 2],
+                topics: {
+                    current: null,
+                    open: false
+                },
                 bar: [3, 4]
             };
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const {UPDATE_LOADER} = require('./actions');
+const {UPDATE_LOADER, FETCH_QUESTIONS, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
 function api(state = {
 	request: '/',
@@ -21,9 +21,27 @@ function api(state = {
 
 }
 
-function foo() {
+function topics(state = {
+	current: null,
+	open: false
+}, action) {
 
-	return [];
+	console.log('reducer | topics');
+	console.log(action);
+
+	switch(action.operation) {
+
+		case SELECT_TOPIC:
+			console.log('SELECT_TOPIC');
+			break;
+
+		case TOGGLE_TOPICS:
+			console.log('TOGGLE_TOPICS');
+			break;
+
+	}
+
+	return state;
 
 }
 
@@ -33,4 +51,4 @@ function bar() {
 
 }
 
-module.exports = {api, foo, bar};
+module.exports = {api, topics, bar};

@@ -12,6 +12,8 @@ class Questions extends React.Component {
 		console.log('** Questions (constructor)');
 
 		super();
+
+		// *** Change this to be part of the state as it will constantly change and will work well when using redux dev tools....
 		this.questions = null;
 
 
@@ -19,7 +21,22 @@ class Questions extends React.Component {
 
 	componentDidMount() {
 
-		console.log('componentDidMount | fetch data');
+		console.log('componentDidMount');
+
+		this.fetch();
+
+	}
+
+	componentWillUnmount() {
+
+		// FIX!
+		this.request.abort();
+
+	}
+
+	fetch() {
+
+		console.log('fetch | questions');
 
 		const request = new XMLHttpRequest();
 		const url = this.props.api.request;
@@ -32,7 +49,7 @@ class Questions extends React.Component {
 			if (request.status >= 200 && request.status < 400) {
 				// Success!
 				console.log('success');
-				console.log(request.responseText);
+
 				this.questions = JSON.parse(request.responseText);
 				this.props.updateLoader(UPDATE_LOADER, false);
 
@@ -51,10 +68,11 @@ class Questions extends React.Component {
 
 	}
 
-	componentWillUnmount() {
+	loader() {
 
-		// FIX!
-		this.request.abort();
+		this.fetch();
+
+		return <div>LOADING...</div>;
 
 	}
 
@@ -63,14 +81,10 @@ class Questions extends React.Component {
 		console.log('compile | questions');
 		console.log(this.questions);
 
-		// let list;
-
-		return this.questions.map((question) => {
-
-			console.log(question);
+		return this.questions.map((question, id) => {
 
 			return (
-				<li>
+				<li key={id}>
 					<button>{question.heading}</button>
 					<div>
 						<h3>{question.heading}</h3>
@@ -81,20 +95,6 @@ class Questions extends React.Component {
 
 		});
 
-		// return list;
-
-
-
-		// return (
-		// 	<li>
-		// 		<button>heading</button>
-		// 		<div>
-		// 			<h3>heading</h3>
-		// 			<p>description</p>
-		// 		</div>
-		// 	</li>
-		// );
-
 	}
 
 	render() {
@@ -104,7 +104,7 @@ class Questions extends React.Component {
 
 		const loading = this.props.api.loading;
 		console.log('loading', loading);
-		const questions = loading ? <div>LOADING...</div> : this.compile();
+		const questions = loading ? this.loader() : this.compile();
 
 
 		return (

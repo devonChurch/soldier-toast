@@ -74,6 +74,8 @@
 
 	'use strict';
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var React = __webpack_require__(7);
 	var ReactDOM = __webpack_require__(38);
 	
@@ -118,6 +120,36 @@
 		// return {foo: 1, bar: 2, baz: 3};
 	}
 	
+	function createElement(Component, props) {
+	
+		var hero = {
+			heading: 'Hero!',
+			description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+		};
+	
+		var topics = [{
+			heading: 'Topic one',
+			description: 'Description one',
+			url: '/apple',
+			total: 7
+		}, {
+			heading: 'Topic two',
+			description: 'Description two',
+			url: '/banana',
+			total: 7
+		}, {
+			heading: 'Topic three',
+			description: 'Description three',
+			url: '/orange',
+			total: 7
+		}];
+	
+		props = _extends({}, props, { static: { hero: hero, topics: topics } });
+	
+		// make sure you pass all the props in!
+		return React.createElement(Component, props);
+	}
+	
 	/**
 	 *
 	 */
@@ -131,7 +163,7 @@
 		ReactDOM.render(React.createElement(
 			Provider,
 			{ store: store },
-			React.createElement(Router, { history: browserHistory, routes: routes })
+			React.createElement(Router, { history: browserHistory, routes: routes, createElement: createElement })
 		), document.getElementById('app'));
 	}
 	
@@ -27082,6 +27114,7 @@
 	
 	var Link = _require.Link;
 	
+	var Topics = __webpack_require__(257);
 	var Questions = __webpack_require__(254);
 	
 	var Faq = function (_React$Component) {
@@ -27100,7 +27133,9 @@
 			value: function render() {
 	
 				// console.log(this);
-				// console.log(this.props);
+				console.log('render | faq');
+				console.log(this.props);
+				console.log(this.props.route.apple);
 	
 				return React.createElement(
 					'div',
@@ -27110,7 +27145,12 @@
 						null,
 						'FAQ'
 					),
-					React.createElement(Questions, null)
+					React.createElement(
+						'nav',
+						null,
+						React.createElement(Topics, null)
+					),
+					React.createElement(Questions, this.props.route.apple)
 				);
 			}
 		}]);
@@ -27156,6 +27196,8 @@
 	
 			console.log('** Questions (constructor)');
 	
+			// *** Change this to be part of the state as it will constantly change and will work well when using redux dev tools....
+	
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Questions).call(this));
 	
 			_this.questions = null;
@@ -27166,9 +27208,24 @@
 		_createClass(Questions, [{
 			key: 'componentDidMount',
 			value: function componentDidMount() {
+	
+				console.log('componentDidMount');
+	
+				this.fetch();
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+	
+				// FIX!
+				this.request.abort();
+			}
+		}, {
+			key: 'fetch',
+			value: function fetch() {
 				var _this2 = this;
 	
-				console.log('componentDidMount | fetch data');
+				console.log('fetch | questions');
 	
 				var request = new XMLHttpRequest();
 				var url = this.props.api.request;
@@ -27181,7 +27238,7 @@
 					if (request.status >= 200 && request.status < 400) {
 						// Success!
 						console.log('success');
-						console.log(request.responseText);
+	
 						_this2.questions = JSON.parse(request.responseText);
 						_this2.props.updateLoader(UPDATE_LOADER, false);
 					} else {
@@ -27197,11 +27254,16 @@
 				request.send();
 			}
 		}, {
-			key: 'componentWillUnmount',
-			value: function componentWillUnmount() {
+			key: 'loader',
+			value: function loader() {
 	
-				// FIX!
-				this.request.abort();
+				this.fetch();
+	
+				return React.createElement(
+					'div',
+					null,
+					'LOADING...'
+				);
 			}
 		}, {
 			key: 'compile',
@@ -27210,15 +27272,11 @@
 				console.log('compile | questions');
 				console.log(this.questions);
 	
-				// let list;
-	
-				return this.questions.map(function (question) {
-	
-					console.log(question);
+				return this.questions.map(function (question, id) {
 	
 					return React.createElement(
 						'li',
-						null,
+						{ key: id },
 						React.createElement(
 							'button',
 							null,
@@ -27240,18 +27298,6 @@
 						)
 					);
 				});
-	
-				// return list;
-	
-				// return (
-				// 	<li>
-				// 		<button>heading</button>
-				// 		<div>
-				// 			<h3>heading</h3>
-				// 			<p>description</p>
-				// 		</div>
-				// 	</li>
-				// );
 			}
 		}, {
 			key: 'render',
@@ -27262,11 +27308,7 @@
 	
 				var loading = this.props.api.loading;
 				console.log('loading', loading);
-				var questions = loading ? React.createElement(
-					'div',
-					null,
-					'LOADING...'
-				) : this.compile();
+				var questions = loading ? this.loader() : this.compile();
 	
 				return React.createElement(
 					'ul',
@@ -27312,7 +27354,9 @@
 	
 	var actions = {
 		UPDATE_LOADER: 'UPDATE_LOADER',
-		FETCH_QUESTIONS: 'FETCH_QUESTIONS'
+		FETCH_QUESTIONS: 'FETCH_QUESTIONS',
+		SELECT_TOPIC: 'SELECT_TOPIC',
+		TOGGLE_TOPICS: 'TOGGLE_TOPICS'
 	};
 	
 	module.exports = actions;
@@ -27328,6 +27372,9 @@
 	var _require = __webpack_require__(255);
 	
 	var UPDATE_LOADER = _require.UPDATE_LOADER;
+	var FETCH_QUESTIONS = _require.FETCH_QUESTIONS;
+	var SELECT_TOPIC = _require.SELECT_TOPIC;
+	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
 	
 	function api() {
@@ -27351,9 +27398,30 @@
 		return state;
 	}
 	
-	function foo() {
+	function topics() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			current: null,
+			open: false
+		} : arguments[0];
+		var action = arguments[1];
 	
-		return [];
+	
+		console.log('reducer | topics');
+		console.log(action);
+	
+		switch (action.operation) {
+	
+			case SELECT_TOPIC:
+				console.log('SELECT_TOPIC');
+				break;
+	
+			case TOGGLE_TOPICS:
+				console.log('TOGGLE_TOPICS');
+				break;
+	
+		}
+	
+		return state;
 	}
 	
 	function bar() {
@@ -27361,7 +27429,122 @@
 		return [];
 	}
 	
-	module.exports = { api: api, foo: foo, bar: bar };
+	module.exports = { api: api, topics: topics, bar: bar };
+
+/***/ },
+/* 257 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var React = __webpack_require__(7);
+	
+	var _require = __webpack_require__(194);
+	
+	var Link = _require.Link;
+	
+	var _require2 = __webpack_require__(185);
+	
+	var connect = _require2.connect;
+	
+	var _require3 = __webpack_require__(255);
+	
+	var SELECT_TOPIC = _require3.SELECT_TOPIC;
+	var TOGGLE_TOPICS = _require3.TOGGLE_TOPICS;
+	
+	var Topics = function (_React$Component) {
+		_inherits(Topics, _React$Component);
+	
+		function Topics() {
+			_classCallCheck(this, Topics);
+	
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Topics).apply(this, arguments));
+		}
+	
+		_createClass(Topics, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+	
+				console.log('componentDidMount');
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+	
+				console.log('Render topics');
+				console.log(this.props);
+	
+				return React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'button',
+						null,
+						'Select topic'
+					),
+					React.createElement(
+						'ul',
+						null,
+						React.createElement(
+							'li',
+							null,
+							'Topic one'
+						),
+						React.createElement(
+							'li',
+							null,
+							'Topic one'
+						)
+					)
+				);
+			}
+		}]);
+	
+		return Topics;
+	}(React.Component);
+	
+	function mapStateToProps(state) {
+	
+		console.log('mapStateToProps | topics');
+		console.log(state);
+	
+		return state;
+	}
+	
+	function mapDispatchToProps(dispatch) {
+	
+		// return bindActionCreators({UPDATE_LOADER}, dispatch);
+	
+		var selectTopic = function selectTopic(operation, topic) {
+			dispatch({
+				type: 'topics', // State.
+				operation: operation, // Action.
+				topic: topic // Params.
+			});
+	
+			// multipe dispatches here to ping the API too?
+		};
+	
+		var toggleTopics = function toggleTopics(operation, status) {
+			dispatch({
+				type: 'topics', // State.
+				operation: operation, // Action.
+				status: status // Params.
+			});
+		};
+	
+		return { selectTopic: selectTopic, toggleTopics: toggleTopics };
+	}
+	
+	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);
 
 /***/ }
 /******/ ]);

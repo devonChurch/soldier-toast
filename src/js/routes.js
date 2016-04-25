@@ -3,6 +3,8 @@ const ReactDOM = require('react-dom');
 const {Router, Route, IndexRoute, Redirect, Link, IndexLink, browserHistory} = require('react-router');
 const Faq = require('./faq');
 
+
+
 const routes = (
 	<Route>
 		<Route path="/:topic" component={Faq} />

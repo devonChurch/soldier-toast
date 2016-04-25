@@ -2,6 +2,7 @@
 
 const React = require('react');
 const {Link} = require('react-router');
+const Topics = require('./topics');
 const Questions = require('./questions');
 
 class Faq extends React.Component {
@@ -18,12 +19,17 @@ class Faq extends React.Component {
 	render() {
 
 		// console.log(this);
-		// console.log(this.props);
+		console.log('render | faq');
+		console.log(this.props);
+		console.log(this.props.route.apple);
 
 		return (
 			<div>
 				<h1>FAQ</h1>
-				<Questions />
+				<nav>
+					<Topics />
+				</nav>
+				<Questions {...this.props.route.apple}/>
 			</div>
 		);
 
