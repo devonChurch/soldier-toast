@@ -27188,6 +27188,8 @@
 	
 	var UPDATE_LOADER = _require3.UPDATE_LOADER;
 	
+	var questionPath = __webpack_require__(258);
+	
 	var Questions = function (_React$Component) {
 		_inherits(Questions, _React$Component);
 	
@@ -27274,13 +27276,16 @@
 	
 				return this.questions.map(function (question, id) {
 	
+					var heading = question.heading;
+					var path = questionPath(heading);
+	
 					return React.createElement(
 						'li',
 						{ key: id },
 						React.createElement(
-							'button',
-							null,
-							question.heading
+							Link,
+							{ to: path },
+							heading
 						),
 						React.createElement(
 							'div',
@@ -27288,7 +27293,7 @@
 							React.createElement(
 								'h3',
 								null,
-								question.heading
+								heading
 							),
 							React.createElement(
 								'p',
@@ -27545,6 +27550,19 @@
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);
+
+/***/ },
+/* 258 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	function generate(path) {
+	
+		return path.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
+	}
+	
+	module.exports = generate;
 
 /***/ }
 /******/ ]);

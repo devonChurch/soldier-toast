@@ -4,6 +4,7 @@ const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
 const {UPDATE_LOADER} = require('./actions');
+const questionPath = require('./question-path');
 
 class Questions extends React.Component {
 
@@ -83,11 +84,14 @@ class Questions extends React.Component {
 
 		return this.questions.map((question, id) => {
 
+			const heading = question.heading;
+			const path = questionPath(heading);
+
 			return (
 				<li key={id}>
-					<button>{question.heading}</button>
+					<Link to={path}>{heading}</Link>
 					<div>
-						<h3>{question.heading}</h3>
+						<h3>{heading}</h3>
 						<p>{question.description}</p>
 					</div>
 				</li>
