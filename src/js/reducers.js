@@ -22,18 +22,21 @@ function api(state = {
 }
 
 function topics(state = {
-	current: null,
+	current: 'all',
 	open: false
 }, action) {
 
+	console.log(' ** ** ** ** **');
 	console.log('reducer | topics');
 	console.log(action);
+	console.log(state);
+	console.log(' ** ** ** ** **');
 
 	switch(action.operation) {
 
 		case SELECT_TOPIC:
 			console.log('SELECT_TOPIC');
-			break;
+			return {...state, current: action.topic};
 
 		case TOGGLE_TOPICS:
 			console.log('TOGGLE_TOPICS');

@@ -47,12 +47,17 @@ function mergeFeed(keys) {
  * If there was a successful question match from matchQuestion() then we extract
  * it and bump it up to the top question in the JSON array.
  * @param {array} JSON - The extracted feed content.
- * @param {number} i - The array id of the matched content.
+ * @param {number} id - The array id of the matched content.
  * @return {array} The reordered JSON data.
  */
-function extractQuestion(json, i) {
+function extractQuestion(json, id) {
 
-    const match = json.splice(i, 1);
+    console.log(' - - ');
+    console.log('extractQuestion');
+
+    const match = json.splice(id, 1);
+    console.log(match);
+    console.log([...match, ...json]);
 
     return [...match, ...json];
 
@@ -70,6 +75,8 @@ function extractQuestion(json, i) {
  */
 function matchQuestion(json, path) {
 
+    let id = null;
+
     for (let i = 0; i < json.length; i += 1) {
 
         const heading = json[i].heading;
@@ -79,15 +86,14 @@ function matchQuestion(json, path) {
 
         if (compare === path) {
 
-            json = extractQuestion(json, i);
-
+            id = i;
             break;
 
         }
 
     }
 
-    return json;
+    return id === null ? json : extractQuestion(json, id);
 
 }
 

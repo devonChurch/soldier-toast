@@ -27148,9 +27148,9 @@
 					React.createElement(
 						'nav',
 						null,
-						React.createElement(Topics, null)
+						React.createElement(Topics, this.props)
 					),
-					React.createElement(Questions, this.props.route.apple)
+					React.createElement(Questions, this.props)
 				);
 			}
 		}]);
@@ -27196,8 +27196,6 @@
 		function Questions() {
 			_classCallCheck(this, Questions);
 	
-			console.log('** Questions (constructor)');
-	
 			// *** Change this to be part of the state as it will constantly change and will work well when using redux dev tools....
 	
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Questions).call(this));
@@ -27211,8 +27209,6 @@
 			key: 'componentDidMount',
 			value: function componentDidMount() {
 	
-				console.log('componentDidMount');
-	
 				this.fetch();
 			}
 		}, {
@@ -27223,6 +27219,17 @@
 				this.request.abort();
 			}
 		}, {
+			key: 'generateUrl',
+			value: function generateUrl() {
+				var _props$routeParams = this.props.routeParams;
+				var topic = _props$routeParams.topic;
+				var _props$routeParams$qu = _props$routeParams.question;
+				var question = _props$routeParams$qu === undefined ? '' : _props$routeParams$qu;
+	
+	
+				return '/api/' + topic + '/' + question;
+			}
+		}, {
 			key: 'fetch',
 			value: function fetch() {
 				var _this2 = this;
@@ -27230,10 +27237,10 @@
 				console.log('fetch | questions');
 	
 				var request = new XMLHttpRequest();
-				var url = this.props.api.request;
+				var url = this.generateUrl();
 				console.log(url);
 	
-				request.open('GET', '/api' + url, true);
+				request.open('GET', url, true);
 	
 				request.onload = function () {
 	
@@ -27242,6 +27249,7 @@
 						console.log('success');
 	
 						_this2.questions = JSON.parse(request.responseText);
+						console.log(_this2.questions);
 						_this2.props.updateLoader(UPDATE_LOADER, false);
 					} else {
 						// We reached our target server, but it returned an error
@@ -27270,9 +27278,8 @@
 		}, {
 			key: 'compile',
 			value: function compile() {
+				var topic = this.props.routeParams.topic;
 	
-				console.log('compile | questions');
-				console.log(this.questions);
 	
 				return this.questions.map(function (question, id) {
 	
@@ -27284,7 +27291,7 @@
 						{ key: id },
 						React.createElement(
 							Link,
-							{ to: path },
+							{ to: '/' + topic + '/' + path },
 							heading
 						),
 						React.createElement(
@@ -27308,11 +27315,10 @@
 			key: 'render',
 			value: function render() {
 	
-				console.log('Render questions');
+				console.log('render | questions');
 				console.log(this.props);
 	
 				var loading = this.props.api.loading;
-				console.log('loading', loading);
 				var questions = loading ? this.loader() : this.compile();
 	
 				return React.createElement(
@@ -27327,9 +27333,6 @@
 	}(React.Component);
 	
 	function mapStateToProps(state) {
-	
-		console.log('mapStateToProps | Questions');
-		console.log(state);
 	
 		return state;
 	}
@@ -27405,20 +27408,23 @@
 	
 	function topics() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			current: null,
+			current: 'all',
 			open: false
 		} : arguments[0];
 		var action = arguments[1];
 	
 	
+		console.log(' ** ** ** ** **');
 		console.log('reducer | topics');
 		console.log(action);
+		console.log(state);
+		console.log(' ** ** ** ** **');
 	
 		switch (action.operation) {
 	
 			case SELECT_TOPIC:
 				console.log('SELECT_TOPIC');
-				break;
+				return _extends({}, state, { current: action.topic });
 	
 			case TOGGLE_TOPICS:
 				console.log('TOGGLE_TOPICS');
@@ -27462,6 +27468,7 @@
 	
 	var _require3 = __webpack_require__(255);
 	
+	var UPDATE_LOADER = _require3.UPDATE_LOADER;
 	var SELECT_TOPIC = _require3.SELECT_TOPIC;
 	var TOGGLE_TOPICS = _require3.TOGGLE_TOPICS;
 	
@@ -27471,21 +27478,33 @@
 		function Topics() {
 			_classCallCheck(this, Topics);
 	
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(Topics).apply(this, arguments));
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Topics).call(this));
 		}
 	
 		_createClass(Topics, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
+			key: 'changeTopic',
+			value: function changeTopic(topic) {
 	
-				console.log('componentDidMount');
+				console.log('changeTopic');
+	
+				if (topic !== this.props.routeParams.topic) {
+					//
+					console.log('  --> topics DONT match = [update]', topic);
+					console.log(this.props);
+					//
+					this.props.selectTopic(SELECT_TOPIC, topic);
+					this.props.updateLoader(UPDATE_LOADER, true);
+					//
+				}
 			}
 		}, {
 			key: 'render',
 			value: function render() {
+				var _this2 = this;
 	
 				console.log('Render topics');
 				console.log(this.props);
+				// console.log(this.props.static.topics);
 	
 				return React.createElement(
 					'div',
@@ -27496,17 +27515,41 @@
 						'Select topic'
 					),
 					React.createElement(
-						'ul',
+						'div',
 						null,
 						React.createElement(
-							'li',
+							'ul',
 							null,
-							'Topic one'
+							this.props.static.topics.map(function (topic, id) {
+	
+								console.log(topic);
+	
+								return React.createElement(
+									'li',
+									{ key: id },
+									React.createElement(
+										Link,
+										{ to: topic.url },
+										React.createElement(
+											'h2',
+											{ onClick: function onClick() {
+													return _this2.changeTopic(topic.url);
+												} },
+											topic.heading
+										)
+									),
+									React.createElement(
+										'p',
+										null,
+										topic.description
+									)
+								);
+							})
 						),
 						React.createElement(
-							'li',
-							null,
-							'Topic one'
+							Link,
+							{ to: '/all' },
+							'View all questions'
 						)
 					)
 				);
@@ -27517,9 +27560,6 @@
 	}(React.Component);
 	
 	function mapStateToProps(state) {
-	
-		console.log('mapStateToProps | topics');
-		console.log(state);
 	
 		return state;
 	}
@@ -27534,19 +27574,26 @@
 				operation: operation, // Action.
 				topic: topic // Params.
 			});
-	
-			// multipe dispatches here to ping the API too?
 		};
 	
-		var toggleTopics = function toggleTopics(operation, status) {
+		var updateLoader = function updateLoader(operation, status) {
 			dispatch({
-				type: 'topics', // State.
+				type: 'api', // State.
 				operation: operation, // Action.
 				status: status // Params.
 			});
 		};
+		//
+		// const toggleTopics = (operation, status) => {
+		// 	dispatch({
+		// 		type: 'topics', // State.
+		// 		operation, // Action.
+		// 		status // Params.
+		// 	});
+		// };
 	
-		return { selectTopic: selectTopic, toggleTopics: toggleTopics };
+		// return {selectTopic, updateLoader, toggleTopics};
+		return { selectTopic: selectTopic, updateLoader: updateLoader };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);

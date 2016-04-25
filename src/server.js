@@ -88,11 +88,10 @@ app.get('*', (req, res) => {
 
             const store = {
                 api: {
-                    request: '/',
                     loading: true
                 },
                 topics: {
-                    current: null,
+                    current: 'all',
                     open: false
                 },
                 bar: [3, 4]

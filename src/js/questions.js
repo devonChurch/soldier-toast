@@ -10,8 +10,6 @@ class Questions extends React.Component {
 
 	constructor() {
 
-		console.log('** Questions (constructor)');
-
 		super();
 
 		// *** Change this to be part of the state as it will constantly change and will work well when using redux dev tools....
@@ -21,8 +19,6 @@ class Questions extends React.Component {
 	}
 
 	componentDidMount() {
-
-		console.log('componentDidMount');
 
 		this.fetch();
 
@@ -35,15 +31,23 @@ class Questions extends React.Component {
 
 	}
 
+	generateUrl() {
+
+		const {topic, question = ''} = this.props.routeParams;
+
+		return `/api/${topic}/${question}`;
+
+	}
+
 	fetch() {
 
 		console.log('fetch | questions');
 
 		const request = new XMLHttpRequest();
-		const url = this.props.api.request;
+		const url = this.generateUrl();
 		console.log(url);
 
-		request.open('GET', `/api${url}`, true);
+		request.open('GET', url, true);
 
 		request.onload = () => {
 
@@ -52,6 +56,7 @@ class Questions extends React.Component {
 				console.log('success');
 
 				this.questions = JSON.parse(request.responseText);
+				console.log(this.questions);
 				this.props.updateLoader(UPDATE_LOADER, false);
 
 			} else {
@@ -79,8 +84,7 @@ class Questions extends React.Component {
 
 	compile() {
 
-		console.log('compile | questions');
-		console.log(this.questions);
+		const {topic} = this.props.routeParams;
 
 		return this.questions.map((question, id) => {
 
@@ -89,7 +93,7 @@ class Questions extends React.Component {
 
 			return (
 				<li key={id}>
-					<Link to={path}>{heading}</Link>
+					<Link to={`/${topic}/${path}`}>{heading}</Link>
 					<div>
 						<h3>{heading}</h3>
 						<p>{question.description}</p>
@@ -103,11 +107,10 @@ class Questions extends React.Component {
 
 	render() {
 
-		console.log('Render questions');
+		console.log('render | questions');
 		console.log(this.props);
 
 		const loading = this.props.api.loading;
-		console.log('loading', loading);
 		const questions = loading ? this.loader() : this.compile();
 
 
@@ -122,9 +125,6 @@ class Questions extends React.Component {
 }
 
 function mapStateToProps(state) {
-
-	console.log('mapStateToProps | Questions');
-	console.log(state);
 
 	return state;
 
