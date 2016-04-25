@@ -35,12 +35,10 @@ function topics(state = {
 	switch(action.operation) {
 
 		case SELECT_TOPIC:
-			console.log('SELECT_TOPIC');
 			return {...state, current: action.topic};
 
 		case TOGGLE_TOPICS:
-			console.log('TOGGLE_TOPICS');
-			break;
+			return {...state, open: !state.open};
 
 	}
 

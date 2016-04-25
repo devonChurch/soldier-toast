@@ -57,7 +57,7 @@ class Questions extends React.Component {
 
 				this.questions = JSON.parse(request.responseText);
 				console.log(this.questions);
-				this.props.updateLoader(UPDATE_LOADER, false);
+				this.props.updateLoader(false);
 
 			} else {
 				// We reached our target server, but it returned an error
@@ -134,10 +134,10 @@ function mapDispatchToProps(dispatch) {
 
 	// return bindActionCreators({UPDATE_LOADER}, dispatch);
 
-	const updateLoader = (operation, status) => {
+	const updateLoader = (status) => {
 		dispatch({
 			type: 'api', // State.
-			operation, // Action.
+			operation: UPDATE_LOADER, // Action.
 			status // Params.
 		});
 	};

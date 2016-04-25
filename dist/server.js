@@ -49156,7 +49156,7 @@
 	
 						_this2.questions = JSON.parse(request.responseText);
 						console.log(_this2.questions);
-						_this2.props.updateLoader(UPDATE_LOADER, false);
+						_this2.props.updateLoader(false);
 					} else {
 						// We reached our target server, but it returned an error
 						console.log('error');
@@ -49247,10 +49247,10 @@
 	
 		// return bindActionCreators({UPDATE_LOADER}, dispatch);
 	
-		var updateLoader = function updateLoader(operation, status) {
+		var updateLoader = function updateLoader(status) {
 			dispatch({
 				type: 'api', // State.
-				operation: operation, // Action.
+				operation: UPDATE_LOADER, // Action.
 				status: status // Params.
 			});
 		};
@@ -51291,8 +51291,8 @@
 					console.log('  --> topics DONT match = [update]', topic);
 					console.log(this.props);
 					//
-					this.props.selectTopic(SELECT_TOPIC, topic);
-					this.props.updateLoader(UPDATE_LOADER, true);
+					this.props.selectTopic(topic);
+					this.props.updateLoader(true);
 					//
 				}
 			}
@@ -51305,41 +51305,45 @@
 				console.log(this.props);
 				// console.log(this.props.static.topics);
 	
+				var toggleClassName = this.props.topics.open ? 'topics__dropdown topics__dropdown--open' : 'topics__dropdown';
+	
 				return React.createElement(
 					'div',
-					null,
+					{ className: 'topics' },
 					React.createElement(
 						'button',
-						null,
+						{ className: 'topics__toggle', onClick: function onClick() {
+								return _this2.props.toggleTopics();
+							} },
 						'Select topic'
 					),
 					React.createElement(
 						'div',
-						null,
+						{ className: toggleClassName },
 						React.createElement(
 							'ul',
-							null,
+							{ className: 'topics__list' },
 							this.props.static.topics.map(function (topic, id) {
 	
 								console.log(topic);
 	
 								return React.createElement(
 									'li',
-									{ key: id },
+									{ className: 'topics__item', key: id },
 									React.createElement(
 										Link,
-										{ to: topic.url },
+										{ className: 'topics__link', to: topic.url, onClick: function onClick() {
+												return _this2.changeTopic(topic.url);
+											} },
 										React.createElement(
 											'h2',
-											{ onClick: function onClick() {
-													return _this2.changeTopic(topic.url);
-												} },
+											{ className: 'topics__heading' },
 											topic.heading
 										)
 									),
 									React.createElement(
 										'p',
-										null,
+										{ className: 'topics__description' },
 										topic.description
 									)
 								);
@@ -51347,7 +51351,9 @@
 						),
 						React.createElement(
 							Link,
-							{ to: '/all' },
+							{ className: 'topics__all', to: '/all', onClick: function onClick() {
+									return _this2.changeTopic('all');
+								} },
 							'View all questions'
 						)
 					)
@@ -51367,32 +51373,30 @@
 	
 		// return bindActionCreators({UPDATE_LOADER}, dispatch);
 	
-		var selectTopic = function selectTopic(operation, topic) {
+		var selectTopic = function selectTopic(topic) {
 			dispatch({
 				type: 'topics', // State.
-				operation: operation, // Action.
+				operation: SELECT_TOPIC, // Action.
 				topic: topic // Params.
 			});
 		};
 	
-		var updateLoader = function updateLoader(operation, status) {
+		var updateLoader = function updateLoader(status) {
 			dispatch({
 				type: 'api', // State.
-				operation: operation, // Action.
+				operation: UPDATE_LOADER, // Action.
 				status: status // Params.
 			});
 		};
-		//
-		// const toggleTopics = (operation, status) => {
-		// 	dispatch({
-		// 		type: 'topics', // State.
-		// 		operation, // Action.
-		// 		status // Params.
-		// 	});
-		// };
 	
-		// return {selectTopic, updateLoader, toggleTopics};
-		return { selectTopic: selectTopic, updateLoader: updateLoader };
+		var toggleTopics = function toggleTopics() {
+			dispatch({
+				type: 'topics', // State.
+				operation: TOGGLE_TOPICS // Action.
+			});
+		};
+	
+		return { selectTopic: selectTopic, updateLoader: updateLoader, toggleTopics: toggleTopics };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);

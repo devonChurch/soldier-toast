@@ -1,0 +1,10 @@
+.topics {
+
+    &__dropdown {
+        display: none;
+
+        &--open {
+            display: block;
+        }
+    }
+}

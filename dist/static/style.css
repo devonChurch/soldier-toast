@@ -1,4 +1,9 @@
 body {
   color: orange !important; }
 
+.topics__dropdown {
+  display: none; }
+  .topics__dropdown--open {
+    display: block; }
+
 /*# sourceMappingURL=style.css.map*/

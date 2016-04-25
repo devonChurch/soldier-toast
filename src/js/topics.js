@@ -23,8 +23,8 @@ class Topics extends React.Component {
 			console.log('  --> topics DONT match = [update]', topic);
 			console.log(this.props);
 		//
-			this.props.selectTopic(SELECT_TOPIC, topic);
-			this.props.updateLoader(UPDATE_LOADER, true);
+			this.props.selectTopic(topic);
+			this.props.updateLoader(true);
 		//
 		}
 
@@ -36,29 +36,31 @@ class Topics extends React.Component {
 		console.log(this.props);
 		// console.log(this.props.static.topics);
 
+		const toggleClassName = this.props.topics.open ? 'topics__dropdown topics__dropdown--open' : 'topics__dropdown';
+
 		return (
-			<div>
-				<button>Select topic</button>
-				<div>
-					<ul>
+			<div className="topics">
+				<button className="topics__toggle" onClick={() => this.props.toggleTopics()}>Select topic</button>
+				<div className={toggleClassName}>
+					<ul className="topics__list">
 						{
 							this.props.static.topics.map((topic, id) => {
 
 								console.log(topic);
 
 								return (
-									<li key={id}>
-										<Link to={topic.url} >
-											<h2 onClick={() => this.changeTopic(topic.url)}>{topic.heading}</h2>
+									<li className="topics__item" key={id}>
+										<Link className="topics__link" to={topic.url} onClick={() => this.changeTopic(topic.url)}>
+											<h2 className="topics__heading">{topic.heading}</h2>
 										</Link>
-										<p>{topic.description}</p>
+										<p className="topics__description">{topic.description}</p>
 									</li>
 								);
 
 							})
 						}
 					</ul>
-					<Link to="/all">View all questions</Link>
+					<Link className="topics__all" to="/all" onClick={() => this.changeTopic('all')}>View all questions</Link>
 				</div>
 			</div>
 		);
@@ -77,32 +79,30 @@ function mapDispatchToProps(dispatch) {
 
 	// return bindActionCreators({UPDATE_LOADER}, dispatch);
 
-	const selectTopic = (operation, topic) => {
+	const selectTopic = (topic) => {
 		dispatch({
 			type: 'topics', // State.
-			operation, // Action.
+			operation: SELECT_TOPIC, // Action.
 			topic // Params.
 		});
 	};
 
-	const updateLoader = (operation, status) => {
+	const updateLoader = (status) => {
 		dispatch({
 			type: 'api', // State.
-			operation, // Action.
+			operation: UPDATE_LOADER, // Action.
 			status // Params.
 		});
 	};
-	//
-	// const toggleTopics = (operation, status) => {
-	// 	dispatch({
-	// 		type: 'topics', // State.
-	// 		operation, // Action.
-	// 		status // Params.
-	// 	});
-	// };
 
-	// return {selectTopic, updateLoader, toggleTopics};
-	return {selectTopic, updateLoader};
+	const toggleTopics = () => {
+		dispatch({
+			type: 'topics', // State.
+			operation: TOGGLE_TOPICS // Action.
+		});
+	};
+
+	return {selectTopic, updateLoader, toggleTopics};
 
 }
 
