@@ -1,10 +1,20 @@
 .topics {
 
-    &__dropdown {
-        display: none;
+    &__toggle {
 
         &--open {
-            display: block;
+            color: red;
+        }
+    }
+
+    &__dropdown {
+        max-height: 0px;
+        overflow: hidden;
+        transition: max-height 1s ease-out;
+
+        .topics__toggle--open ~ & {
+            max-height: 1000px;
+    		transition: max-height 1s ease-in;
         }
     }
 }

@@ -1,5 +1,6 @@
 'use strict';
 
+const $ = require('jquery');
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
@@ -36,12 +37,12 @@ class Topics extends React.Component {
 		console.log(this.props);
 		// console.log(this.props.static.topics);
 
-		const toggleClassName = this.props.topics.open ? 'topics__dropdown topics__dropdown--open' : 'topics__dropdown';
+		const toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
 
 		return (
 			<div className="topics">
-				<button className="topics__toggle" onClick={() => this.props.toggleTopics()}>Select topic</button>
-				<div className={toggleClassName}>
+				<button className={toggleClassName} onClick={() => this.props.toggleTopics()}>Select topic</button>
+				<div className="topics__dropdown">
 					<ul className="topics__list">
 						{
 							this.props.static.topics.map((topic, id) => {
@@ -89,7 +90,7 @@ function mapDispatchToProps(dispatch) {
 
 	const updateLoader = (status) => {
 		dispatch({
-			type: 'api', // State.
+			type: 'questions', // State.
 			operation: UPDATE_LOADER, // Action.
 			status // Params.
 		});

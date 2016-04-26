@@ -87,8 +87,9 @@ app.get('*', (req, res) => {
             json = curate(req.url);
 
             const store = {
-                api: {
-                    loading: true
+                questions: {
+                    loading: true,
+                    data: []
                 },
                 topics: {
                     current: 'all',

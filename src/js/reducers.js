@@ -1,19 +1,22 @@
 'use strict';
 
-const {UPDATE_LOADER, FETCH_QUESTIONS, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
+const {UPDATE_LOADER, UPDATE_DATA, FETCH_QUESTIONS, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
-function api(state = {
-	request: '/',
-	loading: true
+function questions(state = {
+	loading: true,
+	data: []
 }, action) {
 
-	console.log('reducer | api');
+	console.log('reducer | questions');
 	console.log(action);
 
 	switch(action.operation) {
 
 		case UPDATE_LOADER:
 			return {...state, loading: action.status};
+
+		case UPDATE_DATA:
+			return {...state, data: action.data};
 
 	}
 
@@ -52,4 +55,4 @@ function bar() {
 
 }
 
-module.exports = {api, topics, bar};
+module.exports = {questions, topics, bar};

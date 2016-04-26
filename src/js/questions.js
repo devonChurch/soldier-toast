@@ -3,7 +3,7 @@
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
-const {UPDATE_LOADER} = require('./actions');
+const {UPDATE_LOADER, UPDATE_DATA} = require('./actions');
 const questionPath = require('./question-path');
 
 class Questions extends React.Component {
@@ -11,10 +11,6 @@ class Questions extends React.Component {
 	constructor() {
 
 		super();
-
-		// *** Change this to be part of the state as it will constantly change and will work well when using redux dev tools....
-		this.questions = null;
-
 
 	}
 
@@ -55,9 +51,11 @@ class Questions extends React.Component {
 				// Success!
 				console.log('success');
 
-				this.questions = JSON.parse(request.responseText);
-				console.log(this.questions);
+				const data = JSON.parse(request.responseText);
+				console.log(data);
+				this.props.updateData(data);
 				this.props.updateLoader(false);
+
 
 			} else {
 				// We reached our target server, but it returned an error
@@ -86,17 +84,20 @@ class Questions extends React.Component {
 
 		const {topic} = this.props.routeParams;
 
-		return this.questions.map((question, id) => {
+		console.log('+++++ compile');
+		console.log(this.props.questions.data);
+
+		return this.props.questions.data.map((question, id) => {
 
 			const heading = question.heading;
 			const path = questionPath(heading);
 
 			return (
-				<li key={id}>
-					<Link to={`/${topic}/${path}`}>{heading}</Link>
-					<div>
-						<h3>{heading}</h3>
-						<p>{question.description}</p>
+				<li className="questions__item" key={id}>
+					<Link className="questions__toggle" to={`/${topic}/${path}`}>{heading}</Link>
+					<div className="questions__dropdown">
+						<h3 className="questions__heading">{heading}</h3>
+						<p className="questions__description">{question.description}</p>
 					</div>
 				</li>
 			);
@@ -110,14 +111,16 @@ class Questions extends React.Component {
 		console.log('render | questions');
 		console.log(this.props);
 
-		const loading = this.props.api.loading;
+		const loading = this.props.questions.loading;
 		const questions = loading ? this.loader() : this.compile();
 
 
 		return (
-			<ul>
-				{questions}
-			</ul>
+			<div className="questions">
+				<ul className="questions__list">
+					{questions}
+				</ul>
+			</div>
 		);
 
 	}
@@ -136,13 +139,21 @@ function mapDispatchToProps(dispatch) {
 
 	const updateLoader = (status) => {
 		dispatch({
-			type: 'api', // State.
+			type: 'questions', // State.
 			operation: UPDATE_LOADER, // Action.
 			status // Params.
 		});
 	};
 
-	return {updateLoader};
+	const updateData = (data) => {
+		dispatch({
+			type: 'questions', // State.
+			operation: UPDATE_DATA, // Action.
+			data // Params.
+		});
+	};
+
+	return {updateLoader, updateData};
 
 }
 
