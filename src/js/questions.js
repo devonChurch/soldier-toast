@@ -3,7 +3,7 @@
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
-const {UPDATE_LOADER, UPDATE_DATA} = require('./actions');
+const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION} = require('./actions');
 const questionPath = require('./question-path');
 
 class Questions extends React.Component {
@@ -83,21 +83,26 @@ class Questions extends React.Component {
 	compile() {
 
 		const {topic} = this.props.routeParams;
+		const {data, open} = this.props.questions;
 
-		console.log('+++++ compile');
-		console.log(this.props.questions.data);
+		// console.log('+++++ compile');
+		// console.log(this.props.questions.data);
+		// () => this.toggleQuestion(id)
 
-		return this.props.questions.data.map((question, id) => {
+		return data.map((question, id) => {
 
-			const heading = question.heading;
+			console.log(`${id} === ${open}`);
+
+			const {heading, description} = question;
 			const path = questionPath(heading);
+			const toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
 
 			return (
 				<li className="questions__item" key={id}>
-					<Link className="questions__toggle" to={`/${topic}/${path}`}>{heading}</Link>
+					<Link className={toggleClassName} to={`/${topic}/${path}`} onClick={() => this.props.toggleQuestion(id)}>{heading}</Link>
 					<div className="questions__dropdown">
 						<h3 className="questions__heading">{heading}</h3>
-						<p className="questions__description">{question.description}</p>
+						<p className="questions__description">{description}</p>
 					</div>
 				</li>
 			);
@@ -108,12 +113,11 @@ class Questions extends React.Component {
 
 	render() {
 
-		console.log('render | questions');
-		console.log(this.props);
+		// console.log('render | questions');
+		// console.log(this.props);
 
 		const loading = this.props.questions.loading;
 		const questions = loading ? this.loader() : this.compile();
-
 
 		return (
 			<div className="questions">
@@ -153,7 +157,15 @@ function mapDispatchToProps(dispatch) {
 		});
 	};
 
-	return {updateLoader, updateData};
+	const toggleQuestion = (id) => {
+		dispatch({
+			type: 'questions', // State.
+			operation: TOGGLE_QUESTION, // Action.
+			id // Params.
+		});
+	};
+
+	return {updateLoader, updateData, toggleQuestion};
 
 }
 

@@ -89,6 +89,7 @@ app.get('*', (req, res) => {
             const store = {
                 questions: {
                     loading: true,
+                    open: 0,
                     data: []
                 },
                 topics: {

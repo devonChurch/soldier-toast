@@ -27188,6 +27188,7 @@
 	
 	var UPDATE_LOADER = _require3.UPDATE_LOADER;
 	var UPDATE_DATA = _require3.UPDATE_DATA;
+	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
 	
 	var questionPath = __webpack_require__(258);
 	
@@ -27274,23 +27275,35 @@
 		}, {
 			key: 'compile',
 			value: function compile() {
+				var _this3 = this;
+	
 				var topic = this.props.routeParams.topic;
+				var _props$questions = this.props.questions;
+				var data = _props$questions.data;
+				var open = _props$questions.open;
 	
+				// console.log('+++++ compile');
+				// console.log(this.props.questions.data);
+				// () => this.toggleQuestion(id)
 	
-				console.log('+++++ compile');
-				console.log(this.props.questions.data);
+				return data.map(function (question, id) {
 	
-				return this.props.questions.data.map(function (question, id) {
+					console.log(id + ' === ' + open);
 	
 					var heading = question.heading;
+					var description = question.description;
+	
 					var path = questionPath(heading);
+					var toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
 	
 					return React.createElement(
 						'li',
 						{ className: 'questions__item', key: id },
 						React.createElement(
 							Link,
-							{ className: 'questions__toggle', to: '/' + topic + '/' + path },
+							{ className: toggleClassName, to: '/' + topic + '/' + path, onClick: function onClick() {
+									return _this3.props.toggleQuestion(id);
+								} },
 							heading
 						),
 						React.createElement(
@@ -27304,7 +27317,7 @@
 							React.createElement(
 								'p',
 								{ className: 'questions__description' },
-								question.description
+								description
 							)
 						)
 					);
@@ -27314,8 +27327,8 @@
 			key: 'render',
 			value: function render() {
 	
-				console.log('render | questions');
-				console.log(this.props);
+				// console.log('render | questions');
+				// console.log(this.props);
 	
 				var loading = this.props.questions.loading;
 				var questions = loading ? this.loader() : this.compile();
@@ -27360,7 +27373,15 @@
 			});
 		};
 	
-		return { updateLoader: updateLoader, updateData: updateData };
+		var toggleQuestion = function toggleQuestion(id) {
+			dispatch({
+				type: 'questions', // State.
+				operation: TOGGLE_QUESTION, // Action.
+				id: id // Params.
+			});
+		};
+	
+		return { updateLoader: updateLoader, updateData: updateData, toggleQuestion: toggleQuestion };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Questions);
@@ -27374,7 +27395,7 @@
 	var actions = {
 		UPDATE_LOADER: 'UPDATE_LOADER',
 		UPDATE_DATA: 'UPDATE_DATA',
-		FETCH_QUESTIONS: 'FETCH_QUESTIONS',
+		TOGGLE_QUESTION: 'TOGGLE_QUESTION',
 		SELECT_TOPIC: 'SELECT_TOPIC',
 		TOGGLE_TOPICS: 'TOGGLE_TOPICS'
 	};
@@ -27393,7 +27414,7 @@
 	
 	var UPDATE_LOADER = _require.UPDATE_LOADER;
 	var UPDATE_DATA = _require.UPDATE_DATA;
-	var FETCH_QUESTIONS = _require.FETCH_QUESTIONS;
+	var TOGGLE_QUESTION = _require.TOGGLE_QUESTION;
 	var SELECT_TOPIC = _require.SELECT_TOPIC;
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
@@ -27401,6 +27422,7 @@
 	function questions() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
 			loading: true,
+			open: null,
 			data: []
 		} : arguments[0];
 		var action = arguments[1];
@@ -27417,9 +27439,13 @@
 			case UPDATE_DATA:
 				return _extends({}, state, { data: action.data });
 	
-		}
+			case TOGGLE_QUESTION:
+				return _extends({}, state, { open: action.id });
 	
-		return state;
+			default:
+				return state;
+	
+		}
 	}
 	
 	function topics() {
@@ -27430,11 +27456,8 @@
 		var action = arguments[1];
 	
 	
-		console.log(' ** ** ** ** **');
 		console.log('reducer | topics');
 		console.log(action);
-		console.log(state);
-		console.log(' ** ** ** ** **');
 	
 		switch (action.operation) {
 	
@@ -27444,9 +27467,10 @@
 			case TOGGLE_TOPICS:
 				return _extends({}, state, { open: !state.open });
 	
-		}
+			default:
+				return state;
 	
-		return state;
+		}
 	}
 	
 	function bar() {

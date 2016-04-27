@@ -1,9 +1,10 @@
 'use strict';
 
-const {UPDATE_LOADER, UPDATE_DATA, FETCH_QUESTIONS, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
+const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
 function questions(state = {
 	loading: true,
+	open: null,
 	data: []
 }, action) {
 
@@ -18,9 +19,13 @@ function questions(state = {
 		case UPDATE_DATA:
 			return {...state, data: action.data};
 
-	}
+		case TOGGLE_QUESTION:
+			return {...state, open: action.id};
 
-	return state;
+		default:
+			return state;
+
+	}
 
 }
 
@@ -29,11 +34,8 @@ function topics(state = {
 	open: false
 }, action) {
 
-	console.log(' ** ** ** ** **');
 	console.log('reducer | topics');
 	console.log(action);
-	console.log(state);
-	console.log(' ** ** ** ** **');
 
 	switch(action.operation) {
 
@@ -43,9 +45,10 @@ function topics(state = {
 		case TOGGLE_TOPICS:
 			return {...state, open: !state.open};
 
-	}
+		default:
+			return state;
 
-	return state;
+	}
 
 }
 

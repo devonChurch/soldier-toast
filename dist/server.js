@@ -139,6 +139,7 @@
 	            var store = {
 	                questions: {
 	                    loading: true,
+	                    open: 0,
 	                    data: []
 	                },
 	                topics: {
@@ -49095,6 +49096,7 @@
 	
 	var UPDATE_LOADER = _require3.UPDATE_LOADER;
 	var UPDATE_DATA = _require3.UPDATE_DATA;
+	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
 	
 	var questionPath = __webpack_require__(336);
 	
@@ -49181,23 +49183,35 @@
 		}, {
 			key: 'compile',
 			value: function compile() {
+				var _this3 = this;
+	
 				var topic = this.props.routeParams.topic;
+				var _props$questions = this.props.questions;
+				var data = _props$questions.data;
+				var open = _props$questions.open;
 	
+				// console.log('+++++ compile');
+				// console.log(this.props.questions.data);
+				// () => this.toggleQuestion(id)
 	
-				console.log('+++++ compile');
-				console.log(this.props.questions.data);
+				return data.map(function (question, id) {
 	
-				return this.props.questions.data.map(function (question, id) {
+					console.log(id + ' === ' + open);
 	
 					var heading = question.heading;
+					var description = question.description;
+	
 					var path = questionPath(heading);
+					var toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
 	
 					return React.createElement(
 						'li',
 						{ className: 'questions__item', key: id },
 						React.createElement(
 							Link,
-							{ className: 'questions__toggle', to: '/' + topic + '/' + path },
+							{ className: toggleClassName, to: '/' + topic + '/' + path, onClick: function onClick() {
+									return _this3.props.toggleQuestion(id);
+								} },
 							heading
 						),
 						React.createElement(
@@ -49211,7 +49225,7 @@
 							React.createElement(
 								'p',
 								{ className: 'questions__description' },
-								question.description
+								description
 							)
 						)
 					);
@@ -49221,8 +49235,8 @@
 			key: 'render',
 			value: function render() {
 	
-				console.log('render | questions');
-				console.log(this.props);
+				// console.log('render | questions');
+				// console.log(this.props);
 	
 				var loading = this.props.questions.loading;
 				var questions = loading ? this.loader() : this.compile();
@@ -49267,7 +49281,15 @@
 			});
 		};
 	
-		return { updateLoader: updateLoader, updateData: updateData };
+		var toggleQuestion = function toggleQuestion(id) {
+			dispatch({
+				type: 'questions', // State.
+				operation: TOGGLE_QUESTION, // Action.
+				id: id // Params.
+			});
+		};
+	
+		return { updateLoader: updateLoader, updateData: updateData, toggleQuestion: toggleQuestion };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Questions);
@@ -50763,7 +50785,7 @@
 	var actions = {
 		UPDATE_LOADER: 'UPDATE_LOADER',
 		UPDATE_DATA: 'UPDATE_DATA',
-		FETCH_QUESTIONS: 'FETCH_QUESTIONS',
+		TOGGLE_QUESTION: 'TOGGLE_QUESTION',
 		SELECT_TOPIC: 'SELECT_TOPIC',
 		TOGGLE_TOPICS: 'TOGGLE_TOPICS'
 	};
@@ -51183,7 +51205,7 @@
 				"description": "description two | banana"
 			},
 			{
-				"heading": "heading three",
+				"heading": "Heading three",
 				"description": "description three | banana"
 			},
 			{
