@@ -52,7 +52,9 @@ app.get('*', (req, res) => {
 
             json = curate(request);
             json = JSON.stringify(json);
+            console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
             console.log(json);
+            console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
 
             res.status(200).send(json);
 

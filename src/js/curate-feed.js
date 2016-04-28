@@ -14,6 +14,8 @@ const questionPath = require('./question-path');
  */
 function distillPath(path) {
 
+    console.log('* distillPath');
+
     // Remove any query string references.
     const index = path.indexOf('?');
     path = path.indexOf('?') > 0 ? path = path.slice(0, index) : path;
@@ -35,6 +37,8 @@ function distillPath(path) {
  */
 function mergeFeed(keys) {
 
+    console.log('* mergeFeed');
+
     const merged = [];
 
     for (let key of keys) merged.push(...feed[key]);
@@ -52,12 +56,16 @@ function mergeFeed(keys) {
  */
 function extractQuestion(json, id) {
 
-    console.log(' - - ');
-    console.log('extractQuestion');
+    // console.log(' - - ');
+    console.log('* extractQuestion');
 
     const match = json.splice(id, 1);
-    console.log(match);
-    console.log([...match, ...json]);
+    // console.log(match);
+    // console.log(' - - ');
+    // console.log(json);
+    // console.log(' - - ');
+    // console.log([...match, ...json]);
+    // console.log(' - - ');
 
     return [...match, ...json];
 
@@ -75,6 +83,8 @@ function extractQuestion(json, id) {
  */
 function matchQuestion(json, path) {
 
+    console.log('* matchQuestion');
+
     let id = null;
 
     for (let i = 0; i < json.length; i += 1) {
@@ -84,6 +94,7 @@ function matchQuestion(json, path) {
         // We generate the URL dynamically from the current questions heading.
         const compare = questionPath(heading);
 
+        console.log(`${compare} === ${path}`);
         if (compare === path) {
 
             id = i;
@@ -93,7 +104,13 @@ function matchQuestion(json, path) {
 
     }
 
-    return id === null ? json : extractQuestion(json, id);
+    const returnMe = id === null ? json : extractQuestion(json, id);
+
+    // console.log(' # # # # ');
+    // console.log(returnMe);
+    // console.log(' # # # # ');
+
+    return returnMe;
 
 }
 
@@ -105,6 +122,8 @@ function matchQuestion(json, path) {
  * @return {object} The formatted steps system.
  */
 function extrapolatePath(steps) {
+
+    console.log('* extrapolatePath');
 
     if (steps.length === 1) {
 
@@ -132,8 +151,19 @@ function curate(path) {
     const keys = Object.keys(feed);
     let json;
 
+    console.log(keys);
+
     json = feed[category] || mergeFeed(keys);
+    console.log(json);
     json = matchQuestion(json, question);
+
+    console.log(' > > > > ');
+    console.log(path);
+    console.log(`path length | ${path.length    }`);
+    console.log(`${category} | ${question}`);
+    console.log(' > > > > ');
+    console.log(json);
+    console.log(' > > > > ');
 
     return json;
 
