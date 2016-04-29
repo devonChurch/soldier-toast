@@ -1,4 +1,4 @@
-// var CopyWebpackPlugin = require('copy-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var autoprefixer = require('autoprefixer');
 
@@ -63,6 +63,11 @@ module.exports = [{
         path: __dirname + '/dist',
         filename: 'server.js'
     },
+    plugins: [
+        new CopyWebpackPlugin([
+            { from:  './feed.json', to: './feed.json' }
+        ])
+    ],
     module: {
         preLoaders: [preLoaderEslint],
         loaders: [loaderJs, loaderJson]
