@@ -7,7 +7,7 @@
     "start": "webpack && npm run server:development",
     "build:development": "webpack --watch",
     "build:production": "webpack -p",
-    "server:development": "cd ./dist && node server.js"
+    "server:development": "cd ./dist && nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "install": "^0.4.4",
     "json-loader": "^0.5.4",
     "node-sass": "^3.4.2",
+    "nodemon": "^1.9.2",
     "postcss-loader": "^0.8.1",
     "react-engine": "^3.2.0",
     "sass-loader": "^3.1.2",
