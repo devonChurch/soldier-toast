@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const debug = require('debug')('curate');
 const questionPath = require('./question-path');
 
 /**
@@ -50,7 +51,7 @@ function mergeFeed(feed) {
     const keys = Object.keys(feed);
     const merged = [];
 
-    for (let key of keys) merged.push(...feed[key]);
+    for (let key of keys) merged.push(...feed[key].questions);
 
     return merged;
 
@@ -117,6 +118,8 @@ function matchQuestion(json, path) {
  */
 function extrapolatePath(steps, feed) {
 
+
+
     if (steps.length === 1) {
 
         const category = steps[0];
@@ -143,7 +146,7 @@ function extractJson(feed, category, question) {
 
     let json;
 
-    json = feed[category] || mergeFeed(feed);
+    json = feed[category].questions || mergeFeed(feed);
     json = matchQuestion(json, question);
 
     return json;
@@ -157,7 +160,7 @@ function extractJson(feed, category, question) {
  */
 function curate(path) {
 
-    console.log('Curating feed...');
+    debug('curating feed....');
 
     const feed = getFeed();
     const steps = distillPath(path);
