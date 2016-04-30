@@ -58,12 +58,19 @@
 	var React = __webpack_require__(103);
 	var ReactDOMServer = __webpack_require__(329);
 	
-	var _require2 = __webpack_require__(307);
+	var _require2 = __webpack_require__(314);
 	
-	var Provider = _require2.Provider;
+	var combineReducers = _require2.combineReducers;
+	var createStore = _require2.createStore;
+	
+	var _require3 = __webpack_require__(307);
+	
+	var Provider = _require3.Provider;
 	
 	var curate = __webpack_require__(334);
 	var scaffold = __webpack_require__(337);
+	var reducers = __webpack_require__(340);
+	// const render = require('./js/render-server');
 	
 	// A URL is pinged
 	
@@ -75,6 +82,40 @@
 	
 	// If there is no URL match to our JSON file...
 	// Redirect the user back to /all and give them a message
+	
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	
+	// function initialise() {
+	//
+	//     console.log('initialise | server');
+	//
+	//     let store = createStore(
+	//         combineReducers(reducers), // Reducers.
+	//         state // State
+	//         // no need for Redux dev tools server side =)
+	//     );
+	//
+	//     store.subscribe(() => render(store)); // Render on state change.
+	//
+	//     console.log(' = = = = = = = = = = = ');
+	//     console.log(store);
+	//     console.log(' = = = = = = = = = = = ');
+	//     console.log(store.getState());
+	//     console.log(' = = = = = = = = = = = ');
+	//
+	//     return render(store); // Prompt initial render on page load.
+	//
+	// }
+	
+	// <RouterContext {...renderProps}  createElement={createElement} />
+	
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 	
 	var app = express();
 	
@@ -109,59 +150,113 @@
 	
 	            res.status(200).send(json);
 	        } else if (renderProps) {
+	            (function () {
 	
-	            // const content = '<h1>Hello world</h1>';
-	            // // const store = [0, 1, 2, 3, 4];
-	            // const store = {
-	            //     foo: [1, 2],
-	            //     bar: [3, 4]
-	            // };
-	            // const html = scaffold({content, store});
-	            // json = curate(req.url);
-	            // console.log(json);
-	            //
-	            // res.status(200).send(html);
+	                // const content = '<h1>Hello world</h1>';
+	                // // const store = [0, 1, 2, 3, 4];
+	                // const store = {
+	                //     foo: [1, 2],
+	                //     bar: [3, 4]
+	                // };
+	                // const html = scaffold({content, store});
+	                // json = curate(req.url);
+	                // console.log(json);
+	                //
+	                // res.status(200).send(html);
 	
-	            // -- - - - -- - - - - -- - - - --
+	                // -- - - - -- - - - - -- - - - --
 	
-	            //         json = fetchData(req.url);
-	            //         const store = {foo: 1, bar: 2, baz: 3};
-	            //         const content = ReactDOMServer.renderToString(
-	            //             /* <Provider store={store}> */
-	            //                 <RouterContext {...renderProps} />
-	            //             /* </Provider> */
-	            //         );
-	            //         const html = scaffold({content, store});
-	            //         // RouterContext
-	            //
-	            //         // res.status(200).send(renderToString(<RouterContext {...renderProps} />));
+	                //         json = fetchData(req.url);
+	                //         const store = {foo: 1, bar: 2, baz: 3};
+	                //         const content = ReactDOMServer.renderToString(
+	                //             /* <Provider store={store}> */
+	                //                 <RouterContext {...renderProps} />
+	                //             /* </Provider> */
+	                //         );
+	                //         const html = scaffold({content, store});
+	                //         // RouterContext
+	                //
+	                //         // res.status(200).send(renderToString(<RouterContext {...renderProps} />));
 	
-	            json = curate(req.url);
+	                json = curate(req.url);
 	
-	            var store = {
-	                questions: {
-	                    loading: true,
-	                    open: 0,
-	                    data: []
-	                },
-	                topics: {
-	                    current: 'all',
-	                    open: false
-	                },
-	                bar: [3, 4]
-	            };
+	                var state = {
+	                    questions: {
+	                        loading: false,
+	                        open: 0,
+	                        data: json
+	                    },
+	                    topics: {
+	                        current: 'all',
+	                        open: false
+	                    }
+	                };
 	
-	            // const content = ReactDOMServer.renderToString(
-	            //     <Provider store={store}>
-	            //         <RouterContext {...renderProps} />
-	            //     </Provider>
-	            // );
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
 	
-	            var content = 'hello world';
+	                var render = function render(store) {
 	
-	            var html = scaffold({ content: content, store: store });
+	                    console.log('render | server');
 	
-	            res.status(200).send(html);
+	                    // {...renderProps, apple}
+	                    var apple = {
+	                        color: 'red',
+	                        shape: 'round'
+	                    };
+	
+	                    var content = ReactDOMServer.renderToString(React.createElement(
+	                        Provider,
+	                        { store: store },
+	                        React.createElement(RouterContext, renderProps)
+	                    ));
+	
+	                    return content;
+	                };
+	
+	                var initialise = function initialise() {
+	
+	                    console.log('initialise | server');
+	
+	                    var store = createStore(combineReducers(reducers), // Reducers.
+	                    state // State
+	                    // no need for Redux dev tools server side =)
+	                    );
+	
+	                    store.subscribe(function () {
+	                        return render(store);
+	                    }); // Render on state change.
+	
+	                    console.log(' = = = = = = = = = = = ');
+	                    console.log(store);
+	                    console.log(' = = = = = = = = = = = ');
+	                    console.log(store.getState());
+	                    console.log(' = = = = = = = = = = = ');
+	
+	                    return render(store); // Prompt initial render on page load.
+	                };
+	
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	
+	                // const content = ReactDOMServer.renderToString(
+	                //     <Provider store={store}>
+	                //         <RouterContext {...renderProps} />
+	                //     </Provider>
+	                // );
+	
+	                var content = initialise();
+	                // const {content, store} = render(renderProps);
+	                // const content = 'hello world';
+	
+	                var html = scaffold({ content: content, state: state });
+	
+	                res.status(200).send(html);
+	            })();
 	        } else {
 	
 	            console.log('** ERROR 404');
@@ -32630,10 +32725,18 @@
 	
 	var routes = React.createElement(
 		Route,
-		null,
+		{ path: '/' },
+		React.createElement(IndexRoute, { component: Faq }),
 		React.createElement(Route, { path: '/:topic', component: Faq }),
 		React.createElement(Route, { path: '/:topic/:question', component: Faq })
 	);
+	
+	// const routes = (
+	// 	<Route>
+	// 		<Route path="/:topic" component={Faq} />
+	// 		<Route path="/:topic/:question" component={Faq} />
+	// 	</Route>
+	// );
 	
 	module.exports = routes;
 	
@@ -49058,7 +49161,11 @@
 					React.createElement(
 						'nav',
 						null,
-						React.createElement(Topics, this.props)
+						React.createElement(
+							'p',
+							null,
+							'NAV'
+						)
 					),
 					React.createElement(Questions, this.props)
 				);
@@ -49115,7 +49222,8 @@
 			key: 'componentDidMount',
 			value: function componentDidMount() {
 	
-				this.fetch();
+				// this.fetch();
+	
 			}
 		}, {
 			key: 'componentWillUnmount',
@@ -51182,6 +51290,8 @@
 	 */
 	function curate(path) {
 	
+	    console.log('Curating feed...');
+	
 	    var feed = getFeed();
 	    var steps = distillPath(path);
 	
@@ -51224,11 +51334,11 @@
 		var desc = _ref$desc === undefined ? 'This is a description' : _ref$desc;
 		var _ref$content = _ref.content;
 		var content = _ref$content === undefined ? 'error' : _ref$content;
-		var _ref$store = _ref.store;
-		var store = _ref$store === undefined ? null : _ref$store;
+		var _ref$state = _ref.state;
+		var state = _ref$state === undefined ? null : _ref$state;
 	
 	
-		return '<!DOCTYPE html>\n\t    <html>\n\t        <head>\n\t            <meta charset="utf-8">\n\t            <meta http-equiv="x-ua-compatible" content="ie=edge">\n\t            <title>' + title + '</title>\n\t            <meta name="description" content="' + desc + '">\n\t            <meta name="viewport" content="width=device-width, initial-scale=1">\n\t            <link rel="apple-touch-icon" href="apple-touch-icon.png">\n\t            <link rel="stylesheet" href="/style.css">\n\t\t\t\t<script id="baseState">\n\t\t\t\t\twindow.__REDUX_STATE__ = ' + JSON.stringify(store) + ';\n\t\t\t\t</script>\n\t        </head>\n\t        <body>\n\t            <div id="app" class="app">' + content + '</div>\n\t            <script src="/client.js"></script>\n\t        </body>\n\t    </html>';
+		return '<!DOCTYPE html>\n\t    <html>\n\t        <head>\n\t            <meta charset="utf-8">\n\t            <meta http-equiv="x-ua-compatible" content="ie=edge">\n\t            <title>' + title + '</title>\n\t            <meta name="description" content="' + desc + '">\n\t            <meta name="viewport" content="width=device-width, initial-scale=1">\n\t            <link rel="apple-touch-icon" href="apple-touch-icon.png">\n\t            <link rel="stylesheet" href="/style.css">\n\t\t\t\t<script id="baseState">\n\t\t\t\t\twindow.__REDUX_STATE__ = ' + JSON.stringify(state) + ';\n\t\t\t\t</script>\n\t        </head>\n\t        <body>\n\t            <div id="app" class="app">' + content + '</div>\n\t            <script src="/client.js"></script>\n\t        </body>\n\t    </html>';
 	};
 	
 	module.exports = scaffold;
@@ -61375,6 +61485,79 @@
 	return jQuery;
 	}));
 
+
+/***/ },
+/* 340 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _require = __webpack_require__(328);
+	
+	var UPDATE_LOADER = _require.UPDATE_LOADER;
+	var UPDATE_DATA = _require.UPDATE_DATA;
+	var TOGGLE_QUESTION = _require.TOGGLE_QUESTION;
+	var SELECT_TOPIC = _require.SELECT_TOPIC;
+	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
+	
+	
+	function questions() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			loading: true,
+			open: null,
+			data: []
+		} : arguments[0];
+		var action = arguments[1];
+	
+	
+		console.log('reducer | questions');
+		console.log(action);
+	
+		switch (action.operation) {
+	
+			case UPDATE_LOADER:
+				return _extends({}, state, { loading: action.status });
+	
+			case UPDATE_DATA:
+				return _extends({}, state, { data: action.data });
+	
+			case TOGGLE_QUESTION:
+				return _extends({}, state, { open: action.id });
+	
+			default:
+				return state;
+	
+		}
+	}
+	
+	function topics() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			current: 'all',
+			open: false
+		} : arguments[0];
+		var action = arguments[1];
+	
+	
+		console.log('reducer | topics');
+		console.log(action);
+	
+		switch (action.operation) {
+	
+			case SELECT_TOPIC:
+				return _extends({}, state, { current: action.topic });
+	
+			case TOGGLE_TOPICS:
+				return _extends({}, state, { open: !state.open });
+	
+			default:
+				return state;
+	
+		}
+	}
+	
+	module.exports = { questions: questions, topics: topics };
 
 /***/ }
 /******/ ]);

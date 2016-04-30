@@ -6,11 +6,19 @@ const Faq = require('./faq');
 
 
 const routes = (
-	<Route>
+	<Route path="/">
+		<IndexRoute component={Faq} />
 		<Route path="/:topic" component={Faq} />
 		<Route path="/:topic/:question" component={Faq} />
 	</Route>
 );
+
+// const routes = (
+// 	<Route>
+// 		<Route path="/:topic" component={Faq} />
+// 		<Route path="/:topic/:question" component={Faq} />
+// 	</Route>
+// );
 
 module.exports = routes;
 

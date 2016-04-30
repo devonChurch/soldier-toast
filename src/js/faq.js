@@ -27,7 +27,8 @@ class Faq extends React.Component {
 			<div>
 				<h1>FAQ</h1>
 				<nav>
-					<Topics {...this.props} />
+					<p>NAV</p>
+					{ /* <Topics {...this.props} /> */ }
 				</nav>
 				<Questions {...this.props} />
 			</div>

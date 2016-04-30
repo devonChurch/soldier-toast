@@ -4,9 +4,12 @@ const {match, RouterContext} = require('react-router');
 const routes = require('./js/routes');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
+const {combineReducers, createStore} = require('redux');
 const {Provider} = require('react-redux');
 const curate = require('./js/curate-feed');
 const scaffold = require('./js/scaffold');
+const reducers = require('./js/reducers');
+// const render = require('./js/render-server');
 
 
 // A URL is pinged
@@ -19,6 +22,44 @@ const scaffold = require('./js/scaffold');
 
 // If there is no URL match to our JSON file...
 // Redirect the user back to /all and give them a message
+
+
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
+
+// function initialise() {
+//
+//     console.log('initialise | server');
+//
+//     let store = createStore(
+//         combineReducers(reducers), // Reducers.
+//         state // State
+//         // no need for Redux dev tools server side =)
+//     );
+//
+//     store.subscribe(() => render(store)); // Render on state change.
+//
+//     console.log(' = = = = = = = = = = = ');
+//     console.log(store);
+//     console.log(' = = = = = = = = = = = ');
+//     console.log(store.getState());
+//     console.log(' = = = = = = = = = = = ');
+//
+//     return render(store); // Prompt initial render on page load.
+//
+// }
+
+// <RouterContext {...renderProps}  createElement={createElement} />
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 
 
@@ -88,18 +129,71 @@ app.get('*', (req, res) => {
 
             json = curate(req.url);
 
-            const store = {
+            const state = {
                 questions: {
-                    loading: true,
+                    loading: false,
                     open: 0,
-                    data: []
+                    data: json
                 },
                 topics: {
                     current: 'all',
                     open: false
-                },
-                bar: [3, 4]
+                }
             };
+
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
+
+            const render = (store) => {
+
+                console.log('render | server');
+
+                // {...renderProps, apple}
+                const apple = {
+                    color: 'red',
+                    shape: 'round'
+                };
+
+                const content = ReactDOMServer.renderToString(
+                    <Provider store={store}>
+                        <RouterContext {...renderProps} />
+                    </Provider>
+                );
+
+                return content;
+
+            };
+
+            const initialise = () => {
+
+                console.log('initialise | server');
+
+                let store = createStore(
+                    combineReducers(reducers), // Reducers.
+                    state // State
+                    // no need for Redux dev tools server side =)
+                );
+
+                store.subscribe(() => render(store)); // Render on state change.
+
+                console.log(' = = = = = = = = = = = ');
+                console.log(store);
+                console.log(' = = = = = = = = = = = ');
+                console.log(store.getState());
+                console.log(' = = = = = = = = = = = ');
+
+                return render(store); // Prompt initial render on page load.
+
+            };
+
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
+
+
 
             // const content = ReactDOMServer.renderToString(
             //     <Provider store={store}>
@@ -107,9 +201,17 @@ app.get('*', (req, res) => {
             //     </Provider>
             // );
 
-            const content = 'hello world';
+            const content = initialise();
+            // const {content, store} = render(renderProps);
+            // const content = 'hello world';
 
-            const html = scaffold({content, store});
+
+
+
+
+
+
+            const html = scaffold({content, state});
 
             res.status(200).send(html);
 

@@ -7,7 +7,8 @@ const {Provider} = require('react-redux');
 const {Router, Route, IndexRoute, Redirect, Link, IndexLink, browserHistory} = require('react-router');
 const routes = require('./routes');
 const reducers = require('./reducers');
-let store;
+const render = require('./render-client');
+// let store;
 
 
 // Renderer
@@ -35,61 +36,28 @@ function rehydrate() {
 }
 
 
-function createElement(Component, props) {
 
-	const hero = {
-		heading: 'Hero!',
-		description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-	};
-
-	const topics = [
-		{
-			heading: 'Topic one',
-			description: 'Description one',
-			url: '/apple',
-			total: 7
-		},
-		{
-			heading: 'Topic two',
-			description: 'Description two',
-			url: '/banana',
-			total: 7
-		},
-		{
-			heading: 'Topic three',
-			description: 'Description three',
-			url: '/orange',
-			total: 7
-		}
-	];
-
-	props = {...props, static: {hero, topics}};
-
-	// make sure you pass all the props in!
-	return <Component {...props}/>;
-
-}
 
 /**
  *
  */
-function render() {
-
-	console.log(' * - - - - - - - - - - * ');
-	console.log('render');
-	console.log(store.getState());
-	console.log(' * - - - - - - - - - - * ');
-
-
-
-	ReactDOM.render(
-		<Provider store={store}>
-			<Router history={browserHistory} routes={routes} createElement={createElement}/>
-		</Provider>,
-		document.getElementById('app')
-	);
-
-}
+// function render() {
+//
+// 	console.log(' * - - - - - - - - - - * ');
+// 	console.log('render');
+// 	console.log(store.getState());
+// 	console.log(' * - - - - - - - - - - * ');
+//
+//
+//
+// 	ReactDOM.render(
+// 		<Provider store={store}>
+// 			<Router history={browserHistory} routes={routes} createElement={createElement}/>
+// 		</Provider>,
+// 		document.getElementById('app')
+// 	);
+//
+// }
 
 /**
  * Activates The Redux dev tools Chrome extension.
@@ -106,15 +74,15 @@ function devTools() {
  */
 function initialise() {
 
-	store = createStore(
+	let store = createStore(
 		combineReducers(reducers), // Reducers.
 		rehydrate(), // State.
 		devTools() // Redux development tools.
 	);
 
-	store.subscribe(() => render()); // Render on state change.
+	store.subscribe(() => render(store)); // Render on state change.
 
-	render(); // Prompt initial render on page load.
+	render(store); // Prompt initial render on page load.
 
 }
 

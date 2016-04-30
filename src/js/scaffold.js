@@ -2,7 +2,7 @@ const scaffold = ({
 	title = 'This is a title',
 	desc = 'This is a description',
 	content = 'error',
-	store = null
+	state = null
 }) => {
 
 	return (
@@ -17,7 +17,7 @@ const scaffold = ({
 	            <link rel="apple-touch-icon" href="apple-touch-icon.png">
 	            <link rel="stylesheet" href="/style.css">
 				<script id="baseState">
-					window.__REDUX_STATE__ = ${JSON.stringify(store)};
+					window.__REDUX_STATE__ = ${JSON.stringify(state)};
 				</script>
 	        </head>
 	        <body>

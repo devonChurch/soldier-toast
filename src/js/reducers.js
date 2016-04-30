@@ -52,10 +52,4 @@ function topics(state = {
 
 }
 
-function bar() {
-
-	return [];
-
-}
-
-module.exports = {questions, topics, bar};
+module.exports = {questions, topics};
