@@ -46,8 +46,6 @@
 
 	'use strict';
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
 	var debug = __webpack_require__(1)('server');
 	var express = __webpack_require__(8);
 	var port = 8000;
@@ -73,8 +71,11 @@
 	var curate = __webpack_require__(337);
 	var getPassive = __webpack_require__(339);
 	var scaffold = __webpack_require__(340);
-	var reducers = __webpack_require__(341);
-	// const render = require('./js/render-server');
+	
+	var _require4 = __webpack_require__(341);
+	
+	var constructState = _require4.constructState;
+	var initialise = _require4.initialise;
 	
 	// A URL is pinged
 	
@@ -87,40 +88,6 @@
 	// If there is no URL match to our JSON file...
 	// Redirect the user back to /all and give them a message
 	
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	
-	// function initialise() {
-	//
-	//     console.log('initialise | server');
-	//
-	//     let store = createStore(
-	//         combineReducers(reducers), // Reducers.
-	//         state // State
-	//         // no need for Redux dev tools server side =)
-	//     );
-	//
-	//     store.subscribe(() => render(store)); // Render on state change.
-	//
-	//     console.log(' = = = = = = = = = = = ');
-	//     console.log(store);
-	//     console.log(' = = = = = = = = = = = ');
-	//     console.log(store.getState());
-	//     console.log(' = = = = = = = = = = = ');
-	//
-	//     return render(store); // Prompt initial render on page load.
-	//
-	// }
-	
-	// <RouterContext {...renderProps}  createElement={createElement} />
-	
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	
 	var app = express();
 	
 	// Express middleware.
@@ -130,359 +97,45 @@
 	
 	    match({ routes: routes, location: req.url }, function (error, redirectLocation, renderProps) {
 	
-	        console.log('  -------------------------------------  ');
-	        console.log('req.url', req.url);
-	        console.log('  -------------------------------------  ');
+	        var path = req.url;
 	
-	        // MAKE AJAX REQUEST VIA FULL URL NOT VIA ADDITIONAL QUERY STRING IF COMING FROM THE API ROUTE!
+	        debug('location = ' + path);
 	
 	        if (error) {
 	
-	            console.log('** ERROR 500');
+	            debug('** error 500 **');
+	
 	            res.status(500).send(error.message);
-	        } else if (req.url.indexOf('/api') >= 0) {
+	        } else if (path.indexOf('/api') >= 0) {
 	
-	            var request = req.url.substr(4);
+	            debug('** fetching api request **');
 	
-	            var json = void 0;
-	            json = curate(request);
-	            json = JSON.stringify(json);
-	            console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
-	            console.log(json);
-	            console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
+	            var request = path.substr(4);
+	            var json = JSON.stringify(curate(request));
 	
 	            res.status(200).send(json);
-	        } else if (renderProps && req.url !== '/favicon.ico') {
-	            (function () {
+	        } else if (renderProps && path !== '/favicon.ico') {
 	
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
+	            debug('** rendering page **');
 	
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
+	            var passive = getPassive();
+	            var state = constructState(path);
+	            var content = initialise(renderProps, passive, state);
+	            var html = scaffold({ content: content, state: state, passive: passive });
 	
-	                var passive = getPassive();
-	                var state = {
-	                    questions: {
-	                        loading: false,
-	                        open: 0,
-	                        data: curate(req.url)
-	                    },
-	                    topics: {
-	                        current: 'all',
-	                        open: false
-	                    }
-	                };
-	
-	                /**
-	                 *
-	                 */
-	                var createElement = function createElement(Component, props) {
-	
-	                    props = _extends({}, props, { passive: passive });
-	
-	                    // make sure you pass all the props in!
-	                    return React.createElement(Component, props);
-	                };
-	
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	
-	                var render = function render(store) {
-	
-	                    console.log('render | server');
-	
-	                    var content = ReactDOMServer.renderToString(React.createElement(
-	                        Provider,
-	                        { store: store },
-	                        React.createElement(RouterContext, _extends({}, renderProps, { createElement: createElement }))
-	                    ));
-	
-	                    return content;
-	                };
-	
-	                var initialise = function initialise() {
-	
-	                    console.log('initialise | server');
-	
-	                    var store = createStore(combineReducers(reducers), // Reducers.
-	                    state // State
-	                    // no need for Redux dev tools server side =)
-	                    );
-	
-	                    store.subscribe(function () {
-	                        return render(store);
-	                    }); // Render on state change.
-	
-	                    console.log(' = = = = = = = = = = = ');
-	                    console.log(store);
-	                    console.log(' = = = = = = = = = = = ');
-	                    console.log(store.getState());
-	                    console.log(' = = = = = = = = = = = ');
-	
-	                    return render(store); // Prompt initial render on page load.
-	                };
-	
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	                // --------------------------------------------------
-	
-	                // const content = ReactDOMServer.renderToString(
-	                //     <Provider store={store}>
-	                //         <RouterContext {...renderProps} />
-	                //     </Provider>
-	                // );
-	
-	                var content = initialise();
-	                // const {content, store} = render(renderProps);
-	                // const content = 'hello world';
-	
-	                var html = scaffold({ content: content, state: state, passive: passive });
-	
-	                res.status(200).send(html);
-	            })();
+	            res.status(200).send(html);
 	        } else {
 	
-	            console.log('** ERROR 404');
+	            debug('** error 404 **');
+	
 	            res.status(404).send('Not found');
 	        }
 	    });
 	});
 	
 	app.listen(port, function () {
-	    return console.log('listening on port ' + port + '!');
+	    return debug('listening on port ' + port);
 	});
-	
-	// match({routes, location: req.url}, (error, redirectLocation, renderProps) => {
-	//
-	//     // console.log('  -------------------------------------  ');
-	//     // console.log('routes', routes);
-	//     console.log('  -------------------------------------  ');
-	//     console.log('req.url', req.url);
-	//     console.log('  -------------------------------------  ');
-	//     // console.log('error', error);
-	//     // console.log('  -------------------------------------  ');
-	//     // console.log('redirectLocation', redirectLocation);
-	//     // console.log('  -------------------------------------  ');
-	//     // console.log('renderProps', renderProps);
-	//     // console.log('  -------------------------------------  ');
-	//
-	//     let json;
-	//
-	//     if (error) {
-	//
-	//         res.status(500).send(error.message);
-	//
-	//     } else if (req.url.indexOf('/api') === 0) {
-	//
-	//         console.log('Ping API');
-	//         console.log(req.url);
-	//         json = fetchData(req.url);
-	//
-	//         res.status(200).send(json);
-	//
-	//     } else if (redirectLocation) {
-	//
-	//         res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-	//
-	//     } else if (renderProps) {
-	//
-	//         // You can also check renderProps.components or renderProps.routes for
-	//         // your "not found" component or route respectively, and send a 404 as
-	//         // below, if you're using a catch-all route.
-	//
-	//         json = fetchData(req.url);
-	//         const store = {foo: 1, bar: 2, baz: 3};
-	//         const content = ReactDOMServer.renderToString(
-	//             /* <Provider store={store}> */
-	//                 <RouterContext {...renderProps} />
-	//             /* </Provider> */
-	//         );
-	//         const html = scaffold({content, store});
-	//         // RouterContext
-	//
-	//         // res.status(200).send(renderToString(<RouterContext {...renderProps} />));
-	//
-	//
-	//
-	//         // res.send("<!DOCTYPE html>"+
-	//         //     ReactDOMServer.renderToString(
-	//         //         Provider({store: store}, RouterContext(renderProps))
-	//         //     )
-	//         // );
-	//
-	//         res.status(200).send(html);
-	//
-	//     } else {
-	//
-	//         res.status(404).send('Not found');
-	//
-	//     }
-	// });
-
-	// app.get('/*', (req, res) => {
-	//
-	//     const json = fetchData(req.url);
-	//
-	//     console.log('** ------------- **');
-	//     console.log(json);
-	//     console.log('** ------------- **');
-	//
-	//     const views = {
-	//         '/' : () => ReactDOMServer.renderToString(<HomePage json={json} />),
-	//         '/fruit' : () => ReactDOMServer.renderToString(<ShowPage json={json} />),
-	//         '/fruit/banana' : () => ReactDOMServer.renderToString(<EpisodePage json={json} />)
-	//     };
-	//
-	//     const error = (
-	//         `<ul>
-	//             <li>There</li>
-	//             <li>Has</li>
-	//             <li>Been</li>
-	//             <li>An</li>
-	//             <li>Error</li>
-	//         </ul>`
-	//     );
-	//
-	//     const title = null; // = 'this is a title';
-	//     const desc = null; // = 'this is a description';
-	//
-	//     const content = views[req.url] ? views[req.url]() : error;
-	//
-	//     const html = (
-	//         `<!DOCTYPE html>
-	//         <html>
-	//             <head>
-	//                 <meta charset="utf-8">
-	//                 <meta http-equiv="x-ua-compatible" content="ie=edge">
-	//                 <title>${title || 'This is a title'}</title>
-	//                 <meta name="description" content="${desc || 'This is a description'}">
-	//                 <meta name="viewport" content="width=device-width, initial-scale=1">
-	//                 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-	//                 <link rel="stylesheet" href="/style.css">
-	//             </head>
-	//             <body>
-	//                 <div id="app" class="app">${content}</div>
-	//                 <script src="/client.js"></script>
-	//             </body>
-	//         </html>`
-	//     );
-	//
-	//     res.send(html);
-	//
-	// });
-	//
-	// app.listen(port, () => console.log(`listening on port ${port}!`));
-
-	// const jade = require('jade');
-	// const path = require('path');
-	// const ReactEngine = require('react-engine');
-	// const docType = '<!DOCTYPE html>';
-
-	// console.log('  ---------------------------  ');
-	// console.log('  ' + __dirname);
-	// console.log('  ---------------------------  ');
-
-	// var engine = ReactEngine.server.create({
-	//   /*
-	//     see the complete server options spec here:
-	//     https://github.com/paypal/react-engine#server-options-spec
-	//   */
-	// });
-
-	// app.engine('.jsx', engine);
-	// app.set('view engine', 'jsx');
-	// app.set('view engine', 'jade');
-	// app.set('views', __dirname + '/views');
-	// app.set('view', require('react-engine/lib/expressView'));
-	// app.use(express.static(path.resolve(__dirname, './dist')));
-
-	// path = '/foo/bar';
-	// let html;
-	// if (req.url === '/foo/bar') html =
-
-	// res.send('Hello World!');
-
-	// ReactDOM.render(<HomePage name="Sebastian" />, mountNode);
-
-	// res.render('layout', {
-	//     reactHtml: React.renderToString(<App />)
-	// });
-
-	// response.render('app', {
-	//     app: ReactDOMServer.renderToString(<App />)
-	// });
-
-	// console.log('  ---------------------------  ');
-	// console.log('  ---------------------------  ');
-	// console.log('  ---------------------------  ');
-	// console.log(req.url);
-	// console.log('  ---------------------------  ');
-	// console.log('  ---------------------------  ');
-	// console.log('  ---------------------------  ');
-	// console.log(res);
-
-	// const content = ReactDOMServer.renderToString(<HomePage name="Sebastian" />);
-
-	// const html = ReactDOMServer.renderToString(
-	//     <html>
-	//         <head>
-	//             <meta charset="utf-8" />
-	//             <meta http-equiv="x-ua-compatible" content="ie=edge" />
-	//             <title>{title}</title>
-	//             <meta name="viewport" content="width=device-width, initial-scale=1" />
-	//             <link rel="stylesheet" href="/style.css" />
-	//         </head>
-	//         <body>
-	//             <div id="app" className="app">
-	//                 <HomePage name="Sebastian" />
-	//             </div>
-	//             <script src="/client.js"></script>
-	//         </body>
-	//     </html>
-	// );
-
-	// const routes = (
-	// 	<Route path="/">
-	// 		<IndexRoute component={Counter} />
-	// 		<Route path="/banana">
-	// 			<IndexRoute component={Banana} foo={'bar'}/>
-	// 		</Route>
-	// 	</Route>
-	// );
-	//
-	// const render = () => {
-	//
-	// 	ReactDOM.render(
-	// 		<Router history={browserHistory}>
-	// 			{routes}
-	// 		</Router>,
-	// 		document.getElementById('app')
-	// 	);
-	//
-	// };
-
-	// const html = ReactDOMServer.renderToString(
-	//     <Router history={browserHistory}>
-	//         <Route path="/">
-	//             <IndexRoute component={Counter} />
-	//             <Route path="/banana">
-	//                 <IndexRoute component={Banana} foo={'bar'}/>
-	//             </Route>
-	//         </Route>
-	//     </Router>
-	// );
-
-	// res.render('./scaffold.jade', {title, desc, content});
-
-	// res.send(`${docType}${html}`);
 
 /***/ },
 /* 1 */
@@ -61535,6 +61188,8 @@
 	 */
 	function extractTopics(topics) {
 	
+	    debug('extractTopics');
+	
 	    var keys = Object.keys(topics);
 	    var json = [];
 	
@@ -61581,6 +61236,8 @@
 	    var hero = _ref.hero;
 	    var topics = _ref.topics;
 	
+	
+	    debug('distillFeed');
 	
 	    return {
 	        hero: hero,
@@ -61631,6 +61288,134 @@
 
 /***/ },
 /* 341 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var debug = __webpack_require__(1)('construct');
+	
+	var _require = __webpack_require__(81);
+	
+	var RouterContext = _require.RouterContext;
+	
+	var React = __webpack_require__(103);
+	var ReactDOMServer = __webpack_require__(332);
+	
+	var _require2 = __webpack_require__(315);
+	
+	var combineReducers = _require2.combineReducers;
+	var createStore = _require2.createStore;
+	
+	var _require3 = __webpack_require__(308);
+	
+	var Provider = _require3.Provider;
+	
+	var curate = __webpack_require__(337);
+	var reducers = __webpack_require__(342);
+	
+	/**
+	 * Construct the initial (base) state that the app needs to render out its first view instance.
+	 * @param {string} path - The express.js request path.
+	 * @return {object} The state data object.
+	 */
+	function constructState(path) {
+	
+	    debug('constructState');
+	
+	    return {
+	        questions: {
+	            loading: false,
+	            open: 0,
+	            data: curate(path)
+	        },
+	        topics: {
+	            current: 'all', // <<<<<< dynamic!
+	            open: false
+	        }
+	    };
+	}
+	
+	exports.constructState = constructState;
+	
+	/**
+	 * This is a setup purely in which to pass our passive props down through the
+	 * router and into out React app wrapper. To do this we need to create a fictitious
+	 * element into the RouterContext. The setup expects something like this
+	 * createElement={createElement} so to be able to pass in our passive props we
+	 * initiate a wrapper function which then returns a function in the format that
+	 * the RouterContext expects. This way we can tag out props onto the end of the
+	 * Routers props object so that they are sent to the FAQ React element to be
+	 * passed down.
+	 * @param {object} passive - Our React app’s passive props.
+	 * @return {function} The true RouterContext createElement function in the
+	 * correct setup.
+	 */
+	function createElement(passive) {
+	
+	    debug('createElement');
+	
+	    return function (Component, props) {
+	
+	        props = _extends({}, props, { passive: passive });
+	
+	        // make sure to pass all the existing props in addition to the passive props!
+	        return React.createElement(Component, props);
+	    };
+	}
+	
+	/**
+	 * The render function that will generate our server side SEO friendly HTML markup
+	 * for our React app. Utilising the React renderer Redux Provider and React Router
+	 * functionality that we use client side with a slight server side twist.
+	 * @param {object} renderProps - The props generated from the react router “match”
+	 * setup in the server.js file.
+	 * @param {object} passive - Our React app’s passive props.
+	 * @param {object} store - The Redux store.
+	 * @return {string} The HTML representation of our app.
+	 */
+	function render(renderProps, passive, store) {
+	
+	    debug('render');
+	
+	    var content = ReactDOMServer.renderToString(React.createElement(
+	        Provider,
+	        { store: store },
+	        React.createElement(RouterContext, _extends({}, renderProps, { createElement: createElement(passive) }))
+	    ));
+	
+	    return content;
+	}
+	
+	/**
+	 * Initialise the render sequence by generating the Redux store and hooking in
+	 * our renderer and reducer functionality into it.
+	 * @param {object} renderProps - The props generated from the react router “match”
+	 * setup in the server.js file.
+	 * @param {object} passive - Our React app’s passive props.
+	 * @param {object} state - The initial app state.
+	 */
+	function initialise(renderProps, passive, state) {
+	
+	    debug('initialise');
+	
+	    var store = createStore(combineReducers(reducers), // Reducers.
+	    state // State
+	    // no need for Redux dev tools server side =)
+	    );
+	
+	    store.subscribe(function () {
+	        return render(renderProps, passive, store);
+	    }); // Render on state change.
+	
+	    return render(renderProps, passive, store); // Generate server side HTML.
+	}
+	
+	exports.initialise = initialise;
+
+/***/ },
+/* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

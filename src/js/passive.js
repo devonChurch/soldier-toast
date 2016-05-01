@@ -11,6 +11,8 @@ const getFeed = require('./feed');
  */
 function extractTopics(topics) {
 
+    debug('extractTopics');
+
     const keys = Object.keys(topics);
     let json = [];
 
@@ -35,6 +37,8 @@ function extractTopics(topics) {
  * @returns {object} The distilled JSON.
  */
 function distillFeed({hero, topics}) {
+
+    debug('distillFeed');
 
     return {
         hero,
