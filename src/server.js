@@ -1,3 +1,4 @@
+const debug = require('debug')('server');
 const express = require('express');
 const port = 8000;
 const {match, RouterContext} = require('react-router');
@@ -6,7 +7,8 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const {combineReducers, createStore} = require('redux');
 const {Provider} = require('react-redux');
-const curate = require('./js/curate-feed');
+const curate = require('./js/curate');
+const getPassive = require('./js/passive');
 const scaffold = require('./js/scaffold');
 const reducers = require('./js/reducers');
 // const render = require('./js/render-server');
@@ -79,7 +81,6 @@ app.get('*', (req, res) => {
 
             // MAKE AJAX REQUEST VIA FULL URL NOT VIA ADDITIONAL QUERY STRING IF COMING FROM THE API ROUTE!
 
-        let json;
 
         if (error) {
 
@@ -92,6 +93,7 @@ app.get('*', (req, res) => {
             const request = req.url.substr(4);
 
 
+            let json;
             json = curate(request);
             json = JSON.stringify(json);
             console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
@@ -100,28 +102,46 @@ app.get('*', (req, res) => {
 
             res.status(200).send(json);
 
-        } else if (renderProps) {
+        } else if (renderProps && req.url !== '/favicon.ico') {
+
+
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
 
 
 
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
+            // --------------------------------------------------
 
-
-
-
-
-            // Only run if Object jeys + all
-            json = curate(req.url);
-
+            const passive = getPassive();
             const state = {
                 questions: {
                     loading: false,
                     open: 0,
-                    data: json
+                    data: curate(req.url)
                 },
                 topics: {
                     current: 'all',
                     open: false
                 }
+            };
+
+
+
+            /**
+             *
+             */
+            const createElement = (Component, props) => {
+
+                props = {...props, passive};
+
+                // make sure you pass all the props in!
+                return <Component {...props}/>;
+
             };
 
             // --------------------------------------------------
@@ -133,15 +153,9 @@ app.get('*', (req, res) => {
 
                 console.log('render | server');
 
-                // {...renderProps, apple}
-                const apple = {
-                    color: 'red',
-                    shape: 'round'
-                };
-
                 const content = ReactDOMServer.renderToString(
                     <Provider store={store}>
-                        <RouterContext {...renderProps} />
+                        <RouterContext {...renderProps} createElement={createElement}/>
                     </Provider>
                 );
 
@@ -194,7 +208,7 @@ app.get('*', (req, res) => {
 
 
 
-            const html = scaffold({content, state});
+            const html = scaffold({content, state, passive});
 
             res.status(200).send(html);
 

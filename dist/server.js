@@ -46,7 +46,10 @@
 
 	'use strict';
 	
-	var express = __webpack_require__(1);
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var debug = __webpack_require__(1)('server');
+	var express = __webpack_require__(8);
 	var port = 8000;
 	
 	var _require = __webpack_require__(81);
@@ -68,8 +71,9 @@
 	var Provider = _require3.Provider;
 	
 	var curate = __webpack_require__(337);
-	var scaffold = __webpack_require__(338);
-	var reducers = __webpack_require__(339);
+	var getPassive = __webpack_require__(339);
+	var scaffold = __webpack_require__(340);
+	var reducers = __webpack_require__(341);
 	// const render = require('./js/render-server');
 	
 	// A URL is pinged
@@ -132,8 +136,6 @@
 	
 	        // MAKE AJAX REQUEST VIA FULL URL NOT VIA ADDITIONAL QUERY STRING IF COMING FROM THE API ROUTE!
 	
-	        var json = void 0;
-	
 	        if (error) {
 	
 	            console.log('** ERROR 500');
@@ -142,6 +144,7 @@
 	
 	            var request = req.url.substr(4);
 	
+	            var json = void 0;
 	            json = curate(request);
 	            json = JSON.stringify(json);
 	            console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
@@ -149,22 +152,41 @@
 	            console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
 	
 	            res.status(200).send(json);
-	        } else if (renderProps) {
+	        } else if (renderProps && req.url !== '/favicon.ico') {
 	            (function () {
 	
-	                // Only run if Object jeys + all
-	                json = curate(req.url);
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
 	
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	                // --------------------------------------------------
+	
+	                var passive = getPassive();
 	                var state = {
 	                    questions: {
 	                        loading: false,
 	                        open: 0,
-	                        data: json
+	                        data: curate(req.url)
 	                    },
 	                    topics: {
 	                        current: 'all',
 	                        open: false
 	                    }
+	                };
+	
+	                /**
+	                 *
+	                 */
+	                var createElement = function createElement(Component, props) {
+	
+	                    props = _extends({}, props, { passive: passive });
+	
+	                    // make sure you pass all the props in!
+	                    return React.createElement(Component, props);
 	                };
 	
 	                // --------------------------------------------------
@@ -176,16 +198,10 @@
 	
 	                    console.log('render | server');
 	
-	                    // {...renderProps, apple}
-	                    var apple = {
-	                        color: 'red',
-	                        shape: 'round'
-	                    };
-	
 	                    var content = ReactDOMServer.renderToString(React.createElement(
 	                        Provider,
 	                        { store: store },
-	                        React.createElement(RouterContext, renderProps)
+	                        React.createElement(RouterContext, _extends({}, renderProps, { createElement: createElement }))
 	                    ));
 	
 	                    return content;
@@ -228,7 +244,7 @@
 	                // const {content, store} = render(renderProps);
 	                // const content = 'hello world';
 	
-	                var html = scaffold({ content: content, state: state });
+	                var html = scaffold({ content: content, state: state, passive: passive });
 	
 	                res.status(200).send(html);
 	            })();
@@ -472,6 +488,579 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
+	
+	/**
+	 * Module dependencies.
+	 */
+	
+	var tty = __webpack_require__(2);
+	var util = __webpack_require__(3);
+	
+	/**
+	 * This is the Node.js implementation of `debug()`.
+	 *
+	 * Expose `debug()` as the module.
+	 */
+	
+	exports = module.exports = __webpack_require__(4);
+	exports.log = log;
+	exports.formatArgs = formatArgs;
+	exports.save = save;
+	exports.load = load;
+	exports.useColors = useColors;
+	
+	/**
+	 * Colors.
+	 */
+	
+	exports.colors = [6, 2, 3, 4, 5, 1];
+	
+	/**
+	 * The file descriptor to write the `debug()` calls to.
+	 * Set the `DEBUG_FD` env variable to override with another value. i.e.:
+	 *
+	 *   $ DEBUG_FD=3 node script.js 3>debug.log
+	 */
+	
+	var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
+	var stream = 1 === fd ? process.stdout :
+	             2 === fd ? process.stderr :
+	             createWritableStdioStream(fd);
+	
+	/**
+	 * Is stdout a TTY? Colored output is enabled when `true`.
+	 */
+	
+	function useColors() {
+	  var debugColors = (process.env.DEBUG_COLORS || '').trim().toLowerCase();
+	  if (0 === debugColors.length) {
+	    return tty.isatty(fd);
+	  } else {
+	    return '0' !== debugColors
+	        && 'no' !== debugColors
+	        && 'false' !== debugColors
+	        && 'disabled' !== debugColors;
+	  }
+	}
+	
+	/**
+	 * Map %o to `util.inspect()`, since Node doesn't do that out of the box.
+	 */
+	
+	var inspect = (4 === util.inspect.length ?
+	  // node <= 0.8.x
+	  function (v, colors) {
+	    return util.inspect(v, void 0, void 0, colors);
+	  } :
+	  // node > 0.8.x
+	  function (v, colors) {
+	    return util.inspect(v, { colors: colors });
+	  }
+	);
+	
+	exports.formatters.o = function(v) {
+	  return inspect(v, this.useColors)
+	    .replace(/\s*\n\s*/g, ' ');
+	};
+	
+	/**
+	 * Adds ANSI color escape codes if enabled.
+	 *
+	 * @api public
+	 */
+	
+	function formatArgs() {
+	  var args = arguments;
+	  var useColors = this.useColors;
+	  var name = this.namespace;
+	
+	  if (useColors) {
+	    var c = this.color;
+	
+	    args[0] = '  \u001b[3' + c + ';1m' + name + ' '
+	      + '\u001b[0m'
+	      + args[0] + '\u001b[3' + c + 'm'
+	      + ' +' + exports.humanize(this.diff) + '\u001b[0m';
+	  } else {
+	    args[0] = new Date().toUTCString()
+	      + ' ' + name + ' ' + args[0];
+	  }
+	  return args;
+	}
+	
+	/**
+	 * Invokes `console.error()` with the specified arguments.
+	 */
+	
+	function log() {
+	  return stream.write(util.format.apply(this, arguments) + '\n');
+	}
+	
+	/**
+	 * Save `namespaces`.
+	 *
+	 * @param {String} namespaces
+	 * @api private
+	 */
+	
+	function save(namespaces) {
+	  if (null == namespaces) {
+	    // If you set a process.env field to null or undefined, it gets cast to the
+	    // string 'null' or 'undefined'. Just delete instead.
+	    delete process.env.DEBUG;
+	  } else {
+	    process.env.DEBUG = namespaces;
+	  }
+	}
+	
+	/**
+	 * Load `namespaces`.
+	 *
+	 * @return {String} returns the previously persisted debug modes
+	 * @api private
+	 */
+	
+	function load() {
+	  return process.env.DEBUG;
+	}
+	
+	/**
+	 * Copied from `node/src/node.js`.
+	 *
+	 * XXX: It's lame that node doesn't expose this API out-of-the-box. It also
+	 * relies on the undocumented `tty_wrap.guessHandleType()` which is also lame.
+	 */
+	
+	function createWritableStdioStream (fd) {
+	  var stream;
+	  var tty_wrap = process.binding('tty_wrap');
+	
+	  // Note stream._type is used for test-module-load-list.js
+	
+	  switch (tty_wrap.guessHandleType(fd)) {
+	    case 'TTY':
+	      stream = new tty.WriteStream(fd);
+	      stream._type = 'tty';
+	
+	      // Hack to have stream not keep the event loop alive.
+	      // See https://github.com/joyent/node/issues/1726
+	      if (stream._handle && stream._handle.unref) {
+	        stream._handle.unref();
+	      }
+	      break;
+	
+	    case 'FILE':
+	      var fs = __webpack_require__(6);
+	      stream = new fs.SyncWriteStream(fd, { autoClose: false });
+	      stream._type = 'fs';
+	      break;
+	
+	    case 'PIPE':
+	    case 'TCP':
+	      var net = __webpack_require__(7);
+	      stream = new net.Socket({
+	        fd: fd,
+	        readable: false,
+	        writable: true
+	      });
+	
+	      // FIXME Should probably have an option in net.Socket to create a
+	      // stream from an existing fd which is writable only. But for now
+	      // we'll just add this hack and set the `readable` member to false.
+	      // Test: ./node test/fixtures/echo.js < /etc/passwd
+	      stream.readable = false;
+	      stream.read = null;
+	      stream._type = 'pipe';
+	
+	      // FIXME Hack to have stream not keep the event loop alive.
+	      // See https://github.com/joyent/node/issues/1726
+	      if (stream._handle && stream._handle.unref) {
+	        stream._handle.unref();
+	      }
+	      break;
+	
+	    default:
+	      // Probably an error on in uv_guess_handle()
+	      throw new Error('Implement me. Unknown stream file type!');
+	  }
+	
+	  // For supporting legacy API we put the FD here.
+	  stream.fd = fd;
+	
+	  stream._isStdio = true;
+	
+	  return stream;
+	}
+	
+	/**
+	 * Enable namespaces listed in `process.env.DEBUG` initially.
+	 */
+	
+	exports.enable(load());
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	module.exports = require("tty");
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	module.exports = require("util");
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/**
+	 * This is the common logic for both the Node.js and web browser
+	 * implementations of `debug()`.
+	 *
+	 * Expose `debug()` as the module.
+	 */
+	
+	exports = module.exports = debug;
+	exports.coerce = coerce;
+	exports.disable = disable;
+	exports.enable = enable;
+	exports.enabled = enabled;
+	exports.humanize = __webpack_require__(5);
+	
+	/**
+	 * The currently active debug mode names, and names to skip.
+	 */
+	
+	exports.names = [];
+	exports.skips = [];
+	
+	/**
+	 * Map of special "%n" handling functions, for the debug "format" argument.
+	 *
+	 * Valid key names are a single, lowercased letter, i.e. "n".
+	 */
+	
+	exports.formatters = {};
+	
+	/**
+	 * Previously assigned color.
+	 */
+	
+	var prevColor = 0;
+	
+	/**
+	 * Previous log timestamp.
+	 */
+	
+	var prevTime;
+	
+	/**
+	 * Select a color.
+	 *
+	 * @return {Number}
+	 * @api private
+	 */
+	
+	function selectColor() {
+	  return exports.colors[prevColor++ % exports.colors.length];
+	}
+	
+	/**
+	 * Create a debugger with the given `namespace`.
+	 *
+	 * @param {String} namespace
+	 * @return {Function}
+	 * @api public
+	 */
+	
+	function debug(namespace) {
+	
+	  // define the `disabled` version
+	  function disabled() {
+	  }
+	  disabled.enabled = false;
+	
+	  // define the `enabled` version
+	  function enabled() {
+	
+	    var self = enabled;
+	
+	    // set `diff` timestamp
+	    var curr = +new Date();
+	    var ms = curr - (prevTime || curr);
+	    self.diff = ms;
+	    self.prev = prevTime;
+	    self.curr = curr;
+	    prevTime = curr;
+	
+	    // add the `color` if not set
+	    if (null == self.useColors) self.useColors = exports.useColors();
+	    if (null == self.color && self.useColors) self.color = selectColor();
+	
+	    var args = Array.prototype.slice.call(arguments);
+	
+	    args[0] = exports.coerce(args[0]);
+	
+	    if ('string' !== typeof args[0]) {
+	      // anything else let's inspect with %o
+	      args = ['%o'].concat(args);
+	    }
+	
+	    // apply any `formatters` transformations
+	    var index = 0;
+	    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
+	      // if we encounter an escaped % then don't increase the array index
+	      if (match === '%%') return match;
+	      index++;
+	      var formatter = exports.formatters[format];
+	      if ('function' === typeof formatter) {
+	        var val = args[index];
+	        match = formatter.call(self, val);
+	
+	        // now we need to remove `args[index]` since it's inlined in the `format`
+	        args.splice(index, 1);
+	        index--;
+	      }
+	      return match;
+	    });
+	
+	    if ('function' === typeof exports.formatArgs) {
+	      args = exports.formatArgs.apply(self, args);
+	    }
+	    var logFn = enabled.log || exports.log || console.log.bind(console);
+	    logFn.apply(self, args);
+	  }
+	  enabled.enabled = true;
+	
+	  var fn = exports.enabled(namespace) ? enabled : disabled;
+	
+	  fn.namespace = namespace;
+	
+	  return fn;
+	}
+	
+	/**
+	 * Enables a debug mode by namespaces. This can include modes
+	 * separated by a colon and wildcards.
+	 *
+	 * @param {String} namespaces
+	 * @api public
+	 */
+	
+	function enable(namespaces) {
+	  exports.save(namespaces);
+	
+	  var split = (namespaces || '').split(/[\s,]+/);
+	  var len = split.length;
+	
+	  for (var i = 0; i < len; i++) {
+	    if (!split[i]) continue; // ignore empty strings
+	    namespaces = split[i].replace(/\*/g, '.*?');
+	    if (namespaces[0] === '-') {
+	      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+	    } else {
+	      exports.names.push(new RegExp('^' + namespaces + '$'));
+	    }
+	  }
+	}
+	
+	/**
+	 * Disable debug output.
+	 *
+	 * @api public
+	 */
+	
+	function disable() {
+	  exports.enable('');
+	}
+	
+	/**
+	 * Returns true if the given mode name is enabled, false otherwise.
+	 *
+	 * @param {String} name
+	 * @return {Boolean}
+	 * @api public
+	 */
+	
+	function enabled(name) {
+	  var i, len;
+	  for (i = 0, len = exports.skips.length; i < len; i++) {
+	    if (exports.skips[i].test(name)) {
+	      return false;
+	    }
+	  }
+	  for (i = 0, len = exports.names.length; i < len; i++) {
+	    if (exports.names[i].test(name)) {
+	      return true;
+	    }
+	  }
+	  return false;
+	}
+	
+	/**
+	 * Coerce `val`.
+	 *
+	 * @param {Mixed} val
+	 * @return {Mixed}
+	 * @api private
+	 */
+	
+	function coerce(val) {
+	  if (val instanceof Error) return val.stack || val.message;
+	  return val;
+	}
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	/**
+	 * Helpers.
+	 */
+	
+	var s = 1000;
+	var m = s * 60;
+	var h = m * 60;
+	var d = h * 24;
+	var y = d * 365.25;
+	
+	/**
+	 * Parse or format the given `val`.
+	 *
+	 * Options:
+	 *
+	 *  - `long` verbose formatting [false]
+	 *
+	 * @param {String|Number} val
+	 * @param {Object} options
+	 * @return {String|Number}
+	 * @api public
+	 */
+	
+	module.exports = function(val, options){
+	  options = options || {};
+	  if ('string' == typeof val) return parse(val);
+	  return options.long
+	    ? long(val)
+	    : short(val);
+	};
+	
+	/**
+	 * Parse the given `str` and return milliseconds.
+	 *
+	 * @param {String} str
+	 * @return {Number}
+	 * @api private
+	 */
+	
+	function parse(str) {
+	  str = '' + str;
+	  if (str.length > 10000) return;
+	  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+	  if (!match) return;
+	  var n = parseFloat(match[1]);
+	  var type = (match[2] || 'ms').toLowerCase();
+	  switch (type) {
+	    case 'years':
+	    case 'year':
+	    case 'yrs':
+	    case 'yr':
+	    case 'y':
+	      return n * y;
+	    case 'days':
+	    case 'day':
+	    case 'd':
+	      return n * d;
+	    case 'hours':
+	    case 'hour':
+	    case 'hrs':
+	    case 'hr':
+	    case 'h':
+	      return n * h;
+	    case 'minutes':
+	    case 'minute':
+	    case 'mins':
+	    case 'min':
+	    case 'm':
+	      return n * m;
+	    case 'seconds':
+	    case 'second':
+	    case 'secs':
+	    case 'sec':
+	    case 's':
+	      return n * s;
+	    case 'milliseconds':
+	    case 'millisecond':
+	    case 'msecs':
+	    case 'msec':
+	    case 'ms':
+	      return n;
+	  }
+	}
+	
+	/**
+	 * Short format for `ms`.
+	 *
+	 * @param {Number} ms
+	 * @return {String}
+	 * @api private
+	 */
+	
+	function short(ms) {
+	  if (ms >= d) return Math.round(ms / d) + 'd';
+	  if (ms >= h) return Math.round(ms / h) + 'h';
+	  if (ms >= m) return Math.round(ms / m) + 'm';
+	  if (ms >= s) return Math.round(ms / s) + 's';
+	  return ms + 'ms';
+	}
+	
+	/**
+	 * Long format for `ms`.
+	 *
+	 * @param {Number} ms
+	 * @return {String}
+	 * @api private
+	 */
+	
+	function long(ms) {
+	  return plural(ms, d, 'day')
+	    || plural(ms, h, 'hour')
+	    || plural(ms, m, 'minute')
+	    || plural(ms, s, 'second')
+	    || ms + ' ms';
+	}
+	
+	/**
+	 * Pluralization helper.
+	 */
+	
+	function plural(ms, n, name) {
+	  if (ms < n) return;
+	  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
+	  return Math.ceil(ms / n) + ' ' + name + 's';
+	}
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = require("fs");
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = require("net");
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/*!
 	 * express
 	 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -482,11 +1071,11 @@
 	
 	'use strict';
 	
-	module.exports = __webpack_require__(2);
+	module.exports = __webpack_require__(9);
 
 
 /***/ },
-/* 2 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -503,9 +1092,9 @@
 	 * Module dependencies.
 	 */
 	
-	var EventEmitter = __webpack_require__(3).EventEmitter;
-	var mixin = __webpack_require__(4);
-	var proto = __webpack_require__(5);
+	var EventEmitter = __webpack_require__(10).EventEmitter;
+	var mixin = __webpack_require__(11);
+	var proto = __webpack_require__(12);
 	var Route = __webpack_require__(20);
 	var Router = __webpack_require__(19);
 	var req = __webpack_require__(64);
@@ -595,13 +1184,13 @@
 
 
 /***/ },
-/* 3 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = require("events");
 
 /***/ },
-/* 4 */
+/* 11 */
 /***/ function(module, exports) {
 
 	/*!
@@ -667,7 +1256,7 @@
 
 
 /***/ },
-/* 5 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -685,12 +1274,12 @@
 	 * @private
 	 */
 	
-	var finalhandler = __webpack_require__(6);
+	var finalhandler = __webpack_require__(13);
 	var Router = __webpack_require__(19);
 	var methods = __webpack_require__(24);
 	var middleware = __webpack_require__(35);
 	var query = __webpack_require__(36);
-	var debug = __webpack_require__(7)('express:application');
+	var debug = __webpack_require__(1)('express:application');
 	var View = __webpack_require__(41);
 	var http = __webpack_require__(15);
 	var compileETag = __webpack_require__(42).compileETag;
@@ -1316,7 +1905,7 @@
 
 
 /***/ },
-/* 6 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -1332,7 +1921,7 @@
 	 * @private
 	 */
 	
-	var debug = __webpack_require__(7)('finalhandler')
+	var debug = __webpack_require__(1)('finalhandler')
 	var escapeHtml = __webpack_require__(14)
 	var http = __webpack_require__(15)
 	var onFinished = __webpack_require__(16)
@@ -1471,579 +2060,6 @@
 	  req.resume()
 	}
 
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/**
-	 * Module dependencies.
-	 */
-	
-	var tty = __webpack_require__(8);
-	var util = __webpack_require__(9);
-	
-	/**
-	 * This is the Node.js implementation of `debug()`.
-	 *
-	 * Expose `debug()` as the module.
-	 */
-	
-	exports = module.exports = __webpack_require__(10);
-	exports.log = log;
-	exports.formatArgs = formatArgs;
-	exports.save = save;
-	exports.load = load;
-	exports.useColors = useColors;
-	
-	/**
-	 * Colors.
-	 */
-	
-	exports.colors = [6, 2, 3, 4, 5, 1];
-	
-	/**
-	 * The file descriptor to write the `debug()` calls to.
-	 * Set the `DEBUG_FD` env variable to override with another value. i.e.:
-	 *
-	 *   $ DEBUG_FD=3 node script.js 3>debug.log
-	 */
-	
-	var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
-	var stream = 1 === fd ? process.stdout :
-	             2 === fd ? process.stderr :
-	             createWritableStdioStream(fd);
-	
-	/**
-	 * Is stdout a TTY? Colored output is enabled when `true`.
-	 */
-	
-	function useColors() {
-	  var debugColors = (process.env.DEBUG_COLORS || '').trim().toLowerCase();
-	  if (0 === debugColors.length) {
-	    return tty.isatty(fd);
-	  } else {
-	    return '0' !== debugColors
-	        && 'no' !== debugColors
-	        && 'false' !== debugColors
-	        && 'disabled' !== debugColors;
-	  }
-	}
-	
-	/**
-	 * Map %o to `util.inspect()`, since Node doesn't do that out of the box.
-	 */
-	
-	var inspect = (4 === util.inspect.length ?
-	  // node <= 0.8.x
-	  function (v, colors) {
-	    return util.inspect(v, void 0, void 0, colors);
-	  } :
-	  // node > 0.8.x
-	  function (v, colors) {
-	    return util.inspect(v, { colors: colors });
-	  }
-	);
-	
-	exports.formatters.o = function(v) {
-	  return inspect(v, this.useColors)
-	    .replace(/\s*\n\s*/g, ' ');
-	};
-	
-	/**
-	 * Adds ANSI color escape codes if enabled.
-	 *
-	 * @api public
-	 */
-	
-	function formatArgs() {
-	  var args = arguments;
-	  var useColors = this.useColors;
-	  var name = this.namespace;
-	
-	  if (useColors) {
-	    var c = this.color;
-	
-	    args[0] = '  \u001b[3' + c + ';1m' + name + ' '
-	      + '\u001b[0m'
-	      + args[0] + '\u001b[3' + c + 'm'
-	      + ' +' + exports.humanize(this.diff) + '\u001b[0m';
-	  } else {
-	    args[0] = new Date().toUTCString()
-	      + ' ' + name + ' ' + args[0];
-	  }
-	  return args;
-	}
-	
-	/**
-	 * Invokes `console.error()` with the specified arguments.
-	 */
-	
-	function log() {
-	  return stream.write(util.format.apply(this, arguments) + '\n');
-	}
-	
-	/**
-	 * Save `namespaces`.
-	 *
-	 * @param {String} namespaces
-	 * @api private
-	 */
-	
-	function save(namespaces) {
-	  if (null == namespaces) {
-	    // If you set a process.env field to null or undefined, it gets cast to the
-	    // string 'null' or 'undefined'. Just delete instead.
-	    delete process.env.DEBUG;
-	  } else {
-	    process.env.DEBUG = namespaces;
-	  }
-	}
-	
-	/**
-	 * Load `namespaces`.
-	 *
-	 * @return {String} returns the previously persisted debug modes
-	 * @api private
-	 */
-	
-	function load() {
-	  return process.env.DEBUG;
-	}
-	
-	/**
-	 * Copied from `node/src/node.js`.
-	 *
-	 * XXX: It's lame that node doesn't expose this API out-of-the-box. It also
-	 * relies on the undocumented `tty_wrap.guessHandleType()` which is also lame.
-	 */
-	
-	function createWritableStdioStream (fd) {
-	  var stream;
-	  var tty_wrap = process.binding('tty_wrap');
-	
-	  // Note stream._type is used for test-module-load-list.js
-	
-	  switch (tty_wrap.guessHandleType(fd)) {
-	    case 'TTY':
-	      stream = new tty.WriteStream(fd);
-	      stream._type = 'tty';
-	
-	      // Hack to have stream not keep the event loop alive.
-	      // See https://github.com/joyent/node/issues/1726
-	      if (stream._handle && stream._handle.unref) {
-	        stream._handle.unref();
-	      }
-	      break;
-	
-	    case 'FILE':
-	      var fs = __webpack_require__(12);
-	      stream = new fs.SyncWriteStream(fd, { autoClose: false });
-	      stream._type = 'fs';
-	      break;
-	
-	    case 'PIPE':
-	    case 'TCP':
-	      var net = __webpack_require__(13);
-	      stream = new net.Socket({
-	        fd: fd,
-	        readable: false,
-	        writable: true
-	      });
-	
-	      // FIXME Should probably have an option in net.Socket to create a
-	      // stream from an existing fd which is writable only. But for now
-	      // we'll just add this hack and set the `readable` member to false.
-	      // Test: ./node test/fixtures/echo.js < /etc/passwd
-	      stream.readable = false;
-	      stream.read = null;
-	      stream._type = 'pipe';
-	
-	      // FIXME Hack to have stream not keep the event loop alive.
-	      // See https://github.com/joyent/node/issues/1726
-	      if (stream._handle && stream._handle.unref) {
-	        stream._handle.unref();
-	      }
-	      break;
-	
-	    default:
-	      // Probably an error on in uv_guess_handle()
-	      throw new Error('Implement me. Unknown stream file type!');
-	  }
-	
-	  // For supporting legacy API we put the FD here.
-	  stream.fd = fd;
-	
-	  stream._isStdio = true;
-	
-	  return stream;
-	}
-	
-	/**
-	 * Enable namespaces listed in `process.env.DEBUG` initially.
-	 */
-	
-	exports.enable(load());
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	module.exports = require("tty");
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	module.exports = require("util");
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/**
-	 * This is the common logic for both the Node.js and web browser
-	 * implementations of `debug()`.
-	 *
-	 * Expose `debug()` as the module.
-	 */
-	
-	exports = module.exports = debug;
-	exports.coerce = coerce;
-	exports.disable = disable;
-	exports.enable = enable;
-	exports.enabled = enabled;
-	exports.humanize = __webpack_require__(11);
-	
-	/**
-	 * The currently active debug mode names, and names to skip.
-	 */
-	
-	exports.names = [];
-	exports.skips = [];
-	
-	/**
-	 * Map of special "%n" handling functions, for the debug "format" argument.
-	 *
-	 * Valid key names are a single, lowercased letter, i.e. "n".
-	 */
-	
-	exports.formatters = {};
-	
-	/**
-	 * Previously assigned color.
-	 */
-	
-	var prevColor = 0;
-	
-	/**
-	 * Previous log timestamp.
-	 */
-	
-	var prevTime;
-	
-	/**
-	 * Select a color.
-	 *
-	 * @return {Number}
-	 * @api private
-	 */
-	
-	function selectColor() {
-	  return exports.colors[prevColor++ % exports.colors.length];
-	}
-	
-	/**
-	 * Create a debugger with the given `namespace`.
-	 *
-	 * @param {String} namespace
-	 * @return {Function}
-	 * @api public
-	 */
-	
-	function debug(namespace) {
-	
-	  // define the `disabled` version
-	  function disabled() {
-	  }
-	  disabled.enabled = false;
-	
-	  // define the `enabled` version
-	  function enabled() {
-	
-	    var self = enabled;
-	
-	    // set `diff` timestamp
-	    var curr = +new Date();
-	    var ms = curr - (prevTime || curr);
-	    self.diff = ms;
-	    self.prev = prevTime;
-	    self.curr = curr;
-	    prevTime = curr;
-	
-	    // add the `color` if not set
-	    if (null == self.useColors) self.useColors = exports.useColors();
-	    if (null == self.color && self.useColors) self.color = selectColor();
-	
-	    var args = Array.prototype.slice.call(arguments);
-	
-	    args[0] = exports.coerce(args[0]);
-	
-	    if ('string' !== typeof args[0]) {
-	      // anything else let's inspect with %o
-	      args = ['%o'].concat(args);
-	    }
-	
-	    // apply any `formatters` transformations
-	    var index = 0;
-	    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
-	      // if we encounter an escaped % then don't increase the array index
-	      if (match === '%%') return match;
-	      index++;
-	      var formatter = exports.formatters[format];
-	      if ('function' === typeof formatter) {
-	        var val = args[index];
-	        match = formatter.call(self, val);
-	
-	        // now we need to remove `args[index]` since it's inlined in the `format`
-	        args.splice(index, 1);
-	        index--;
-	      }
-	      return match;
-	    });
-	
-	    if ('function' === typeof exports.formatArgs) {
-	      args = exports.formatArgs.apply(self, args);
-	    }
-	    var logFn = enabled.log || exports.log || console.log.bind(console);
-	    logFn.apply(self, args);
-	  }
-	  enabled.enabled = true;
-	
-	  var fn = exports.enabled(namespace) ? enabled : disabled;
-	
-	  fn.namespace = namespace;
-	
-	  return fn;
-	}
-	
-	/**
-	 * Enables a debug mode by namespaces. This can include modes
-	 * separated by a colon and wildcards.
-	 *
-	 * @param {String} namespaces
-	 * @api public
-	 */
-	
-	function enable(namespaces) {
-	  exports.save(namespaces);
-	
-	  var split = (namespaces || '').split(/[\s,]+/);
-	  var len = split.length;
-	
-	  for (var i = 0; i < len; i++) {
-	    if (!split[i]) continue; // ignore empty strings
-	    namespaces = split[i].replace(/\*/g, '.*?');
-	    if (namespaces[0] === '-') {
-	      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-	    } else {
-	      exports.names.push(new RegExp('^' + namespaces + '$'));
-	    }
-	  }
-	}
-	
-	/**
-	 * Disable debug output.
-	 *
-	 * @api public
-	 */
-	
-	function disable() {
-	  exports.enable('');
-	}
-	
-	/**
-	 * Returns true if the given mode name is enabled, false otherwise.
-	 *
-	 * @param {String} name
-	 * @return {Boolean}
-	 * @api public
-	 */
-	
-	function enabled(name) {
-	  var i, len;
-	  for (i = 0, len = exports.skips.length; i < len; i++) {
-	    if (exports.skips[i].test(name)) {
-	      return false;
-	    }
-	  }
-	  for (i = 0, len = exports.names.length; i < len; i++) {
-	    if (exports.names[i].test(name)) {
-	      return true;
-	    }
-	  }
-	  return false;
-	}
-	
-	/**
-	 * Coerce `val`.
-	 *
-	 * @param {Mixed} val
-	 * @return {Mixed}
-	 * @api private
-	 */
-	
-	function coerce(val) {
-	  if (val instanceof Error) return val.stack || val.message;
-	  return val;
-	}
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	/**
-	 * Helpers.
-	 */
-	
-	var s = 1000;
-	var m = s * 60;
-	var h = m * 60;
-	var d = h * 24;
-	var y = d * 365.25;
-	
-	/**
-	 * Parse or format the given `val`.
-	 *
-	 * Options:
-	 *
-	 *  - `long` verbose formatting [false]
-	 *
-	 * @param {String|Number} val
-	 * @param {Object} options
-	 * @return {String|Number}
-	 * @api public
-	 */
-	
-	module.exports = function(val, options){
-	  options = options || {};
-	  if ('string' == typeof val) return parse(val);
-	  return options.long
-	    ? long(val)
-	    : short(val);
-	};
-	
-	/**
-	 * Parse the given `str` and return milliseconds.
-	 *
-	 * @param {String} str
-	 * @return {Number}
-	 * @api private
-	 */
-	
-	function parse(str) {
-	  str = '' + str;
-	  if (str.length > 10000) return;
-	  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
-	  if (!match) return;
-	  var n = parseFloat(match[1]);
-	  var type = (match[2] || 'ms').toLowerCase();
-	  switch (type) {
-	    case 'years':
-	    case 'year':
-	    case 'yrs':
-	    case 'yr':
-	    case 'y':
-	      return n * y;
-	    case 'days':
-	    case 'day':
-	    case 'd':
-	      return n * d;
-	    case 'hours':
-	    case 'hour':
-	    case 'hrs':
-	    case 'hr':
-	    case 'h':
-	      return n * h;
-	    case 'minutes':
-	    case 'minute':
-	    case 'mins':
-	    case 'min':
-	    case 'm':
-	      return n * m;
-	    case 'seconds':
-	    case 'second':
-	    case 'secs':
-	    case 'sec':
-	    case 's':
-	      return n * s;
-	    case 'milliseconds':
-	    case 'millisecond':
-	    case 'msecs':
-	    case 'msec':
-	    case 'ms':
-	      return n;
-	  }
-	}
-	
-	/**
-	 * Short format for `ms`.
-	 *
-	 * @param {Number} ms
-	 * @return {String}
-	 * @api private
-	 */
-	
-	function short(ms) {
-	  if (ms >= d) return Math.round(ms / d) + 'd';
-	  if (ms >= h) return Math.round(ms / h) + 'h';
-	  if (ms >= m) return Math.round(ms / m) + 'm';
-	  if (ms >= s) return Math.round(ms / s) + 's';
-	  return ms + 'ms';
-	}
-	
-	/**
-	 * Long format for `ms`.
-	 *
-	 * @param {Number} ms
-	 * @return {String}
-	 * @api private
-	 */
-	
-	function long(ms) {
-	  return plural(ms, d, 'day')
-	    || plural(ms, h, 'hour')
-	    || plural(ms, m, 'minute')
-	    || plural(ms, s, 'second')
-	    || ms + ' ms';
-	}
-	
-	/**
-	 * Pluralization helper.
-	 */
-	
-	function plural(ms, n, name) {
-	  if (ms < n) return;
-	  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
-	  return Math.ceil(ms / n) + ' ' + name + 's';
-	}
-
-
-/***/ },
-/* 12 */
-/***/ function(module, exports) {
-
-	module.exports = require("fs");
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	module.exports = require("net");
 
 /***/ },
 /* 14 */
@@ -2536,7 +2552,7 @@
 	var Layer = __webpack_require__(22);
 	var methods = __webpack_require__(24);
 	var mixin = __webpack_require__(25);
-	var debug = __webpack_require__(7)('express:router');
+	var debug = __webpack_require__(1)('express:router');
 	var deprecate = __webpack_require__(26)('express');
 	var flatten = __webpack_require__(21);
 	var parseUrl = __webpack_require__(33);
@@ -3183,7 +3199,7 @@
 	 * @private
 	 */
 	
-	var debug = __webpack_require__(7)('express:router:route');
+	var debug = __webpack_require__(1)('express:router:route');
 	var flatten = __webpack_require__(21);
 	var Layer = __webpack_require__(22);
 	var methods = __webpack_require__(24);
@@ -3470,7 +3486,7 @@
 	 */
 	
 	var pathRegexp = __webpack_require__(23);
-	var debug = __webpack_require__(7)('express:router:layer');
+	var debug = __webpack_require__(1)('express:router:layer');
 	
 	/**
 	 * Module variables.
@@ -4416,7 +4432,7 @@
 	 */
 	
 	var Buffer = __webpack_require__(28)
-	var EventEmitter = __webpack_require__(3).EventEmitter
+	var EventEmitter = __webpack_require__(10).EventEmitter
 	
 	/**
 	 * Module exports.
@@ -5482,9 +5498,9 @@
 	 * @private
 	 */
 	
-	var debug = __webpack_require__(7)('express:view');
+	var debug = __webpack_require__(1)('express:view');
 	var path = __webpack_require__(32);
-	var fs = __webpack_require__(12);
+	var fs = __webpack_require__(6);
 	var utils = __webpack_require__(42);
 	
 	/**
@@ -6638,7 +6654,7 @@
 	 */
 	
 	var createError = __webpack_require__(46)
-	var debug = __webpack_require__(7)('send')
+	var debug = __webpack_require__(1)('send')
 	var deprecate = __webpack_require__(26)('send')
 	var destroy = __webpack_require__(50)
 	var escapeHtml = __webpack_require__(14)
@@ -6647,12 +6663,12 @@
 	  , mime = __webpack_require__(53)
 	  , fresh = __webpack_require__(55)
 	  , path = __webpack_require__(32)
-	  , fs = __webpack_require__(12)
+	  , fs = __webpack_require__(6)
 	  , normalize = path.normalize
 	  , join = path.join
 	var etag = __webpack_require__(56)
-	var EventEmitter = __webpack_require__(3).EventEmitter;
-	var ms = __webpack_require__(11);
+	var EventEmitter = __webpack_require__(10).EventEmitter;
+	var ms = __webpack_require__(5);
 	var onFinished = __webpack_require__(16)
 	var statuses = __webpack_require__(47)
 	
@@ -7710,7 +7726,7 @@
 /* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(9).inherits
+	module.exports = __webpack_require__(3).inherits
 
 
 /***/ },
@@ -7730,7 +7746,7 @@
 	 * @private
 	 */
 	
-	var ReadStream = __webpack_require__(12).ReadStream
+	var ReadStream = __webpack_require__(6).ReadStream
 	var Stream = __webpack_require__(51)
 	
 	/**
@@ -7874,7 +7890,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var path = __webpack_require__(32);
-	var fs = __webpack_require__(12);
+	var fs = __webpack_require__(6);
 	
 	function Mime() {
 	  // Map of extension -> mime type
@@ -10662,7 +10678,7 @@
 	 */
 	
 	var crypto = __webpack_require__(57)
-	var Stats = __webpack_require__(12).Stats
+	var Stats = __webpack_require__(6).Stats
 	
 	/**
 	 * Module variables.
@@ -11676,10 +11692,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./application": 5,
-		"./application.js": 5,
-		"./express": 2,
-		"./express.js": 2,
+		"./application": 12,
+		"./application.js": 12,
+		"./express": 9,
+		"./express.js": 9,
 		"./middleware/init": 35,
 		"./middleware/init.js": 35,
 		"./middleware/query": 36,
@@ -11734,7 +11750,7 @@
 	
 	var accepts = __webpack_require__(65);
 	var deprecate = __webpack_require__(26)('express');
-	var isIP = __webpack_require__(13).isIP;
+	var isIP = __webpack_require__(7).isIP;
 	var typeis = __webpack_require__(74);
 	var http = __webpack_require__(15);
 	var fresh = __webpack_require__(55);
@@ -49136,11 +49152,7 @@
 					React.createElement(
 						'nav',
 						null,
-						React.createElement(
-							'p',
-							null,
-							'NAV'
-						)
+						React.createElement(Topics, this.props)
 					),
 					React.createElement(Questions, this.props)
 				);
@@ -49215,7 +49227,7 @@
 	
 				console.log('Render topics');
 				console.log(this.props);
-				// console.log(this.props.static.topics);
+				// console.log(this.props.passive.topics);
 	
 				var toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
 	
@@ -49235,7 +49247,7 @@
 						React.createElement(
 							'ul',
 							{ className: 'topics__list' },
-							this.props.static.topics.map(function (topic, id) {
+							this.props.passive.topics.map(function (topic, id) {
 	
 								console.log(topic);
 	
@@ -61252,20 +61264,9 @@
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
-	var fs = __webpack_require__(12);
-	var debug = __webpack_require__(7)('curate');
+	var debug = __webpack_require__(1)('curate');
+	var getFeed = __webpack_require__(338);
 	var questionPath = __webpack_require__(331);
-	
-	/**
-	 * Pulls in the static feed.json file from the server.
-	 * @return {object} Parsed JSON data.
-	 */
-	function getFeed() {
-	
-	    var raw = fs.readFileSync('./feed.json');
-	
-	    return JSON.parse(raw);
-	}
 	
 	/**
 	 * Distills down the request URL into an array that we can utilise to access the
@@ -61277,6 +61278,8 @@
 	 * @returns {array} An array referencing our nested JSON structure.
 	 */
 	function distillPath(path) {
+	
+	    debug('distillPath');
 	
 	    // Remove any query string references.
 	    var index = path.indexOf('?');
@@ -61293,14 +61296,14 @@
 	/**
 	 * If no applicable category is provided then we merge all categories into a
 	 * single array to represent the /all status.
-	 * @param {array} keys - The category names that we will extract from feed.JSON
-	 * @return {array} The merged feed data into a single array.
+	 * @param {array} keys - The category names that we will extract from questions.JSON
+	 * @return {array} The merged questions data into a single array.
 	 */
-	function mergeFeed(feed) {
+	function mergeFeed(questions) {
 	
 	    debug('mergeFeed');
 	
-	    var keys = Object.keys(feed);
+	    var keys = Object.keys(questions);
 	    var merged = [];
 	
 	    var _iteratorNormalCompletion = true;
@@ -61310,7 +61313,7 @@
 	    try {
 	        for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	            var key = _step.value;
-	            merged.push.apply(merged, _toConsumableArray(feed[key].questions));
+	            merged.push.apply(merged, _toConsumableArray(questions[key]));
 	        }
 	    } catch (err) {
 	        _didIteratorError = true;
@@ -61333,11 +61336,13 @@
 	/**
 	 * If there was a successful question match from matchQuestion() then we extract
 	 * it and bump it up to the top question in the JSON array.
-	 * @param {array} JSON - The extracted feed content.
+	 * @param {array} JSON - The extracted questions content.
 	 * @param {number} id - The array id of the matched content.
 	 * @return {array} The reordered JSON data.
 	 */
 	function extractQuestion(json, id) {
+	
+	    debug('extractQuestion');
 	
 	    var match = json.splice(id, 1);
 	
@@ -61348,7 +61353,7 @@
 	 * If the user has specified to surface a specific question in their URL request
 	 * then we extract that particular question reference and push it to the top of
 	 * the content stack.
-	 * @param {array} JSON - The extracted feed content.
+	 * @param {array} JSON - The extracted questions content.
 	 * @param {string} path - The question path in which to match the JSON content
 	 * against.
 	 * @return {array} The potentially reformatted son structure depending on
@@ -61382,16 +61387,18 @@
 	 * In that regard we test the request URL and reformat the steps system i.e.
 	 * [category, question] to cater to this formatting choice.
 	 * @param {array} steps - The path to JSON correlation generated from distillPath().
-	 * @param {object} feed - The JSON data from the server.
+	 * @param {object} questions - The distilled question data.
 	 * @return {object} The formatted steps system.
 	 */
-	function extrapolatePath(steps, feed) {
+	function extrapolatePath(steps, questions) {
+	
+	    debug('extrapolatePath');
 	
 	    if (steps.length === 1) {
 	
 	        var category = steps[0];
 	
-	        steps = feed[category] || category === 'all' ? steps : ['all', category];
+	        steps = questions[category] || category === 'all' ? steps : ['all', category];
 	    }
 	
 	    return {
@@ -61401,47 +61408,87 @@
 	}
 	
 	/**
-	 * We extract the relevant JSON data from the feed.json file based on the current step parameters.
-	 * @param {object} feed - The JSON data from the server.
+	 * We extract the relevant JSON data from the questions.json file based on the
+	 * current step parameters.
+	 * @param {object} questions - The distilled question data.
 	 * @param {string} category - The first step into the JSON data.
 	 * @param {string} question - The second step into the JSON data.
 	 * @return {object} The extracted JSON data.
 	 */
-	function extractJson(feed, category, question) {
+	function extractJson(questions, category, question) {
 	
 	    debug('extractJson');
 	
 	    var json = void 0;
 	
-	    debug('feed[' + category + '] = ' + (feed[category] ? 'true' : 'false'));
-	    json = feed[category] ? feed[category].questions : mergeFeed(feed);
-	    debug('relevant JSON', json);
+	    json = questions[category] ? questions[category] : mergeFeed(questions);
 	    json = matchQuestion(json, question);
 	
 	    return json;
 	}
 	
 	/**
-	 * Curates the feed.json data to reflect the users URL request. We first finesse the request path into an applicable format, make concessions to surface data rather than a nasty 404 if the query is not relevant then package up the relating content for injection via our React system.
+	 * Distills the entire feed.json file down to represent only the relevant question
+	 * data.
+	 * @param {object} feed - The JSON data from the server.
+	 * @return {object} The extracted JSON data.
+	 */
+	function distillFeed(feed) {
+	
+	    debug('distillFeed');
+	
+	    var keys = Object.keys(feed.topics);
+	    var questions = {};
+	
+	    var _iteratorNormalCompletion2 = true;
+	    var _didIteratorError2 = false;
+	    var _iteratorError2 = undefined;
+	
+	    try {
+	        for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	            var key = _step2.value;
+	            questions[key] = feed.topics[key].questions;
+	        }
+	    } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	    } finally {
+	        try {
+	            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                _iterator2.return();
+	            }
+	        } finally {
+	            if (_didIteratorError2) {
+	                throw _iteratorError2;
+	            }
+	        }
+	    }
+	
+	    return questions;
+	}
+	
+	/**
+	 * Curates the feed.json data to reflect the users URL request. We first finesse
+	 * the request path into an applicable format, make concessions to surface data
+	 * rather than a nasty 404 if the query is not relevant then package up the relating
+	 * content for injection via our React system.
 	 * @param {string} path - The raw request URL sent through from our Express.js server.
 	 * @return {array} the curated JSON data.
 	 */
 	function curate(path) {
 	
-	    debug('curating feed....');
+	    debug('curate (questions)...');
 	
 	    var feed = getFeed();
-	    debug('feed', feed);
+	    var questions = distillFeed(feed);
 	    var steps = distillPath(path);
 	
-	    var _extrapolatePath = extrapolatePath(steps, feed);
+	    var _extrapolatePath = extrapolatePath(steps, questions);
 	
 	    var category = _extrapolatePath.category;
 	    var question = _extrapolatePath.question;
 	
-	    debug('category = ' + category + ' | question = ' + question);
-	    var json = extractJson(feed, category, question);
-	    debug(json);
+	    var json = extractJson(questions, category, question);
 	
 	    return json;
 	}
@@ -61450,6 +61497,116 @@
 
 /***/ },
 /* 338 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var fs = __webpack_require__(6);
+	
+	/**
+	 * Pulls in the static feed.json file from the server.
+	 * @return {object} Parsed JSON data.
+	 */
+	function feed() {
+	
+	  var raw = fs.readFileSync('./feed.json');
+	
+	  return JSON.parse(raw);
+	}
+	
+	module.exports = feed;
+
+/***/ },
+/* 339 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var debug = __webpack_require__(1)('props');
+	var getFeed = __webpack_require__(338);
+	
+	/**
+	 * Extract only the relevant passive topic data from the JSON. We also change
+	 * the data structure from an object into an array for easy looping with React.
+	 * @param {object} topics - Topic data from feed.json
+	 * @return {array} Extracted topic data.
+	 */
+	function extractTopics(topics) {
+	
+	    var keys = Object.keys(topics);
+	    var json = [];
+	
+	    var _iteratorNormalCompletion = true;
+	    var _didIteratorError = false;
+	    var _iteratorError = undefined;
+	
+	    try {
+	        for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	            var key = _step.value;
+	
+	
+	            var topic = topics[key];
+	            var data = _extends({}, topic.overview, { url: '/' + key, total: topic.questions.length });
+	
+	            json.push(data);
+	        }
+	    } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	    } finally {
+	        try {
+	            if (!_iteratorNormalCompletion && _iterator.return) {
+	                _iterator.return();
+	            }
+	        } finally {
+	            if (_didIteratorError) {
+	                throw _iteratorError;
+	            }
+	        }
+	    }
+	
+	    return json;
+	}
+	
+	/**
+	 * Consolidate only the data associated with passive props.
+	 * @param {object} feed - The raw feed data from feed.json
+	 * @param {object} feed.hero - The hero data extracted via destructuring.
+	 * @param {object} feed.topics - The topics data extracted via destructuring.
+	 * @returns {object} The distilled JSON.
+	 */
+	function distillFeed(_ref) {
+	    var hero = _ref.hero;
+	    var topics = _ref.topics;
+	
+	
+	    return {
+	        hero: hero,
+	        topics: extractTopics(topics)
+	    };
+	}
+	
+	/**
+	 * Extracts the passive props (will not change during the executions duration)
+	 * from feed.json
+	 * @return {object} The extracted JSON.
+	 */
+	function extract() {
+	
+	    debug('extract (passive props)...');
+	
+	    var feed = getFeed();
+	    var json = distillFeed(feed);
+	
+	    return json;
+	}
+	
+	module.exports = extract;
+
+/***/ },
+/* 340 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -61462,16 +61619,18 @@
 		var _ref$content = _ref.content;
 		var content = _ref$content === undefined ? 'error' : _ref$content;
 		var _ref$state = _ref.state;
-		var state = _ref$state === undefined ? null : _ref$state;
+		var state = _ref$state === undefined ? {} : _ref$state;
+		var _ref$passive = _ref.passive;
+		var passive = _ref$passive === undefined ? {} : _ref$passive;
 	
 	
-		return '<!DOCTYPE html>\n\t    <html>\n\t        <head>\n\t            <meta charset="utf-8">\n\t            <meta http-equiv="x-ua-compatible" content="ie=edge">\n\t            <title>' + title + '</title>\n\t            <meta name="description" content="' + desc + '">\n\t            <meta name="viewport" content="width=device-width, initial-scale=1">\n\t            <link rel="apple-touch-icon" href="apple-touch-icon.png">\n\t            <link rel="stylesheet" href="/style.css">\n\t\t\t\t<script id="baseState">\n\t\t\t\t\twindow.__REDUX_STATE__ = ' + JSON.stringify(state) + ';\n\t\t\t\t</script>\n\t        </head>\n\t        <body>\n\t            <div id="app" class="app">' + content + '</div>\n\t            <script src="/client.js"></script>\n\t        </body>\n\t    </html>';
+		return '<!DOCTYPE html>\n\t    <html>\n\t        <head>\n\t            <meta charset="utf-8">\n\t            <meta http-equiv="x-ua-compatible" content="ie=edge">\n\t            <title>' + title + '</title>\n\t            <meta name="description" content="' + desc + '">\n\t            <meta name="viewport" content="width=device-width, initial-scale=1">\n\t            <link rel="apple-touch-icon" href="apple-touch-icon.png">\n\t            <link rel="stylesheet" href="/style.css">\n\t\t\t\t<script>\n\t\t\t\t\twindow.__REDUX_STATE__ = ' + JSON.stringify(state) + ';\n\t\t\t\t\twindow.__PASSIVE_PROPS__ = ' + JSON.stringify(passive) + ';\n\t\t\t\t</script>\n\t        </head>\n\t        <body>\n\t            <div id="app" class="app">' + content + '</div>\n\t            <script src="/client.js"></script>\n\t        </body>\n\t    </html>';
 	};
 	
 	module.exports = scaffold;
 
 /***/ },
-/* 339 */
+/* 341 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

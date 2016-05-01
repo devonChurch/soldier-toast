@@ -1,20 +1,8 @@
 'use strict';
 
-const fs = require('fs');
 const debug = require('debug')('curate');
+const getFeed = require('./feed');
 const questionPath = require('./question-path');
-
-/**
- * Pulls in the static feed.json file from the server.
- * @return {object} Parsed JSON data.
- */
-function getFeed() {
-
-    const raw = fs.readFileSync('./feed.json');
-
-    return JSON.parse(raw);
-
-}
 
 /**
  * Distills down the request URL into an array that we can utilise to access the
@@ -26,6 +14,8 @@ function getFeed() {
  * @returns {array} An array referencing our nested JSON structure.
  */
 function distillPath(path) {
+
+    debug('distillPath');
 
     // Remove any query string references.
     const index = path.indexOf('?');
@@ -43,17 +33,17 @@ function distillPath(path) {
 /**
  * If no applicable category is provided then we merge all categories into a
  * single array to represent the /all status.
- * @param {array} keys - The category names that we will extract from feed.JSON
- * @return {array} The merged feed data into a single array.
+ * @param {array} keys - The category names that we will extract from questions.JSON
+ * @return {array} The merged questions data into a single array.
  */
-function mergeFeed(feed) {
+function mergeFeed(questions) {
 
     debug('mergeFeed');
 
-    const keys = Object.keys(feed);
+    const keys = Object.keys(questions);
     const merged = [];
 
-    for (let key of keys) merged.push(...feed[key].questions);
+    for (let key of keys) merged.push(...questions[key]);
 
     return merged;
 
@@ -62,11 +52,13 @@ function mergeFeed(feed) {
 /**
  * If there was a successful question match from matchQuestion() then we extract
  * it and bump it up to the top question in the JSON array.
- * @param {array} JSON - The extracted feed content.
+ * @param {array} JSON - The extracted questions content.
  * @param {number} id - The array id of the matched content.
  * @return {array} The reordered JSON data.
  */
 function extractQuestion(json, id) {
+
+    debug('extractQuestion');
 
     const match = json.splice(id, 1);
 
@@ -78,7 +70,7 @@ function extractQuestion(json, id) {
  * If the user has specified to surface a specific question in their URL request
  * then we extract that particular question reference and push it to the top of
  * the content stack.
- * @param {array} JSON - The extracted feed content.
+ * @param {array} JSON - The extracted questions content.
  * @param {string} path - The question path in which to match the JSON content
  * against.
  * @return {array} The potentially reformatted son structure depending on
@@ -115,16 +107,18 @@ function matchQuestion(json, question) {
  * In that regard we test the request URL and reformat the steps system i.e.
  * [category, question] to cater to this formatting choice.
  * @param {array} steps - The path to JSON correlation generated from distillPath().
- * @param {object} feed - The JSON data from the server.
+ * @param {object} questions - The distilled question data.
  * @return {object} The formatted steps system.
  */
-function extrapolatePath(steps, feed) {
+function extrapolatePath(steps, questions) {
+
+    debug('extrapolatePath');
 
     if (steps.length === 1) {
 
         const category = steps[0];
 
-        steps = feed[category] || category === 'all' ? steps : ['all', category];
+        steps = questions[category] || category === 'all' ? steps : ['all', category];
 
     }
 
@@ -136,21 +130,20 @@ function extrapolatePath(steps, feed) {
 }
 
 /**
- * We extract the relevant JSON data from the feed.json file based on the current step parameters.
- * @param {object} feed - The JSON data from the server.
+ * We extract the relevant JSON data from the questions.json file based on the
+ * current step parameters.
+ * @param {object} questions - The distilled question data.
  * @param {string} category - The first step into the JSON data.
  * @param {string} question - The second step into the JSON data.
  * @return {object} The extracted JSON data.
  */
-function extractJson(feed, category, question) {
+function extractJson(questions, category, question) {
 
     debug('extractJson');
 
     let json;
 
-    debug(`feed[${category}] = ${feed[category] ? 'true' : 'false'}`);
-    json = feed[category] ? feed[category].questions : mergeFeed(feed);
-    debug('relevant JSON', json);
+    json = questions[category] ? questions[category] : mergeFeed(questions);
     json = matchQuestion(json, question);
 
     return json;
@@ -158,21 +151,41 @@ function extractJson(feed, category, question) {
 }
 
 /**
- * Curates the feed.json data to reflect the users URL request. We first finesse the request path into an applicable format, make concessions to surface data rather than a nasty 404 if the query is not relevant then package up the relating content for injection via our React system.
+ * Distills the entire feed.json file down to represent only the relevant question
+ * data.
+ * @param {object} feed - The JSON data from the server.
+ * @return {object} The extracted JSON data.
+ */
+function distillFeed(feed) {
+
+    debug('distillFeed');
+
+    const keys = Object.keys(feed.topics);
+    let questions = {};
+
+    for (let key of keys) questions[key] = feed.topics[key].questions;
+
+    return questions;
+
+}
+
+/**
+ * Curates the feed.json data to reflect the users URL request. We first finesse
+ * the request path into an applicable format, make concessions to surface data
+ * rather than a nasty 404 if the query is not relevant then package up the relating
+ * content for injection via our React system.
  * @param {string} path - The raw request URL sent through from our Express.js server.
  * @return {array} the curated JSON data.
  */
 function curate(path) {
 
-    debug('curating feed....');
+    debug('curate (questions)...');
 
     const feed = getFeed();
-    debug('feed', feed);
+    const questions = distillFeed(feed);
     const steps = distillPath(path);
-    const {category, question} = extrapolatePath(steps, feed);
-    debug(`category = ${category} | question = ${question}`);
-    const json = extractJson(feed, category, question);
-    debug(json);
+    const {category, question} = extrapolatePath(steps, questions);
+    const json = extractJson(questions, category, question);
 
     return json;
 

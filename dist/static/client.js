@@ -109,45 +109,53 @@
 	/**
 	 *
 	 */
-	function rehydrate() {
+	var rehydrate = {
+		state: function state() {
 	
-		console.log('rehydrate');
+			console.log('rehydrate (state)');
 	
-		var raw = window.__REDUX_STATE__;
-		console.log(raw);
-		return raw; // ? JSON.parse(raw) : {};
+			return window.__REDUX_STATE__;
+		},
+		props: function props() {
 	
-		// return {foo: 1, bar: 2, baz: 3};
-	}
+			console.log('rehydrate (props)');
+	
+			return window.__PASSIVE_PROPS__;
+		}
+	};
 	
 	/**
 	 *
 	 */
 	function createElement(Component, props) {
 	
-		var hero = {
-			heading: 'Hero!',
-			description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-		};
+		// const hero = {
+		// 	heading: 'Hero!',
+		// 	description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+		// };
+		//
+		// const topics = [
+		// 	{
+		// 		heading: 'Topic one',
+		// 		description: 'Description one',
+		// 		url: '/apple',
+		// 		total: 7
+		// 	},
+		// 	{
+		// 		heading: 'Topic two',
+		// 		description: 'Description two',
+		// 		url: '/banana',
+		// 		total: 7
+		// 	},
+		// 	{
+		// 		heading: 'Topic three',
+		// 		description: 'Description three',
+		// 		url: '/orange',
+		// 		total: 7
+		// 	}
+		// ];
 	
-		var topics = [{
-			heading: 'Topic one',
-			description: 'Description one',
-			url: '/apple',
-			total: 7
-		}, {
-			heading: 'Topic two',
-			description: 'Description two',
-			url: '/banana',
-			total: 7
-		}, {
-			heading: 'Topic three',
-			description: 'Description three',
-			url: '/orange',
-			total: 7
-		}];
-	
-		props = _extends({}, props, { static: { hero: hero, topics: topics } });
+		props = _extends({}, props, { passive: rehydrate.props() });
 	
 		// make sure you pass all the props in!
 		return React.createElement(Component, props);
@@ -185,7 +193,7 @@
 	function initialise() {
 	
 		var store = createStore(combineReducers(reducers), // Reducers.
-		rehydrate(), // State.
+		rehydrate.state(), // State.
 		devTools() // Redux development tools.
 		);
 	
@@ -27159,11 +27167,7 @@
 					React.createElement(
 						'nav',
 						null,
-						React.createElement(
-							'p',
-							null,
-							'NAV'
-						)
+						React.createElement(Topics, this.props)
 					),
 					React.createElement(Questions, this.props)
 				);
@@ -27238,7 +27242,7 @@
 	
 				console.log('Render topics');
 				console.log(this.props);
-				// console.log(this.props.static.topics);
+				// console.log(this.props.passive.topics);
 	
 				var toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
 	
@@ -27258,7 +27262,7 @@
 						React.createElement(
 							'ul',
 							{ className: 'topics__list' },
-							this.props.static.topics.map(function (topic, id) {
+							this.props.passive.topics.map(function (topic, id) {
 	
 								console.log(topic);
 	

@@ -22,50 +22,58 @@ const reducers = require('./reducers');
 /**
  *
  */
-function rehydrate() {
+const rehydrate = {
 
-	console.log('rehydrate');
+	state() {
 
-	const raw = window.__REDUX_STATE__;
-	console.log(raw);
-	return raw; // ? JSON.parse(raw) : {};
+		console.log('rehydrate (state)');
 
-	// return {foo: 1, bar: 2, baz: 3};
+		return window.__REDUX_STATE__;
 
-}
+	},
+
+	props() {
+
+		console.log('rehydrate (props)');
+
+		return window.__PASSIVE_PROPS__;
+
+	}
+
+};
 
 /**
  *
  */
 function createElement(Component, props) {
 
-	const hero = {
-		heading: 'Hero!',
-		description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-	};
+	// const hero = {
+	// 	heading: 'Hero!',
+	// 	description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+	// };
+	//
+	// const topics = [
+	// 	{
+	// 		heading: 'Topic one',
+	// 		description: 'Description one',
+	// 		url: '/apple',
+	// 		total: 7
+	// 	},
+	// 	{
+	// 		heading: 'Topic two',
+	// 		description: 'Description two',
+	// 		url: '/banana',
+	// 		total: 7
+	// 	},
+	// 	{
+	// 		heading: 'Topic three',
+	// 		description: 'Description three',
+	// 		url: '/orange',
+	// 		total: 7
+	// 	}
+	// ];
 
-	const topics = [
-		{
-			heading: 'Topic one',
-			description: 'Description one',
-			url: '/apple',
-			total: 7
-		},
-		{
-			heading: 'Topic two',
-			description: 'Description two',
-			url: '/banana',
-			total: 7
-		},
-		{
-			heading: 'Topic three',
-			description: 'Description three',
-			url: '/orange',
-			total: 7
-		}
-	];
-
-	props = {...props, static: {hero, topics}};
+	props = {...props, passive: rehydrate.props()};
 
 	// make sure you pass all the props in!
 	return <Component {...props}/>;
@@ -110,7 +118,7 @@ function initialise() {
 
 	let store = createStore(
 		combineReducers(reducers), // Reducers.
-		rehydrate(), // State.
+		rehydrate.state(), // State.
 		devTools() // Redux development tools.
 	);
 

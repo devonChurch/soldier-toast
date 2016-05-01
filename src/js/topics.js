@@ -35,7 +35,7 @@ class Topics extends React.Component {
 
 		console.log('Render topics');
 		console.log(this.props);
-		// console.log(this.props.static.topics);
+		// console.log(this.props.passive.topics);
 
 		const toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
 
@@ -45,7 +45,7 @@ class Topics extends React.Component {
 				<div className="topics__dropdown">
 					<ul className="topics__list">
 						{
-							this.props.static.topics.map((topic, id) => {
+							this.props.passive.topics.map((topic, id) => {
 
 								console.log(topic);
 
