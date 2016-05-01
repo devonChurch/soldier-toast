@@ -74,6 +74,8 @@
 
 	'use strict';
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var React = __webpack_require__(7);
 	var ReactDOM = __webpack_require__(38);
 	
@@ -97,8 +99,7 @@
 	var browserHistory = _require3.browserHistory;
 	
 	var routes = __webpack_require__(252);
-	var reducers = __webpack_require__(256);
-	var render = __webpack_require__(261);
+	var reducers = __webpack_require__(259);
 	// let store;
 	
 	// Renderer
@@ -122,23 +123,52 @@
 	/**
 	 *
 	 */
-	// function render() {
-	//
-	// 	console.log(' * - - - - - - - - - - * ');
-	// 	console.log('render');
-	// 	console.log(store.getState());
-	// 	console.log(' * - - - - - - - - - - * ');
-	//
-	//
-	//
-	// 	ReactDOM.render(
-	// 		<Provider store={store}>
-	// 			<Router history={browserHistory} routes={routes} createElement={createElement}/>
-	// 		</Provider>,
-	// 		document.getElementById('app')
-	// 	);
-	//
-	// }
+	function createElement(Component, props) {
+	
+		var hero = {
+			heading: 'Hero!',
+			description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+		};
+	
+		var topics = [{
+			heading: 'Topic one',
+			description: 'Description one',
+			url: '/apple',
+			total: 7
+		}, {
+			heading: 'Topic two',
+			description: 'Description two',
+			url: '/banana',
+			total: 7
+		}, {
+			heading: 'Topic three',
+			description: 'Description three',
+			url: '/orange',
+			total: 7
+		}];
+	
+		props = _extends({}, props, { static: { hero: hero, topics: topics } });
+	
+		// make sure you pass all the props in!
+		return React.createElement(Component, props);
+	}
+	
+	/**
+	 *
+	 */
+	function render(store) {
+	
+		console.log(' * - - - - - - - - - - * ');
+		console.log('render');
+		console.log(store.getState());
+		console.log(' * - - - - - - - - - - * ');
+	
+		ReactDOM.render(React.createElement(
+			Provider,
+			{ store: store },
+			React.createElement(Router, { history: browserHistory, routes: routes, createElement: createElement })
+		), document.getElementById('app'));
+	}
 	
 	/**
 	 * Activates The Redux dev tools Chrome extension.
@@ -27095,8 +27125,8 @@
 	
 	var Link = _require.Link;
 	
-	var Topics = __webpack_require__(257);
-	var Questions = __webpack_require__(254);
+	var Topics = __webpack_require__(254);
+	var Questions = __webpack_require__(257);
 	
 	var Faq = function (_React$Component) {
 		_inherits(Faq, _React$Component);
@@ -27159,6 +27189,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var $ = __webpack_require__(255);
 	var React = __webpack_require__(7);
 	
 	var _require = __webpack_require__(194);
@@ -27169,324 +27200,7 @@
 	
 	var connect = _require2.connect;
 	
-	var _require3 = __webpack_require__(255);
-	
-	var UPDATE_LOADER = _require3.UPDATE_LOADER;
-	var UPDATE_DATA = _require3.UPDATE_DATA;
-	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
-	
-	var questionPath = __webpack_require__(258);
-	
-	var Questions = function (_React$Component) {
-		_inherits(Questions, _React$Component);
-	
-		function Questions() {
-			_classCallCheck(this, Questions);
-	
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(Questions).call(this));
-		}
-	
-		_createClass(Questions, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-	
-				// this.fetch();
-	
-			}
-		}, {
-			key: 'componentWillUnmount',
-			value: function componentWillUnmount() {
-	
-				// FIX!
-				this.request.abort();
-			}
-		}, {
-			key: 'generateUrl',
-			value: function generateUrl() {
-				var _props$routeParams = this.props.routeParams;
-				var topic = _props$routeParams.topic;
-				var _props$routeParams$qu = _props$routeParams.question;
-				var question = _props$routeParams$qu === undefined ? '' : _props$routeParams$qu;
-	
-	
-				return '/api/' + topic + '/' + question;
-			}
-		}, {
-			key: 'fetch',
-			value: function fetch() {
-				var _this2 = this;
-	
-				console.log('fetch | questions');
-	
-				var request = new XMLHttpRequest();
-				var url = this.generateUrl();
-				console.log(url);
-	
-				request.open('GET', url, true);
-	
-				request.onload = function () {
-	
-					if (request.status >= 200 && request.status < 400) {
-						// Success!
-						console.log('success');
-	
-						var data = JSON.parse(request.responseText);
-						console.log(data);
-						_this2.props.updateData(data);
-						_this2.props.updateLoader(false);
-					} else {
-						// We reached our target server, but it returned an error
-						console.log('error');
-					}
-				};
-	
-				request.onerror = function () {
-					// There was a connection error of some sort
-				};
-	
-				request.send();
-			}
-		}, {
-			key: 'loader',
-			value: function loader() {
-	
-				this.fetch();
-	
-				return React.createElement(
-					'div',
-					null,
-					'LOADING...'
-				);
-			}
-		}, {
-			key: 'compile',
-			value: function compile() {
-				var _this3 = this;
-	
-				var topic = this.props.routeParams.topic;
-				var _props$questions = this.props.questions;
-				var data = _props$questions.data;
-				var open = _props$questions.open;
-	
-				// console.log('+++++ compile');
-				// console.log(this.props.questions.data);
-				// () => this.toggleQuestion(id)
-	
-				return data.map(function (question, id) {
-	
-					console.log(id + ' === ' + open);
-	
-					var heading = question.heading;
-					var description = question.description;
-	
-					var path = questionPath(heading);
-					var toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
-	
-					return React.createElement(
-						'li',
-						{ className: 'questions__item', key: id },
-						React.createElement(
-							Link,
-							{ className: toggleClassName, to: '/' + topic + '/' + path, onClick: function onClick() {
-									return _this3.props.toggleQuestion(id);
-								} },
-							heading
-						),
-						React.createElement(
-							'div',
-							{ className: 'questions__dropdown' },
-							React.createElement(
-								'h3',
-								{ className: 'questions__heading' },
-								heading
-							),
-							React.createElement(
-								'p',
-								{ className: 'questions__description' },
-								description
-							)
-						)
-					);
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-	
-				// console.log('render | questions');
-				// console.log(this.props);
-	
-				var loading = this.props.questions.loading;
-				var questions = loading ? this.loader() : this.compile();
-	
-				return React.createElement(
-					'div',
-					{ className: 'questions' },
-					React.createElement(
-						'ul',
-						{ className: 'questions__list' },
-						questions
-					)
-				);
-			}
-		}]);
-	
-		return Questions;
-	}(React.Component);
-	
-	function mapStateToProps(state) {
-	
-		return state;
-	}
-	
-	function mapDispatchToProps(dispatch) {
-	
-		// return bindActionCreators({UPDATE_LOADER}, dispatch);
-	
-		var updateLoader = function updateLoader(status) {
-			dispatch({
-				type: 'questions', // State.
-				operation: UPDATE_LOADER, // Action.
-				status: status // Params.
-			});
-		};
-	
-		var updateData = function updateData(data) {
-			dispatch({
-				type: 'questions', // State.
-				operation: UPDATE_DATA, // Action.
-				data: data // Params.
-			});
-		};
-	
-		var toggleQuestion = function toggleQuestion(id) {
-			dispatch({
-				type: 'questions', // State.
-				operation: TOGGLE_QUESTION, // Action.
-				id: id // Params.
-			});
-		};
-	
-		return { updateLoader: updateLoader, updateData: updateData, toggleQuestion: toggleQuestion };
-	}
-	
-	module.exports = connect(mapStateToProps, mapDispatchToProps)(Questions);
-
-/***/ },
-/* 255 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var actions = {
-		UPDATE_LOADER: 'UPDATE_LOADER',
-		UPDATE_DATA: 'UPDATE_DATA',
-		TOGGLE_QUESTION: 'TOGGLE_QUESTION',
-		SELECT_TOPIC: 'SELECT_TOPIC',
-		TOGGLE_TOPICS: 'TOGGLE_TOPICS'
-	};
-	
-	module.exports = actions;
-
-/***/ },
-/* 256 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _require = __webpack_require__(255);
-	
-	var UPDATE_LOADER = _require.UPDATE_LOADER;
-	var UPDATE_DATA = _require.UPDATE_DATA;
-	var TOGGLE_QUESTION = _require.TOGGLE_QUESTION;
-	var SELECT_TOPIC = _require.SELECT_TOPIC;
-	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
-	
-	
-	function questions() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			loading: true,
-			open: null,
-			data: []
-		} : arguments[0];
-		var action = arguments[1];
-	
-	
-		console.log('reducer | questions');
-		console.log(action);
-	
-		switch (action.operation) {
-	
-			case UPDATE_LOADER:
-				return _extends({}, state, { loading: action.status });
-	
-			case UPDATE_DATA:
-				return _extends({}, state, { data: action.data });
-	
-			case TOGGLE_QUESTION:
-				return _extends({}, state, { open: action.id });
-	
-			default:
-				return state;
-	
-		}
-	}
-	
-	function topics() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			current: 'all',
-			open: false
-		} : arguments[0];
-		var action = arguments[1];
-	
-	
-		console.log('reducer | topics');
-		console.log(action);
-	
-		switch (action.operation) {
-	
-			case SELECT_TOPIC:
-				return _extends({}, state, { current: action.topic });
-	
-			case TOGGLE_TOPICS:
-				return _extends({}, state, { open: !state.open });
-	
-			default:
-				return state;
-	
-		}
-	}
-	
-	module.exports = { questions: questions, topics: topics };
-
-/***/ },
-/* 257 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var $ = __webpack_require__(259);
-	var React = __webpack_require__(7);
-	
-	var _require = __webpack_require__(194);
-	
-	var Link = _require.Link;
-	
-	var _require2 = __webpack_require__(185);
-	
-	var connect = _require2.connect;
-	
-	var _require3 = __webpack_require__(255);
+	var _require3 = __webpack_require__(256);
 	
 	var UPDATE_LOADER = _require3.UPDATE_LOADER;
 	var SELECT_TOPIC = _require3.SELECT_TOPIC;
@@ -27623,20 +27337,7 @@
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);
 
 /***/ },
-/* 258 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	function generate(path) {
-	
-		return path.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
-	}
-	
-	module.exports = generate;
-
-/***/ },
-/* 259 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -37618,88 +37319,333 @@
 
 
 /***/ },
-/* 260 */,
-/* 261 */
+/* 256 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var actions = {
+		UPDATE_LOADER: 'UPDATE_LOADER',
+		UPDATE_DATA: 'UPDATE_DATA',
+		TOGGLE_QUESTION: 'TOGGLE_QUESTION',
+		SELECT_TOPIC: 'SELECT_TOPIC',
+		TOGGLE_TOPICS: 'TOGGLE_TOPICS'
+	};
+	
+	module.exports = actions;
+
+/***/ },
+/* 257 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var React = __webpack_require__(7);
+	
+	var _require = __webpack_require__(194);
+	
+	var Link = _require.Link;
+	
+	var _require2 = __webpack_require__(185);
+	
+	var connect = _require2.connect;
+	
+	var _require3 = __webpack_require__(256);
+	
+	var UPDATE_LOADER = _require3.UPDATE_LOADER;
+	var UPDATE_DATA = _require3.UPDATE_DATA;
+	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
+	
+	var questionPath = __webpack_require__(258);
+	
+	var Questions = function (_React$Component) {
+		_inherits(Questions, _React$Component);
+	
+		function Questions() {
+			_classCallCheck(this, Questions);
+	
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Questions).call(this));
+		}
+	
+		_createClass(Questions, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+	
+				// this.fetch();
+	
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+	
+				// FIX!
+				this.request.abort();
+			}
+		}, {
+			key: 'generateUrl',
+			value: function generateUrl() {
+				var _props$routeParams = this.props.routeParams;
+				var topic = _props$routeParams.topic;
+				var _props$routeParams$qu = _props$routeParams.question;
+				var question = _props$routeParams$qu === undefined ? '' : _props$routeParams$qu;
+	
+	
+				return '/api/' + topic + '/' + question;
+			}
+		}, {
+			key: 'fetch',
+			value: function fetch() {
+				var _this2 = this;
+	
+				console.log('fetch | questions');
+	
+				var request = new XMLHttpRequest();
+				var url = this.generateUrl();
+				console.log(url);
+	
+				request.open('GET', url, true);
+	
+				request.onload = function () {
+	
+					if (request.status >= 200 && request.status < 400) {
+						// Success!
+						console.log('success');
+	
+						var data = JSON.parse(request.responseText);
+						console.log(data);
+						_this2.props.updateData(data);
+						_this2.props.updateLoader(false);
+					} else {
+						// We reached our target server, but it returned an error
+						console.log('error');
+					}
+				};
+	
+				request.onerror = function () {
+					// There was a connection error of some sort
+				};
+	
+				request.send();
+			}
+		}, {
+			key: 'loader',
+			value: function loader() {
+	
+				this.fetch();
+	
+				return React.createElement(
+					'div',
+					null,
+					'LOADING...'
+				);
+			}
+		}, {
+			key: 'compile',
+			value: function compile() {
+				var _this3 = this;
+	
+				var topic = this.props.routeParams.topic;
+				var _props$questions = this.props.questions;
+				var data = _props$questions.data;
+				var open = _props$questions.open;
+	
+				// console.log('+++++ compile');
+				// console.log(this.props.questions.data);
+				// () => this.toggleQuestion(id)
+	
+				return data.map(function (question, id) {
+	
+					console.log(id + ' === ' + open);
+	
+					var heading = question.heading;
+					var description = question.description;
+	
+					var path = questionPath(heading);
+					var toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
+	
+					return React.createElement(
+						'li',
+						{ className: 'questions__item', key: id },
+						React.createElement(
+							Link,
+							{ className: toggleClassName, to: '/' + topic + '/' + path, onClick: function onClick() {
+									return _this3.props.toggleQuestion(id);
+								} },
+							heading
+						),
+						React.createElement(
+							'div',
+							{ className: 'questions__dropdown' },
+							React.createElement(
+								'h3',
+								{ className: 'questions__heading' },
+								heading
+							),
+							React.createElement(
+								'p',
+								{ className: 'questions__description' },
+								description
+							)
+						)
+					);
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+	
+				// console.log('render | questions');
+				// console.log(this.props);
+	
+				var loading = this.props.questions.loading;
+				var questions = loading ? this.loader() : this.compile();
+	
+				return React.createElement(
+					'div',
+					{ className: 'questions' },
+					React.createElement(
+						'ul',
+						{ className: 'questions__list' },
+						questions
+					)
+				);
+			}
+		}]);
+	
+		return Questions;
+	}(React.Component);
+	
+	function mapStateToProps(state) {
+	
+		return state;
+	}
+	
+	function mapDispatchToProps(dispatch) {
+	
+		// return bindActionCreators({UPDATE_LOADER}, dispatch);
+	
+		var updateLoader = function updateLoader(status) {
+			dispatch({
+				type: 'questions', // State.
+				operation: UPDATE_LOADER, // Action.
+				status: status // Params.
+			});
+		};
+	
+		var updateData = function updateData(data) {
+			dispatch({
+				type: 'questions', // State.
+				operation: UPDATE_DATA, // Action.
+				data: data // Params.
+			});
+		};
+	
+		var toggleQuestion = function toggleQuestion(id) {
+			dispatch({
+				type: 'questions', // State.
+				operation: TOGGLE_QUESTION, // Action.
+				id: id // Params.
+			});
+		};
+	
+		return { updateLoader: updateLoader, updateData: updateData, toggleQuestion: toggleQuestion };
+	}
+	
+	module.exports = connect(mapStateToProps, mapDispatchToProps)(Questions);
+
+/***/ },
+/* 258 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	function generate(path) {
+	
+		return path.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
+	}
+	
+	module.exports = generate;
+
+/***/ },
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var React = __webpack_require__(7);
-	var ReactDOM = __webpack_require__(38);
+	var _require = __webpack_require__(256);
 	
-	var _require = __webpack_require__(185);
+	var UPDATE_LOADER = _require.UPDATE_LOADER;
+	var UPDATE_DATA = _require.UPDATE_DATA;
+	var TOGGLE_QUESTION = _require.TOGGLE_QUESTION;
+	var SELECT_TOPIC = _require.SELECT_TOPIC;
+	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
-	var Provider = _require.Provider;
 	
-	var _require2 = __webpack_require__(194);
+	function questions() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			loading: true,
+			open: null,
+			data: []
+		} : arguments[0];
+		var action = arguments[1];
 	
-	var Router = _require2.Router;
-	var Route = _require2.Route;
-	var IndexRoute = _require2.IndexRoute;
-	var Redirect = _require2.Redirect;
-	var Link = _require2.Link;
-	var IndexLink = _require2.IndexLink;
-	var browserHistory = _require2.browserHistory;
 	
-	var routes = __webpack_require__(252);
+		console.log('reducer | questions');
+		console.log(action);
 	
-	// Renderer
-	// Router
-	// redux
+		switch (action.operation) {
 	
-	/**
-	 *
-	 */
-	function createElement(Component, props) {
+			case UPDATE_LOADER:
+				return _extends({}, state, { loading: action.status });
 	
-		var hero = {
-			heading: 'Hero!',
-			description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-		};
+			case UPDATE_DATA:
+				return _extends({}, state, { data: action.data });
 	
-		var topics = [{
-			heading: 'Topic one',
-			description: 'Description one',
-			url: '/apple',
-			total: 7
-		}, {
-			heading: 'Topic two',
-			description: 'Description two',
-			url: '/banana',
-			total: 7
-		}, {
-			heading: 'Topic three',
-			description: 'Description three',
-			url: '/orange',
-			total: 7
-		}];
+			case TOGGLE_QUESTION:
+				return _extends({}, state, { open: action.id });
 	
-		props = _extends({}, props, { static: { hero: hero, topics: topics } });
+			default:
+				return state;
 	
-		// make sure you pass all the props in!
-		return React.createElement(Component, props);
+		}
 	}
 	
-	/**
-	 *
-	 */
-	function render(store) {
+	function topics() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			current: 'all',
+			open: false
+		} : arguments[0];
+		var action = arguments[1];
 	
-		console.log(' * - - - - - - - - - - * ');
-		console.log('render | client');
-		console.log(store.getState());
-		console.log(' * - - - - - - - - - - * ');
 	
-		ReactDOM.render(React.createElement(
-			Provider,
-			{ store: store },
-			React.createElement(Router, { history: browserHistory, routes: routes, createElement: createElement })
-		), document.getElementById('app'));
+		console.log('reducer | topics');
+		console.log(action);
+	
+		switch (action.operation) {
+	
+			case SELECT_TOPIC:
+				return _extends({}, state, { current: action.topic });
+	
+			case TOGGLE_TOPICS:
+				return _extends({}, state, { open: !state.open });
+	
+			default:
+				return state;
+	
+		}
 	}
 	
-	module.exports = render;
+	module.exports = { questions: questions, topics: topics };
 
 /***/ }
 /******/ ]);

@@ -48,6 +48,8 @@ function distillPath(path) {
  */
 function mergeFeed(feed) {
 
+    debug('mergeFeed');
+
     const keys = Object.keys(feed);
     const merged = [];
 
@@ -82,7 +84,9 @@ function extractQuestion(json, id) {
  * @return {array} The potentially reformatted son structure depending on
  * successfully match.
  */
-function matchQuestion(json, path) {
+function matchQuestion(json, question) {
+
+    debug('matchQuestion');
 
     let id = null;
 
@@ -93,7 +97,7 @@ function matchQuestion(json, path) {
         // We generate the URL dynamically from the current questions heading.
         const compare = questionPath(heading);
 
-        if (compare === path) {
+        if (compare === question) {
 
             id = i;
             break;
@@ -102,9 +106,7 @@ function matchQuestion(json, path) {
 
     }
 
-    const returnMe = id === null ? json : extractQuestion(json, id);
-
-    return returnMe;
+    return id === null ? json : extractQuestion(json, id);
 
 }
 
@@ -117,8 +119,6 @@ function matchQuestion(json, path) {
  * @return {object} The formatted steps system.
  */
 function extrapolatePath(steps, feed) {
-
-
 
     if (steps.length === 1) {
 
@@ -144,9 +144,13 @@ function extrapolatePath(steps, feed) {
  */
 function extractJson(feed, category, question) {
 
+    debug('extractJson');
+
     let json;
 
-    json = feed[category].questions || mergeFeed(feed);
+    debug(`feed[${category}] = ${feed[category] ? 'true' : 'false'}`);
+    json = feed[category] ? feed[category].questions : mergeFeed(feed);
+    debug('relevant JSON', json);
     json = matchQuestion(json, question);
 
     return json;
@@ -163,9 +167,12 @@ function curate(path) {
     debug('curating feed....');
 
     const feed = getFeed();
+    debug('feed', feed);
     const steps = distillPath(path);
     const {category, question} = extrapolatePath(steps, feed);
+    debug(`category = ${category} | question = ${question}`);
     const json = extractJson(feed, category, question);
+    debug(json);
 
     return json;
 

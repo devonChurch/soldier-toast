@@ -91,6 +91,7 @@ app.get('*', (req, res) => {
 
             const request = req.url.substr(4);
 
+
             json = curate(request);
             json = JSON.stringify(json);
             console.log(' ** ** ** ** ** ** ** ** ** ** ** ');
@@ -101,32 +102,14 @@ app.get('*', (req, res) => {
 
         } else if (renderProps) {
 
-            // const content = '<h1>Hello world</h1>';
-            // // const store = [0, 1, 2, 3, 4];
-            // const store = {
-            //     foo: [1, 2],
-            //     bar: [3, 4]
-            // };
-            // const html = scaffold({content, store});
-            // json = curate(req.url);
-            // console.log(json);
-            //
-            // res.status(200).send(html);
 
-            // -- - - - -- - - - - -- - - - --
 
-            //         json = fetchData(req.url);
-            //         const store = {foo: 1, bar: 2, baz: 3};
-            //         const content = ReactDOMServer.renderToString(
-            //             /* <Provider store={store}> */
-            //                 <RouterContext {...renderProps} />
-            //             /* </Provider> */
-            //         );
-            //         const html = scaffold({content, store});
-            //         // RouterContext
-            //
-            //         // res.status(200).send(renderToString(<RouterContext {...renderProps} />));
 
+
+
+
+
+            // Only run if Object jeys + all
             json = curate(req.url);
 
             const state = {
