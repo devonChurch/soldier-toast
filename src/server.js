@@ -48,7 +48,8 @@ app.get('*', (req, res) => {
             debug('** fetching api request **');
 
             const request = path.substr(4);
-            const json = JSON.stringify(curate(request));
+            let {json} = curate(request);
+            json = JSON.stringify(json);
 
             res.status(200).send(json);
 

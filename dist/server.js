@@ -111,7 +111,12 @@
 	            debug('** fetching api request **');
 	
 	            var request = path.substr(4);
-	            var json = JSON.stringify(curate(request));
+	
+	            var _curate = curate(request);
+	
+	            var json = _curate.json;
+	
+	            json = JSON.stringify(json);
 	
 	            res.status(200).send(json);
 	        } else if (renderProps && path !== '/favicon.ico') {
@@ -48845,6 +48850,7 @@
 	var _require3 = __webpack_require__(329);
 	
 	var UPDATE_LOADER = _require3.UPDATE_LOADER;
+	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
 	var SELECT_TOPIC = _require3.SELECT_TOPIC;
 	var TOGGLE_TOPICS = _require3.TOGGLE_TOPICS;
 	
@@ -48864,13 +48870,13 @@
 				console.log('changeTopic');
 	
 				if (topic !== this.props.routeParams.topic) {
-					//
+	
 					console.log('  --> topics DONT match = [update]', topic);
 					console.log(this.props);
-					//
+	
 					this.props.selectTopic(topic);
-					this.props.updateLoader(true);
-					//
+					this.props.updateLoader();
+					this.props.toggleQuestion();
 				}
 			}
 		}, {
@@ -48958,11 +48964,11 @@
 			});
 		};
 	
-		var updateLoader = function updateLoader(status) {
+		var updateLoader = function updateLoader() {
 			dispatch({
 				type: 'questions', // State.
 				operation: UPDATE_LOADER, // Action.
-				status: status // Params.
+				status: true // Params.
 			});
 		};
 	
@@ -48973,7 +48979,15 @@
 			});
 		};
 	
-		return { selectTopic: selectTopic, updateLoader: updateLoader, toggleTopics: toggleTopics };
+		var toggleQuestion = function toggleQuestion() {
+			dispatch({
+				type: 'questions', // State.
+				operation: TOGGLE_QUESTION, // Action.
+				id: null // Params.
+			});
+		};
+	
+		return { selectTopic: selectTopic, updateLoader: updateLoader, toggleTopics: toggleTopics, toggleQuestion: toggleQuestion };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);
@@ -60472,6 +60486,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var debug = __webpack_require__(1)('questions');
 	var React = __webpack_require__(103);
 	
 	var _require = __webpack_require__(81);
@@ -61032,7 +61047,10 @@
 	        }
 	    }
 	
-	    return id === null ? json : extractQuestion(json, id);
+	    return {
+	        json: id === null ? json : extractQuestion(json, id),
+	        open: id === null ? null : 0
+	    };
 	}
 	
 	/**
@@ -61068,16 +61086,11 @@
 	 * @param {string} question - The second step into the JSON data.
 	 * @return {object} The extracted JSON data.
 	 */
-	function extractJson(questions, category, question) {
+	function extractJson(questions, category) {
 	
 	    debug('extractJson');
 	
-	    var json = void 0;
-	
-	    json = questions[category] ? questions[category] : mergeFeed(questions);
-	    json = matchQuestion(json, question);
-	
-	    return json;
+	    return questions[category] ? questions[category] : mergeFeed(questions);
 	}
 	
 	/**
@@ -61141,9 +61154,15 @@
 	    var category = _extrapolatePath.category;
 	    var question = _extrapolatePath.question;
 	
-	    var json = extractJson(questions, category, question);
+	    var extracted = extractJson(questions, category);
 	
-	    return json;
+	    var _matchQuestion = matchQuestion(extracted, question);
+	
+	    var json = _matchQuestion.json;
+	    var open = _matchQuestion.open;
+	
+	
+	    return { json: json, open: open, category: category };
 	}
 	
 	module.exports = curate;
@@ -61324,14 +61343,21 @@
 	
 	    debug('constructState');
 	
+	    var _curate = curate(path);
+	
+	    var json = _curate.json;
+	    var open = _curate.open;
+	    var category = _curate.category;
+	
+	
 	    return {
 	        questions: {
 	            loading: false,
-	            open: 0,
-	            data: curate(path)
+	            open: open,
+	            data: json
 	        },
 	        topics: {
-	            current: 'all', // <<<<<< dynamic!
+	            current: category,
 	            open: false
 	        }
 	    };

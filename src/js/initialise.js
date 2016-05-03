@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('initialise');
 const React = require('react');
 const ReactDOM = require('react-dom');
 const {combineReducers, createStore} = require('redux');
@@ -90,7 +91,7 @@ function render(store) {
 	console.log(store.getState());
 	console.log(' * - - - - - - - - - - * ');
 
-
+	debug(store.getState());
 
 	ReactDOM.render(
 		<Provider store={store}>

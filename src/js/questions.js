@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('questions');
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');

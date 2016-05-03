@@ -98,7 +98,10 @@ function matchQuestion(json, question) {
 
     }
 
-    return id === null ? json : extractQuestion(json, id);
+    return {
+        json: id === null ? json : extractQuestion(json, id),
+        open: id === null ? null : 0
+    };
 
 }
 
@@ -137,16 +140,11 @@ function extrapolatePath(steps, questions) {
  * @param {string} question - The second step into the JSON data.
  * @return {object} The extracted JSON data.
  */
-function extractJson(questions, category, question) {
+function extractJson(questions, category) {
 
     debug('extractJson');
 
-    let json;
-
-    json = questions[category] ? questions[category] : mergeFeed(questions);
-    json = matchQuestion(json, question);
-
-    return json;
+    return questions[category] ? questions[category] : mergeFeed(questions);
 
 }
 
@@ -185,9 +183,10 @@ function curate(path) {
     const questions = distillFeed(feed);
     const steps = distillPath(path);
     const {category, question} = extrapolatePath(steps, questions);
-    const json = extractJson(questions, category, question);
+    const extracted = extractJson(questions, category);
+    const {json, open} = matchQuestion(extracted, question);
 
-    return json;
+    return {json, open, category};
 
 }
 

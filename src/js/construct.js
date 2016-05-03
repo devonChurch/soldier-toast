@@ -18,14 +18,16 @@ function constructState(path) {
 
 	debug('constructState');
 
+	const {json, open, category} = curate(path);
+
     return {
         questions: {
             loading: false,
-            open: 0,
-            data: curate(path)
+            open,
+            data: json
         },
         topics: {
-            current: 'all', // <<<<<< dynamic!
+            current: category,
             open: false
         }
     };

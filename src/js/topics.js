@@ -4,7 +4,7 @@ const $ = require('jquery');
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
-const {UPDATE_LOADER, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
+const {UPDATE_LOADER, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
 class Topics extends React.Component {
 
@@ -20,13 +20,14 @@ class Topics extends React.Component {
 		console.log('changeTopic');
 
 		if (topic !== this.props.routeParams.topic) {
-		//
+
 			console.log('  --> topics DONT match = [update]', topic);
 			console.log(this.props);
-		//
+
 			this.props.selectTopic(topic);
-			this.props.updateLoader(true);
-		//
+			this.props.updateLoader();
+			this.props.toggleQuestion();
+
 		}
 
 	}
@@ -88,11 +89,11 @@ function mapDispatchToProps(dispatch) {
 		});
 	};
 
-	const updateLoader = (status) => {
+	const updateLoader = () => {
 		dispatch({
 			type: 'questions', // State.
 			operation: UPDATE_LOADER, // Action.
-			status // Params.
+			status: true // Params.
 		});
 	};
 
@@ -103,7 +104,15 @@ function mapDispatchToProps(dispatch) {
 		});
 	};
 
-	return {selectTopic, updateLoader, toggleTopics};
+	const toggleQuestion = () => {
+		dispatch({
+			type: 'questions', // State.
+			operation: TOGGLE_QUESTION, // Action.
+			id: null // Params.
+		});
+	};
+
+	return {selectTopic, updateLoader, toggleTopics, toggleQuestion};
 
 }
 
