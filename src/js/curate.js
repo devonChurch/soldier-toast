@@ -137,7 +137,6 @@ function extrapolatePath(steps, questions) {
  * current step parameters.
  * @param {object} questions - The distilled question data.
  * @param {string} category - The first step into the JSON data.
- * @param {string} question - The second step into the JSON data.
  * @return {object} The extracted JSON data.
  */
 function extractJson(questions, category) {
@@ -168,6 +167,22 @@ function distillFeed(feed) {
 }
 
 /**
+ *
+ */
+function comparePath(steps, category, question) {
+
+    debug('comparePath');
+    debug(steps);
+    debug(category, question);
+
+    const before = steps.join('/');
+    const after = `${category}${question ? '/' : ''}${question || ''}`;
+
+    return {before, after};
+
+}
+
+/**
  * Curates the feed.json data to reflect the users URL request. We first finesse
  * the request path into an applicable format, make concessions to surface data
  * rather than a nasty 404 if the query is not relevant then package up the relating
@@ -185,8 +200,9 @@ function curate(path) {
     const {category, question} = extrapolatePath(steps, questions);
     const extracted = extractJson(questions, category);
     const {json, open} = matchQuestion(extracted, question);
+    const comparison = comparePath(steps, category, question);
 
-    return {json, open, category};
+    return {json, open, category, comparison};
 
 }
 

@@ -88,6 +88,13 @@
 	// If there is no URL match to our JSON file...
 	// Redirect the user back to /all and give them a message
 	
+	// TODO:
+	// Order
+	// Load more + slice ?from=0
+	// Redirect
+	// - The section "foo" does not exist - redirecting you to show "all" section questions
+	// - The question "bar" does not exist - now showing question inside the "baz" section
+	
 	var app = express();
 	
 	// Express middleware.
@@ -116,9 +123,8 @@
 	
 	            var json = _curate.json;
 	
-	            json = JSON.stringify(json);
 	
-	            res.status(200).send(json);
+	            res.status(200).json(json);
 	        } else if (renderProps && path !== '/favicon.ico') {
 	
 	            debug('** rendering page **');
@@ -129,12 +135,13 @@
 	            var html = scaffold({ content: content, state: state, passive: passive });
 	
 	            res.status(200).send(html);
+	            //
 	        } else {
 	
-	            debug('** error 404 **');
+	                debug('** error 404 **');
 	
-	            res.status(404).send('Not found');
-	        }
+	                res.status(404).send('Not found');
+	            }
 	    });
 	});
 	
@@ -61083,7 +61090,6 @@
 	 * current step parameters.
 	 * @param {object} questions - The distilled question data.
 	 * @param {string} category - The first step into the JSON data.
-	 * @param {string} question - The second step into the JSON data.
 	 * @return {object} The extracted JSON data.
 	 */
 	function extractJson(questions, category) {
@@ -61134,6 +61140,21 @@
 	}
 	
 	/**
+	 *
+	 */
+	function comparePath(steps, category, question) {
+	
+	    debug('comparePath');
+	    debug(steps);
+	    debug(category, question);
+	
+	    var before = steps.join('/');
+	    var after = '' + category + (question ? '/' : '') + (question || '');
+	
+	    return { before: before, after: after };
+	}
+	
+	/**
 	 * Curates the feed.json data to reflect the users URL request. We first finesse
 	 * the request path into an applicable format, make concessions to surface data
 	 * rather than a nasty 404 if the query is not relevant then package up the relating
@@ -61161,8 +61182,9 @@
 	    var json = _matchQuestion.json;
 	    var open = _matchQuestion.open;
 	
+	    var comparison = comparePath(steps, category, question);
 	
-	    return { json: json, open: open, category: category };
+	    return { json: json, open: open, category: category, comparison: comparison };
 	}
 	
 	module.exports = curate;
@@ -61348,9 +61370,13 @@
 	    var json = _curate.json;
 	    var open = _curate.open;
 	    var category = _curate.category;
+	    var comparison = _curate.comparison;
 	
 	
 	    return {
+	        comparison: _extends({}, comparison, {
+	            show: false
+	        }),
 	        questions: {
 	            loading: false,
 	            open: open,
@@ -61457,6 +61483,26 @@
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
 	
+	function comparison() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			before: 'all',
+			after: 'all',
+			show: true
+		} : arguments[0];
+		var action = arguments[1];
+	
+	
+		console.log('reducer | questions');
+		console.log(action);
+	
+		switch (action.operation) {
+	
+			default:
+				return state;
+	
+		}
+	}
+	
 	function questions() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
 			loading: true,
@@ -61511,7 +61557,7 @@
 		}
 	}
 	
-	module.exports = { questions: questions, topics: topics };
+	module.exports = { comparison: comparison, questions: questions, topics: topics };
 
 /***/ }
 /******/ ]);

@@ -48,32 +48,6 @@ const rehydrate = {
  */
 function createElement(Component, props) {
 
-	// const hero = {
-	// 	heading: 'Hero!',
-	// 	description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-	// };
-	//
-	// const topics = [
-	// 	{
-	// 		heading: 'Topic one',
-	// 		description: 'Description one',
-	// 		url: '/apple',
-	// 		total: 7
-	// 	},
-	// 	{
-	// 		heading: 'Topic two',
-	// 		description: 'Description two',
-	// 		url: '/banana',
-	// 		total: 7
-	// 	},
-	// 	{
-	// 		heading: 'Topic three',
-	// 		description: 'Description three',
-	// 		url: '/orange',
-	// 		total: 7
-	// 	}
-	// ];
-
 	props = {...props, passive: rehydrate.props()};
 
 	// make sure you pass all the props in!

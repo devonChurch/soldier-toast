@@ -24,6 +24,13 @@ const {constructState, initialise} = require('./js/construct');
 // If there is no URL match to our JSON file...
 // Redirect the user back to /all and give them a message
 
+// TODO:
+// Order
+// Load more + slice ?from=0
+// Redirect
+// - The section "foo" does not exist - redirecting you to show "all" section questions
+// - The question "bar" does not exist - now showing question inside the "baz" section
+
 const app = express();
 
 // Express middleware.
@@ -48,10 +55,9 @@ app.get('*', (req, res) => {
             debug('** fetching api request **');
 
             const request = path.substr(4);
-            let {json} = curate(request);
-            json = JSON.stringify(json);
+            const {json} = curate(request);
 
-            res.status(200).send(json);
+            res.status(200).json(json);
 
         } else if (renderProps && path !== '/favicon.ico') {
 
@@ -62,7 +68,9 @@ app.get('*', (req, res) => {
             const content = initialise(renderProps, passive, state);
             const html = scaffold({content, state, passive});
 
+
             res.status(200).send(html);
+            //
 
         } else {
 

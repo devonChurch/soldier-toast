@@ -130,32 +130,6 @@
 	 */
 	function createElement(Component, props) {
 	
-		// const hero = {
-		// 	heading: 'Hero!',
-		// 	description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-		// };
-		//
-		// const topics = [
-		// 	{
-		// 		heading: 'Topic one',
-		// 		description: 'Description one',
-		// 		url: '/apple',
-		// 		total: 7
-		// 	},
-		// 	{
-		// 		heading: 'Topic two',
-		// 		description: 'Description two',
-		// 		url: '/banana',
-		// 		total: 7
-		// 	},
-		// 	{
-		// 		heading: 'Topic three',
-		// 		description: 'Description three',
-		// 		url: '/orange',
-		// 		total: 7
-		// 	}
-		// ];
-	
 		props = _extends({}, props, { passive: rehydrate.props() });
 	
 		// make sure you pass all the props in!
@@ -37608,6 +37582,26 @@
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
 	
+	function comparison() {
+		var state = arguments.length <= 0 || arguments[0] === undefined ? {
+			before: 'all',
+			after: 'all',
+			show: true
+		} : arguments[0];
+		var action = arguments[1];
+	
+	
+		console.log('reducer | questions');
+		console.log(action);
+	
+		switch (action.operation) {
+	
+			default:
+				return state;
+	
+		}
+	}
+	
 	function questions() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
 			loading: true,
@@ -37662,7 +37656,7 @@
 		}
 	}
 	
-	module.exports = { questions: questions, topics: topics };
+	module.exports = { comparison: comparison, questions: questions, topics: topics };
 
 /***/ },
 /* 260 */

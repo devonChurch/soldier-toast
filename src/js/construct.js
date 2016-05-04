@@ -18,9 +18,13 @@ function constructState(path) {
 
 	debug('constructState');
 
-	const {json, open, category} = curate(path);
+	const {json, open, category, comparison} = curate(path);
 
     return {
+		comparison: {
+			...comparison,
+			show: false
+		},
         questions: {
             loading: false,
             open,
