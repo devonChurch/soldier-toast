@@ -18,20 +18,17 @@ function constructState(path) {
 
 	debug('constructState');
 
-	const {json, open, category, comparison} = curate(path);
+	const {json, open, topic, params} = curate(path);
 
     return {
-		comparison: {
-			...comparison,
-			show: false
-		},
+		params,
         questions: {
             loading: false,
             open,
             data: json
         },
         topics: {
-            current: category,
+            current: topic,
             open: false
         }
     };
@@ -109,6 +106,11 @@ function initialise(renderProps, passive, state) {
         state // State
         // no need for Redux dev tools server side =)
     );
+
+	debug('renderProps.params', renderProps.params);
+
+	// renderProps.location.pathname = `/${state.comparison.after}`;
+	renderProps.params = state.params;
 
     store.subscribe(() => render(renderProps, passive, store)); // Render on state change.
 

@@ -62,6 +62,7 @@ app.get('*', (req, res) => {
         } else if (renderProps && path !== '/favicon.ico') {
 
             debug('** rendering page **');
+            // debug('renderProps', renderProps);
 
             const passive = getPassive();
             const state = constructState(path);

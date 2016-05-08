@@ -110,19 +110,29 @@
 	/**
 	 *
 	 */
+	function replaceUrl(state) {
+		var _state$params = state.params;
+		var topic = _state$params.topic;
+		var question = _state$params.question;
+	
+		console.log('topic', topic, 'question', question);
+		var path = question ? '/' + topic + '/' + question : '/' + topic;
+	
+		history.replaceState({}, '', path);
+	}
+	
+	/**
+	 *
+	 */
 	var rehydrate = {
+	
 		state: function state() {
-	
-			console.log('rehydrate (state)');
-	
 			return window.__REDUX_STATE__;
 		},
 		props: function props() {
-	
-			console.log('rehydrate (props)');
-	
 			return window.__PASSIVE_PROPS__;
 		}
+	
 	};
 	
 	/**
@@ -169,8 +179,12 @@
 	 */
 	function initialise() {
 	
+		var state = rehydrate.state();
+	
+		replaceUrl(state);
+	
 		var store = createStore(combineReducers(reducers), // Reducers.
-		rehydrate.state(), // State.
+		state, // State.
 		devTools() // Redux development tools.
 		);
 	
@@ -37582,11 +37596,9 @@
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
 	
-	function comparison() {
+	function params() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			before: 'all',
-			after: 'all',
-			show: true
+			topic: 'all'
 		} : arguments[0];
 		var action = arguments[1];
 	
@@ -37656,7 +37668,7 @@
 		}
 	}
 	
-	module.exports = { comparison: comparison, questions: questions, topics: topics };
+	module.exports = { params: params, questions: questions, topics: topics };
 
 /***/ },
 /* 260 */

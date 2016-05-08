@@ -128,6 +128,7 @@
 	        } else if (renderProps && path !== '/favicon.ico') {
 	
 	            debug('** rendering page **');
+	            // debug('renderProps', renderProps);
 	
 	            var passive = getPassive();
 	            var state = constructState(path);
@@ -60969,9 +60970,9 @@
 	}
 	
 	/**
-	 * If no applicable category is provided then we merge all categories into a
+	 * If no applicable topic is provided then we merge all topics into a
 	 * single array to represent the /all status.
-	 * @param {array} keys - The category names that we will extract from questions.JSON
+	 * @param {array} keys - The topic names that we will extract from questions.JSON
 	 * @return {array} The merged questions data into a single array.
 	 */
 	function mergeFeed(questions) {
@@ -61037,6 +61038,8 @@
 	function matchQuestion(json, question) {
 	
 	    debug('matchQuestion');
+	    debug('json', json);
+	    debug('question', question);
 	
 	    var id = null;
 	
@@ -61063,7 +61066,7 @@
 	/**
 	 * We try and make the Url more verbose by having “/” actually reference “/all”.
 	 * In that regard we test the request URL and reformat the steps system i.e.
-	 * [category, question] to cater to this formatting choice.
+	 * [topic, question] to cater to this formatting choice.
 	 * @param {array} steps - The path to JSON correlation generated from distillPath().
 	 * @param {object} questions - The distilled question data.
 	 * @return {object} The formatted steps system.
@@ -61074,13 +61077,13 @@
 	
 	    if (steps.length === 1) {
 	
-	        var category = steps[0];
+	        var topic = steps[0];
 	
-	        steps = questions[category] || category === 'all' ? steps : ['all', category];
+	        steps = questions[topic] || topic === 'all' ? steps : ['all', topic];
 	    }
 	
 	    return {
-	        category: steps[0],
+	        topic: steps[0],
 	        question: steps[1]
 	    };
 	}
@@ -61089,14 +61092,14 @@
 	 * We extract the relevant JSON data from the questions.json file based on the
 	 * current step parameters.
 	 * @param {object} questions - The distilled question data.
-	 * @param {string} category - The first step into the JSON data.
+	 * @param {string} topic - The first step into the JSON data.
 	 * @return {object} The extracted JSON data.
 	 */
-	function extractJson(questions, category) {
+	function extractJson(questions, topic) {
 	
 	    debug('extractJson');
 	
-	    return questions[category] ? questions[category] : mergeFeed(questions);
+	    return questions[topic] ? questions[topic] : mergeFeed(questions);
 	}
 	
 	/**
@@ -61142,16 +61145,11 @@
 	/**
 	 *
 	 */
-	function comparePath(steps, category, question) {
+	function defineParams(topic, question, open) {
 	
-	    debug('comparePath');
-	    debug(steps);
-	    debug(category, question);
+	    // return open === 0 ? `/${topic}/${question}` : `/${topic}`;
 	
-	    var before = steps.join('/');
-	    var after = '' + category + (question ? '/' : '') + (question || '');
-	
-	    return { before: before, after: after };
+	    return open === 0 ? { topic: topic, question: question } : { topic: topic };
 	}
 	
 	/**
@@ -61172,19 +61170,20 @@
 	
 	    var _extrapolatePath = extrapolatePath(steps, questions);
 	
-	    var category = _extrapolatePath.category;
+	    var topic = _extrapolatePath.topic;
 	    var question = _extrapolatePath.question;
 	
-	    var extracted = extractJson(questions, category);
+	    debug('topic', topic, 'question', question);
+	    var extracted = extractJson(questions, topic);
 	
 	    var _matchQuestion = matchQuestion(extracted, question);
 	
 	    var json = _matchQuestion.json;
 	    var open = _matchQuestion.open;
 	
-	    var comparison = comparePath(steps, category, question);
+	    var params = defineParams(topic, question, open);
 	
-	    return { json: json, open: open, category: category, comparison: comparison };
+	    return { json: json, open: open, topic: topic, params: params };
 	}
 	
 	module.exports = curate;
@@ -61369,21 +61368,19 @@
 	
 	    var json = _curate.json;
 	    var open = _curate.open;
-	    var category = _curate.category;
-	    var comparison = _curate.comparison;
+	    var topic = _curate.topic;
+	    var params = _curate.params;
 	
 	
 	    return {
-	        comparison: _extends({}, comparison, {
-	            show: false
-	        }),
+	        params: params,
 	        questions: {
 	            loading: false,
 	            open: open,
 	            data: json
 	        },
 	        topics: {
-	            current: category,
+	            current: topic,
 	            open: false
 	        }
 	    };
@@ -61457,6 +61454,11 @@
 	    // no need for Redux dev tools server side =)
 	    );
 	
+	    debug('renderProps.params', renderProps.params);
+	
+	    // renderProps.location.pathname = `/${state.comparison.after}`;
+	    renderProps.params = state.params;
+	
 	    store.subscribe(function () {
 	        return render(renderProps, passive, store);
 	    }); // Render on state change.
@@ -61483,11 +61485,9 @@
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
 	
-	function comparison() {
+	function params() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			before: 'all',
-			after: 'all',
-			show: true
+			topic: 'all'
 		} : arguments[0];
 		var action = arguments[1];
 	
@@ -61557,7 +61557,7 @@
 		}
 	}
 	
-	module.exports = { comparison: comparison, questions: questions, topics: topics };
+	module.exports = { params: params, questions: questions, topics: topics };
 
 /***/ }
 /******/ ]);

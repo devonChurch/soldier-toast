@@ -31,9 +31,9 @@ function distillPath(path) {
 }
 
 /**
- * If no applicable category is provided then we merge all categories into a
+ * If no applicable topic is provided then we merge all topics into a
  * single array to represent the /all status.
- * @param {array} keys - The category names that we will extract from questions.JSON
+ * @param {array} keys - The topic names that we will extract from questions.JSON
  * @return {array} The merged questions data into a single array.
  */
 function mergeFeed(questions) {
@@ -79,6 +79,8 @@ function extractQuestion(json, id) {
 function matchQuestion(json, question) {
 
     debug('matchQuestion');
+    debug('json', json);
+    debug('question', question);
 
     let id = null;
 
@@ -108,7 +110,7 @@ function matchQuestion(json, question) {
 /**
  * We try and make the Url more verbose by having “/” actually reference “/all”.
  * In that regard we test the request URL and reformat the steps system i.e.
- * [category, question] to cater to this formatting choice.
+ * [topic, question] to cater to this formatting choice.
  * @param {array} steps - The path to JSON correlation generated from distillPath().
  * @param {object} questions - The distilled question data.
  * @return {object} The formatted steps system.
@@ -119,14 +121,14 @@ function extrapolatePath(steps, questions) {
 
     if (steps.length === 1) {
 
-        const category = steps[0];
+        const topic = steps[0];
 
-        steps = questions[category] || category === 'all' ? steps : ['all', category];
+        steps = questions[topic] || topic === 'all' ? steps : ['all', topic];
 
     }
 
     return {
-        category: steps[0],
+        topic: steps[0],
         question: steps[1]
     };
 
@@ -136,14 +138,14 @@ function extrapolatePath(steps, questions) {
  * We extract the relevant JSON data from the questions.json file based on the
  * current step parameters.
  * @param {object} questions - The distilled question data.
- * @param {string} category - The first step into the JSON data.
+ * @param {string} topic - The first step into the JSON data.
  * @return {object} The extracted JSON data.
  */
-function extractJson(questions, category) {
+function extractJson(questions, topic) {
 
     debug('extractJson');
 
-    return questions[category] ? questions[category] : mergeFeed(questions);
+    return questions[topic] ? questions[topic] : mergeFeed(questions);
 
 }
 
@@ -169,16 +171,11 @@ function distillFeed(feed) {
 /**
  *
  */
-function comparePath(steps, category, question) {
+function defineParams(topic, question, open) {
 
-    debug('comparePath');
-    debug(steps);
-    debug(category, question);
+    // return open === 0 ? `/${topic}/${question}` : `/${topic}`;
 
-    const before = steps.join('/');
-    const after = `${category}${question ? '/' : ''}${question || ''}`;
-
-    return {before, after};
+    return open === 0 ? {topic, question} : {topic};
 
 }
 
@@ -197,12 +194,13 @@ function curate(path) {
     const feed = getFeed();
     const questions = distillFeed(feed);
     const steps = distillPath(path);
-    const {category, question} = extrapolatePath(steps, questions);
-    const extracted = extractJson(questions, category);
+    const {topic, question} = extrapolatePath(steps, questions);
+    debug('topic', topic, 'question', question);
+    const extracted = extractJson(questions, topic);
     const {json, open} = matchQuestion(extracted, question);
-    const comparison = comparePath(steps, category, question);
+    const params = defineParams(topic, question, open);
 
-    return {json, open, category, comparison};
+    return {json, open, topic, params};
 
 }
 

@@ -16,30 +16,26 @@ const reducers = require('./reducers');
 // redux
 
 
+/**
+ *
+ */
+function replaceUrl(state) {
 
+	const {topic, question} = state.params;
+	console.log('topic', topic, 'question', question);
+	const path = question ? `/${topic}/${question}` : `/${topic}`;
 
+	history.replaceState( {} , '', path);
 
+}
 
 /**
  *
  */
 const rehydrate = {
 
-	state() {
-
-		console.log('rehydrate (state)');
-
-		return window.__REDUX_STATE__;
-
-	},
-
-	props() {
-
-		console.log('rehydrate (props)');
-
-		return window.__PASSIVE_PROPS__;
-
-	}
+	state: () => window.__REDUX_STATE__,
+	props: () => window.__PASSIVE_PROPS__
 
 };
 
@@ -91,9 +87,13 @@ function devTools() {
  */
 function initialise() {
 
+	const state = rehydrate.state();
+
+	replaceUrl(state);
+
 	let store = createStore(
 		combineReducers(reducers), // Reducers.
-		rehydrate.state(), // State.
+		state, // State.
 		devTools() // Redux development tools.
 	);
 

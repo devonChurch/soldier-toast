@@ -2,10 +2,8 @@
 
 const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
-function comparison(state = {
-	before: 'all',
-	after: 'all',
-	show: true
+function params(state = {
+	topic: 'all'
 }, action) {
 
 	console.log('reducer | questions');
@@ -69,4 +67,4 @@ function topics(state = {
 
 }
 
-module.exports = {comparison, questions, topics};
+module.exports = {params, questions, topics};
