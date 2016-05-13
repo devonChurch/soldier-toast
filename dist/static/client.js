@@ -110,10 +110,13 @@
 	/**
 	 *
 	 */
-	function replaceUrl(state) {
-		var _state$params = state.params;
-		var topic = _state$params.topic;
-		var question = _state$params.question;
+	function replaceUrl() {
+	
+		console.log('replaceUrl');
+	
+		var _rehydrate$props$para = rehydrate.props().params;
+		var topic = _rehydrate$props$para.topic;
+		var question = _rehydrate$props$para.question;
 	
 		console.log('topic', topic, 'question', question);
 		var path = question ? '/' + topic + '/' + question : '/' + topic;
@@ -179,12 +182,10 @@
 	 */
 	function initialise() {
 	
-		var state = rehydrate.state();
-	
-		replaceUrl(state);
+		replaceUrl();
 	
 		var store = createStore(combineReducers(reducers), // Reducers.
-		state, // State.
+		rehydrate.state(), // State.
 		devTools() // Redux development tools.
 		);
 	
@@ -37596,24 +37597,6 @@
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
 	
-	function params() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			topic: 'all'
-		} : arguments[0];
-		var action = arguments[1];
-	
-	
-		console.log('reducer | questions');
-		console.log(action);
-	
-		switch (action.operation) {
-	
-			default:
-				return state;
-	
-		}
-	}
-	
 	function questions() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
 			loading: true,
@@ -37668,7 +37651,7 @@
 		}
 	}
 	
-	module.exports = { params: params, questions: questions, topics: topics };
+	module.exports = { questions: questions, topics: topics };
 
 /***/ },
 /* 260 */

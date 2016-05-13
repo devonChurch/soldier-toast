@@ -14,14 +14,11 @@ const reducers = require('./reducers');
  * @param {string} path - The express.js request path.
  * @return {object} The state data object.
  */
-function constructState(path) {
+function constructState({json, open, topic}) {
 
 	debug('constructState');
 
-	const {json, open, topic, params} = curate(path);
-
     return {
-		params,
         questions: {
             loading: false,
             open,
@@ -110,7 +107,7 @@ function initialise(renderProps, passive, state) {
 	debug('renderProps.params', renderProps.params);
 
 	// renderProps.location.pathname = `/${state.comparison.after}`;
-	renderProps.params = state.params;
+	renderProps.params = passive.params;
 
     store.subscribe(() => render(renderProps, passive, store)); // Render on state change.
 

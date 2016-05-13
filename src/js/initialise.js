@@ -19,9 +19,11 @@ const reducers = require('./reducers');
 /**
  *
  */
-function replaceUrl(state) {
+function replaceUrl() {
 
-	const {topic, question} = state.params;
+	console.log('replaceUrl');
+
+	const {topic, question} = rehydrate.props().params;
 	console.log('topic', topic, 'question', question);
 	const path = question ? `/${topic}/${question}` : `/${topic}`;
 
@@ -87,13 +89,11 @@ function devTools() {
  */
 function initialise() {
 
-	const state = rehydrate.state();
-
-	replaceUrl(state);
+	replaceUrl();
 
 	let store = createStore(
 		combineReducers(reducers), // Reducers.
-		state, // State.
+		rehydrate.state(), // State.
 		devTools() // Redux development tools.
 	);
 

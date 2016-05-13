@@ -130,19 +130,20 @@
 	            debug('** rendering page **');
 	            // debug('renderProps', renderProps);
 	
-	            var passive = getPassive();
-	            var state = constructState(path);
+	            var curated = curate(path); // = const {json, open, topic, params} = curate(path);
+	            var passive = getPassive(curated);
+	            debug('passive', passive);
+	            var state = constructState(curated);
 	            var content = initialise(renderProps, passive, state);
 	            var html = scaffold({ content: content, state: state, passive: passive });
 	
 	            res.status(200).send(html);
-	            //
 	        } else {
 	
-	                debug('** error 404 **');
+	            debug('** error 404 **');
 	
-	                res.status(404).send('Not found');
-	            }
+	            res.status(404).send('Not found');
+	        }
 	    });
 	});
 	
@@ -61290,14 +61291,16 @@
 	 * from feed.json
 	 * @return {object} The extracted JSON.
 	 */
-	function extract() {
+	function extract(_ref2) {
+	    var params = _ref2.params;
+	
 	
 	    debug('extract (passive props)...');
 	
 	    var feed = getFeed();
 	    var json = distillFeed(feed);
 	
-	    return json;
+	    return _extends({}, json, { params: params });
 	}
 	
 	module.exports = extract;
@@ -61360,20 +61363,15 @@
 	 * @param {string} path - The express.js request path.
 	 * @return {object} The state data object.
 	 */
-	function constructState(path) {
+	function constructState(_ref) {
+	    var json = _ref.json;
+	    var open = _ref.open;
+	    var topic = _ref.topic;
+	
 	
 	    debug('constructState');
 	
-	    var _curate = curate(path);
-	
-	    var json = _curate.json;
-	    var open = _curate.open;
-	    var topic = _curate.topic;
-	    var params = _curate.params;
-	
-	
 	    return {
-	        params: params,
 	        questions: {
 	            loading: false,
 	            open: open,
@@ -61457,7 +61455,7 @@
 	    debug('renderProps.params', renderProps.params);
 	
 	    // renderProps.location.pathname = `/${state.comparison.after}`;
-	    renderProps.params = state.params;
+	    renderProps.params = passive.params;
 	
 	    store.subscribe(function () {
 	        return render(renderProps, passive, store);
@@ -61484,24 +61482,6 @@
 	var SELECT_TOPIC = _require.SELECT_TOPIC;
 	var TOGGLE_TOPICS = _require.TOGGLE_TOPICS;
 	
-	
-	function params() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? {
-			topic: 'all'
-		} : arguments[0];
-		var action = arguments[1];
-	
-	
-		console.log('reducer | questions');
-		console.log(action);
-	
-		switch (action.operation) {
-	
-			default:
-				return state;
-	
-		}
-	}
 	
 	function questions() {
 		var state = arguments.length <= 0 || arguments[0] === undefined ? {
@@ -61557,7 +61537,7 @@
 		}
 	}
 	
-	module.exports = { params: params, questions: questions, topics: topics };
+	module.exports = { questions: questions, topics: topics };
 
 /***/ }
 /******/ ]);

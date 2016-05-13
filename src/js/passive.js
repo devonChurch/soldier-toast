@@ -52,14 +52,14 @@ function distillFeed({hero, topics}) {
  * from feed.json
  * @return {object} The extracted JSON.
  */
-function extract() {
+function extract({params}) {
 
     debug('extract (passive props)...');
 
     const feed = getFeed();
     const json = distillFeed(feed);
 
-    return json;
+    return {...json, params};
 
 }
 

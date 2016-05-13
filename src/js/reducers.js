@@ -2,21 +2,6 @@
 
 const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
-function params(state = {
-	topic: 'all'
-}, action) {
-
-	console.log('reducer | questions');
-	console.log(action);
-
-	switch(action.operation) {
-
-		default:
-			return state;
-
-	}
-}
-
 function questions(state = {
 	loading: true,
 	open: null,
@@ -67,4 +52,4 @@ function topics(state = {
 
 }
 
-module.exports = {params, questions, topics};
+module.exports = {questions, topics};

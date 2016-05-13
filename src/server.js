@@ -64,14 +64,14 @@ app.get('*', (req, res) => {
             debug('** rendering page **');
             // debug('renderProps', renderProps);
 
-            const passive = getPassive();
-            const state = constructState(path);
+            const curated = curate(path); // = const {json, open, topic, params} = curate(path);
+            const passive = getPassive(curated);
+            debug('passive', passive);
+            const state = constructState(curated);
             const content = initialise(renderProps, passive, state);
             const html = scaffold({content, state, passive});
 
-
             res.status(200).send(html);
-            //
 
         } else {
 
