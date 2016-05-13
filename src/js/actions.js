@@ -1,0 +1,11 @@
+'use strict';
+
+const actions = {
+	UPDATE_LOADER: 'UPDATE_LOADER',
+	UPDATE_DATA: 'UPDATE_DATA',
+	TOGGLE_QUESTION: 'TOGGLE_QUESTION',
+	SELECT_TOPIC: 'SELECT_TOPIC',
+	TOGGLE_TOPICS: 'TOGGLE_TOPICS'
+};
+
+module.exports = actions;
