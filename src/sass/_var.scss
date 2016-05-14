@@ -41,9 +41,9 @@ $color: (
         dark: #19415A
     ),
     gray: (
-        light: #CCCCCC,
-        medium: #989898,
-        dark: #4C4C4C
+        light: #ECEFF1,
+        medium: #CFD8DC,
+        dark: #607D8B
     ),
     pink: (
         light: #FFBAD9,
@@ -66,8 +66,7 @@ $zIndex: (
 }
 
 $font: (
-    base: 'Roboto',
-    block: 'BLOKKNeue-Regular'
+    base: 'Roboto'
 );
 
 @function font($type: block) {

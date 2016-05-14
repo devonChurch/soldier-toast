@@ -20,7 +20,7 @@ function questions(state = {
 			return {...state, data: action.data};
 
 		case TOGGLE_QUESTION:
-			return {...state, open: action.id};
+			return {...state, open: (() => action.id === state.open ? null : action.id)()};
 
 		default:
 			return state;

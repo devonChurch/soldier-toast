@@ -36,8 +36,12 @@ class Questions extends React.Component {
 				<li className="questions__item" key={id}>
 					<Link className={toggleClassName} to={`/${topic}/${path}`} onClick={() => this.props.toggleQuestion(id)}>{heading}</Link>
 					<div className="questions__dropdown">
-						<h3 className="questions__heading">{heading}</h3>
-						<p className="questions__description">{description}</p>
+						<div className="questions__spacing">
+							<div className="questions__content">
+								<h3 className="questions__heading">{heading}</h3>
+								<p className="questions__description">{description}</p>
+							</div>
+						</div>
 					</div>
 				</li>
 			);

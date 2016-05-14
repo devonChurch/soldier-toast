@@ -60766,14 +60766,22 @@
 							'div',
 							{ className: 'questions__dropdown' },
 							React.createElement(
-								'h3',
-								{ className: 'questions__heading' },
-								heading
-							),
-							React.createElement(
-								'p',
-								{ className: 'questions__description' },
-								description
+								'div',
+								{ className: 'questions__spacing' },
+								React.createElement(
+									'div',
+									{ className: 'questions__content' },
+									React.createElement(
+										'h3',
+										{ className: 'questions__heading' },
+										heading
+									),
+									React.createElement(
+										'p',
+										{ className: 'questions__description' },
+										description
+									)
+								)
 							)
 						)
 					);
@@ -61619,7 +61627,9 @@
 				return _extends({}, state, { data: action.data });
 	
 			case TOGGLE_QUESTION:
-				return _extends({}, state, { open: action.id });
+				return _extends({}, state, { open: function () {
+						return action.id === state.open ? null : action.id;
+					}() });
 	
 			default:
 				return state;
