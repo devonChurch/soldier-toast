@@ -12,7 +12,7 @@ body {
   margin: 0; }
 
 .hero {
-  background: #ECEFF1; }
+  background: #607D8B; }
   .hero__content {
     max-width: 992px;
     margin: auto;
@@ -20,12 +20,12 @@ body {
     padding-bottom: 32px;
     padding-top: 32px; }
   .hero__heading, .hero__description {
+    color: white;
     margin: 0;
     padding: 16px 0; }
 
 .topics__nav {
-  border: solid #CFD8DC;
-  border-width: 2px 0;
+  border-bottom: 2px solid #CFD8DC;
   position: relative; }
 
 .topics__content {

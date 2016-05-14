@@ -1,5 +1,5 @@
 .hero {
-    background: color(gray, light);
+    background: color(gray, dark);
 
     &__content {
         @include siteContent;
@@ -11,6 +11,7 @@
 
     &__heading,
     &__description {
+        color: white;
         margin: 0;
         padding: space(small) 0;
     }

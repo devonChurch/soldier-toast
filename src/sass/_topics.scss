@@ -1,8 +1,7 @@
 .topics {
 
     &__nav {
-        border: solid color(gray);
-        border-width: border(medium) 0;
+        border-bottom: border(medium) solid color(gray);
         position: relative;
     }
 

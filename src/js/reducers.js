@@ -20,7 +20,8 @@ function questions(state = {
 			return {...state, data: action.data};
 
 		case TOGGLE_QUESTION:
-			return {...state, open: (() => action.id === state.open ? null : action.id)()};
+			// do this inside the question component so you can update teh url
+			return {...state, open: action.id};
 
 		default:
 			return state;

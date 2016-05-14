@@ -29,12 +29,14 @@ class Questions extends React.Component {
 		return data.map((question, id) => {
 
 			const {heading, description} = question;
-			const path = questionPath(heading);
-			const toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
+			const active = id === open;
+			const url = active ? `/${topic}` : `/${topic}/${questionPath(heading)}`;
+			const toggleClassName = active ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
+			const param = active ? null : id;
 
 			return (
 				<li className="questions__item" key={id}>
-					<Link className={toggleClassName} to={`/${topic}/${path}`} onClick={() => this.props.toggleQuestion(id)}>{heading}</Link>
+					<Link className={toggleClassName} to={url} onClick={() => this.props.toggleQuestion(param)}>{heading}</Link>
 					<div className="questions__dropdown">
 						<div className="questions__spacing">
 							<div className="questions__content">

@@ -38094,16 +38094,18 @@
 					var heading = question.heading;
 					var description = question.description;
 	
-					var path = questionPath(heading);
-					var toggleClassName = id === open ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
+					var active = id === open;
+					var url = active ? '/' + topic : '/' + topic + '/' + questionPath(heading);
+					var toggleClassName = active ? 'questions__toggle questions__toggle--open' : 'questions__toggle';
+					var param = active ? null : id;
 	
 					return React.createElement(
 						'li',
 						{ className: 'questions__item', key: id },
 						React.createElement(
 							Link,
-							{ className: toggleClassName, to: '/' + topic + '/' + path, onClick: function onClick() {
-									return _this2.props.toggleQuestion(id);
+							{ className: toggleClassName, to: url, onClick: function onClick() {
+									return _this2.props.toggleQuestion(param);
 								} },
 							heading
 						),
@@ -38226,9 +38228,8 @@
 				return _extends({}, state, { data: action.data });
 	
 			case TOGGLE_QUESTION:
-				return _extends({}, state, { open: function () {
-						return action.id === state.open ? null : action.id;
-					}() });
+				// do this inside the question component so you can update teh url
+				return _extends({}, state, { open: action.id });
 	
 			default:
 				return state;
