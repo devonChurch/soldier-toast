@@ -46,7 +46,7 @@
 
 	'use strict';
 	
-	var debug = __webpack_require__(1)('server');
+	var _debug = __webpack_require__(1)('Server');
 	var express = __webpack_require__(8);
 	var port = 8000;
 	
@@ -88,6 +88,14 @@
 	// If there is no URL match to our JSON file...
 	// Redirect the user back to /all and give them a message
 	
+	// SERVER:
+	// Get the raw json file FS (async request with promice)
+	// Sort out the Topic / Question params (could change based on retrived data)
+	// Curate the RAW JSON
+	// Order the curated JSON
+	// Move applicable question to top of the stack
+	// Start construction
+	
 	// TODO:
 	// Order
 	// Load more + slice ?from=0
@@ -106,16 +114,16 @@
 	
 	        var path = req.url;
 	
-	        debug('location = ' + path);
+	        _debug('Location = ' + path);
 	
 	        if (error) {
 	
-	            debug('** error 500 **');
+	            _debug('** error 500 **');
 	
 	            res.status(500).send(error.message);
 	        } else if (path.indexOf('/api') >= 0) {
 	
-	            debug('** fetching api request **');
+	            _debug('** fetching api request **');
 	
 	            var request = path.substr(4);
 	
@@ -127,12 +135,12 @@
 	            res.status(200).json(json);
 	        } else if (renderProps && path !== '/favicon.ico') {
 	
-	            debug('** rendering page **');
-	            // debug('renderProps', renderProps);
+	            _debug('** rendering page **');
+	            // _debug('renderProps', renderProps);
 	
-	            var curated = curate(path); // = const {json, open, topic, params} = curate(path);
+	            var curated = curate(path);
 	            var passive = getPassive(curated);
-	            debug('passive', passive);
+	            _debug('passive', passive);
 	            var state = constructState(curated);
 	            var content = initialise(renderProps, passive, state);
 	            var html = scaffold({ content: content, state: state, passive: passive });
@@ -140,7 +148,7 @@
 	            res.status(200).send(html);
 	        } else {
 	
-	            debug('** error 404 **');
+	            _debug('** error 404 **');
 	
 	            res.status(404).send('Not found');
 	        }
@@ -148,7 +156,7 @@
 	});
 	
 	app.listen(port, function () {
-	    return debug('listening on port ' + port);
+	    return _debug('listening on port ' + port);
 	});
 
 /***/ },
@@ -48794,19 +48802,12 @@
 		function Faq() {
 			_classCallCheck(this, Faq);
 	
-			console.log('** Faq (constructor)');
-	
 			return _possibleConstructorReturn(this, Object.getPrototypeOf(Faq).call(this));
 		}
 	
 		_createClass(Faq, [{
 			key: 'render',
 			value: function render() {
-	
-				// console.log(this);
-				console.log('render | faq');
-				console.log(this.props);
-				console.log(this.props.route.apple);
 	
 				return React.createElement(
 					'div',
@@ -48845,6 +48846,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var _debug = __webpack_require__(1)('Topics');
 	var $ = __webpack_require__(307);
 	var React = __webpack_require__(103);
 	
@@ -48876,12 +48878,13 @@
 			key: 'changeTopic',
 			value: function changeTopic(topic) {
 	
-				console.log('changeTopic');
+				_debug('Changing topic');
 	
-				if (topic !== this.props.routeParams.topic) {
+				var current = '/' + this.props.routeParams.topic;
 	
-					console.log('  --> topics DONT match = [update]', topic);
-					console.log(this.props);
+				if (topic !== current) {
+	
+					_debug('- ' + topic + ' !== ' + current + ' | make the topic change');
 	
 					this.props.selectTopic(topic);
 					this.props.updateLoader();
@@ -48892,10 +48895,6 @@
 			key: 'render',
 			value: function render() {
 				var _this2 = this;
-	
-				console.log('Render topics');
-				console.log(this.props);
-				// console.log(this.props.passive.topics);
 	
 				var toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
 	
@@ -48916,8 +48915,6 @@
 							'ul',
 							{ className: 'topics__list' },
 							this.props.passive.topics.map(function (topic, id) {
-	
-								console.log(topic);
 	
 								return React.createElement(
 									'li',
@@ -60495,7 +60492,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var debug = __webpack_require__(1)('questions');
+	var _debug = __webpack_require__(1)('Questions');
 	var React = __webpack_require__(103);
 	
 	var _require = __webpack_require__(81);
@@ -60553,27 +60550,30 @@
 			value: function fetch() {
 				var _this2 = this;
 	
-				console.log('fetch | questions');
+				_debug('Fetching questions');
 	
 				var request = new XMLHttpRequest();
 				var url = this.generateUrl();
-				console.log(url);
+	
+				_debug('- URL = ' + url);
 	
 				request.open('GET', url, true);
 	
 				request.onload = function () {
 	
 					if (request.status >= 200 && request.status < 400) {
-						// Success!
-						console.log('success');
+	
+						_debug('- Fetch = success');
 	
 						var data = JSON.parse(request.responseText);
-						console.log(data);
+	
+						_debug('- Returned data', data);
+	
 						_this2.props.updateData(data);
 						_this2.props.updateLoader(false);
 					} else {
-						// We reached our target server, but it returned an error
-						console.log('error');
+	
+						_debug('- Fetch = error');
 					}
 				};
 	
@@ -60605,14 +60605,8 @@
 				var data = _props$questions.data;
 				var open = _props$questions.open;
 	
-				// console.log('+++++ compile');
-				// console.log(this.props.questions.data);
-				// () => this.toggleQuestion(id)
 	
 				return data.map(function (question, id) {
-	
-					console.log(id + ' === ' + open);
-	
 					var heading = question.heading;
 					var description = question.description;
 	
@@ -60649,9 +60643,6 @@
 		}, {
 			key: 'render',
 			value: function render() {
-	
-				// console.log('render | questions');
-				// console.log(this.props);
 	
 				var loading = this.props.questions.loading;
 				var questions = loading ? this.loader() : this.compile();
@@ -60941,7 +60932,7 @@
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
-	var debug = __webpack_require__(1)('curate');
+	var _debug = __webpack_require__(1)('Curate');
 	var getFeed = __webpack_require__(338);
 	var questionPath = __webpack_require__(331);
 	
@@ -60956,7 +60947,7 @@
 	 */
 	function distillPath(path) {
 	
-	    debug('distillPath');
+	    _debug('Disilling path');
 	
 	    // Remove any query string references.
 	    var index = path.indexOf('?');
@@ -60978,7 +60969,7 @@
 	 */
 	function mergeFeed(questions) {
 	
-	    debug('mergeFeed');
+	    _debug('Merging Feed');
 	
 	    var keys = Object.keys(questions);
 	    var merged = [];
@@ -61019,7 +61010,7 @@
 	 */
 	function extractQuestion(json, id) {
 	
-	    debug('extractQuestion');
+	    _debug('Extracting relevant question');
 	
 	    var match = json.splice(id, 1);
 	
@@ -61038,9 +61029,7 @@
 	 */
 	function matchQuestion(json, question) {
 	
-	    debug('matchQuestion');
-	    debug('json', json);
-	    debug('question', question);
+	    _debug('Matching Question', 'JSON', json, 'Question', question);
 	
 	    var id = null;
 	
@@ -61074,7 +61063,7 @@
 	 */
 	function extrapolatePath(steps, questions) {
 	
-	    debug('extrapolatePath');
+	    _debug('Extrapolating path');
 	
 	    if (steps.length === 1) {
 	
@@ -61098,7 +61087,7 @@
 	 */
 	function extractJson(questions, topic) {
 	
-	    debug('extractJson');
+	    _debug('Extracting JSON');
 	
 	    return questions[topic] ? questions[topic] : mergeFeed(questions);
 	}
@@ -61111,7 +61100,7 @@
 	 */
 	function distillFeed(feed) {
 	
-	    debug('distillFeed');
+	    _debug('Distilling feed');
 	
 	    var keys = Object.keys(feed.topics);
 	    var questions = {};
@@ -61163,7 +61152,7 @@
 	 */
 	function curate(path) {
 	
-	    debug('curate (questions)...');
+	    _debug('Curating');
 	
 	    var feed = getFeed();
 	    var questions = distillFeed(feed);
@@ -61174,7 +61163,7 @@
 	    var topic = _extrapolatePath.topic;
 	    var question = _extrapolatePath.question;
 	
-	    debug('topic', topic, 'question', question);
+	    _debug('topic', topic, 'question', question);
 	    var extracted = extractJson(questions, topic);
 	
 	    var _matchQuestion = matchQuestion(extracted, question);
@@ -61218,7 +61207,7 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var debug = __webpack_require__(1)('props');
+	var _debug = __webpack_require__(1)('Passive');
 	var getFeed = __webpack_require__(338);
 	
 	/**
@@ -61227,9 +61216,9 @@
 	 * @param {object} topics - Topic data from feed.json
 	 * @return {array} Extracted topic data.
 	 */
-	function extractTopics(topics) {
+	function curateTopics(topics) {
 	
-	    debug('extractTopics');
+	    _debug('Curating topics');
 	
 	    var keys = Object.keys(topics);
 	    var json = [];
@@ -61278,11 +61267,11 @@
 	    var topics = _ref.topics;
 	
 	
-	    debug('distillFeed');
+	    _debug('Distilling');
 	
 	    return {
 	        hero: hero,
-	        topics: extractTopics(topics)
+	        topics: curateTopics(topics)
 	    };
 	}
 	
@@ -61295,7 +61284,7 @@
 	    var params = _ref2.params;
 	
 	
-	    debug('extract (passive props)...');
+	    _debug('Extraction');
 	
 	    var feed = getFeed();
 	    var json = distillFeed(feed);
@@ -61337,7 +61326,7 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var debug = __webpack_require__(1)('construct');
+	var _debug = __webpack_require__(1)('Construct');
 	
 	var _require = __webpack_require__(81);
 	
@@ -61369,7 +61358,7 @@
 	    var topic = _ref.topic;
 	
 	
-	    debug('constructState');
+	    _debug('Constrcuting state');
 	
 	    return {
 	        questions: {
@@ -61401,7 +61390,7 @@
 	 */
 	function createElement(passive) {
 	
-	    debug('createElement');
+	    _debug('Creating element');
 	
 	    return function (Component, props) {
 	
@@ -61424,7 +61413,7 @@
 	 */
 	function render(renderProps, passive, store) {
 	
-	    debug('render');
+	    _debug('Rendering');
 	
 	    var content = ReactDOMServer.renderToString(React.createElement(
 	        Provider,
@@ -61445,16 +61434,15 @@
 	 */
 	function initialise(renderProps, passive, state) {
 	
-	    debug('initialise');
+	    _debug('Initialising');
 	
 	    var store = createStore(combineReducers(reducers), // Reducers.
 	    state // State
 	    // no need for Redux dev tools server side =)
 	    );
 	
-	    debug('renderProps.params', renderProps.params);
+	    // _debug('renderProps.params', renderProps.params);
 	
-	    // renderProps.location.pathname = `/${state.comparison.after}`;
 	    renderProps.params = passive.params;
 	
 	    store.subscribe(function () {
@@ -61474,6 +61462,8 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
+	var _debug = __webpack_require__(1)('Reducers');
+	
 	var _require = __webpack_require__(329);
 	
 	var UPDATE_LOADER = _require.UPDATE_LOADER;
@@ -61492,8 +61482,7 @@
 		var action = arguments[1];
 	
 	
-		console.log('reducer | questions');
-		console.log(action);
+		_debug('Questions:', 'action', action);
 	
 		switch (action.operation) {
 	
@@ -61520,8 +61509,7 @@
 		var action = arguments[1];
 	
 	
-		console.log('reducer | topics');
-		console.log(action);
+		_debug('Topics:', 'action', action);
 	
 		switch (action.operation) {
 	

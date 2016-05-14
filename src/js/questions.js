@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('questions');
+const _debug = require('debug')('Questions');
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
@@ -38,29 +38,33 @@ class Questions extends React.Component {
 
 	fetch() {
 
-		console.log('fetch | questions');
+		_debug('Fetching questions');
 
 		const request = new XMLHttpRequest();
 		const url = this.generateUrl();
-		console.log(url);
+
+		_debug(`- URL = ${url}`);
 
 		request.open('GET', url, true);
 
 		request.onload = () => {
 
 			if (request.status >= 200 && request.status < 400) {
-				// Success!
-				console.log('success');
+
+				_debug('- Fetch = success');
 
 				const data = JSON.parse(request.responseText);
-				console.log(data);
+
+				_debug('- Returned data', data);
+
 				this.props.updateData(data);
 				this.props.updateLoader(false);
 
 
 			} else {
-				// We reached our target server, but it returned an error
-				console.log('error');
+
+				_debug('- Fetch = error');
+
 			}
 
 		};
@@ -86,13 +90,7 @@ class Questions extends React.Component {
 		const {topic} = this.props.routeParams;
 		const {data, open} = this.props.questions;
 
-		// console.log('+++++ compile');
-		// console.log(this.props.questions.data);
-		// () => this.toggleQuestion(id)
-
 		return data.map((question, id) => {
-
-			console.log(`${id} === ${open}`);
 
 			const {heading, description} = question;
 			const path = questionPath(heading);
@@ -113,9 +111,6 @@ class Questions extends React.Component {
 	}
 
 	render() {
-
-		// console.log('render | questions');
-		// console.log(this.props);
 
 		const loading = this.props.questions.loading;
 		const questions = loading ? this.loader() : this.compile();

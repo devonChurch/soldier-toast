@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('initialise');
+const _debug = require('debug')('Initialise');
 const React = require('react');
 const ReactDOM = require('react-dom');
 const {combineReducers, createStore} = require('redux');
@@ -8,23 +8,16 @@ const {Provider} = require('react-redux');
 const {Router, Route, IndexRoute, Redirect, Link, IndexLink, browserHistory} = require('react-router');
 const routes = require('./routes');
 const reducers = require('./reducers');
-// let store;
-
-
-// Renderer
-// Router
-// redux
-
 
 /**
  *
  */
 function replaceUrl() {
 
-	console.log('replaceUrl');
-
 	const {topic, question} = rehydrate.props().params;
-	console.log('topic', topic, 'question', question);
+	_debug('Replacing URL:');
+	_debug(`- Topic = ${topic}`);
+	_debug(`- Question = ${question}`);
 	const path = question ? `/${topic}/${question}` : `/${topic}`;
 
 	history.replaceState( {} , '', path);
@@ -58,12 +51,7 @@ function createElement(Component, props) {
  */
 function render(store) {
 
-	console.log(' * - - - - - - - - - - * ');
-	console.log('render');
-	console.log(store.getState());
-	console.log(' * - - - - - - - - - - * ');
-
-	debug(store.getState());
+	_debug(store.getState());
 
 	ReactDOM.render(
 		<Provider store={store}>

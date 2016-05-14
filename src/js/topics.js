@@ -1,5 +1,6 @@
 'use strict';
 
+const _debug = require('debug')('Topics');
 const $ = require('jquery');
 const React = require('react');
 const {Link} = require('react-router');
@@ -12,17 +13,17 @@ class Topics extends React.Component {
 
 		super();
 
-
 	}
 
 	changeTopic(topic) {
 
-		console.log('changeTopic');
+		_debug('Changing topic');
 
-		if (topic !== this.props.routeParams.topic) {
+		const current = `/${this.props.routeParams.topic}`;
 
-			console.log('  --> topics DONT match = [update]', topic);
-			console.log(this.props);
+		if (topic !== current) {
+
+			_debug(`- ${topic} !== ${current} | make the topic change`);
 
 			this.props.selectTopic(topic);
 			this.props.updateLoader();
@@ -34,10 +35,6 @@ class Topics extends React.Component {
 
 	render() {
 
-		console.log('Render topics');
-		console.log(this.props);
-		// console.log(this.props.passive.topics);
-
 		const toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
 
 		return (
@@ -47,8 +44,6 @@ class Topics extends React.Component {
 					<ul className="topics__list">
 						{
 							this.props.passive.topics.map((topic, id) => {
-
-								console.log(topic);
 
 								return (
 									<li className="topics__item" key={id}>

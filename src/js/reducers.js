@@ -1,5 +1,6 @@
 'use strict';
 
+const _debug = require('debug')('Reducers');
 const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
 function questions(state = {
@@ -8,8 +9,7 @@ function questions(state = {
 	data: []
 }, action) {
 
-	console.log('reducer | questions');
-	console.log(action);
+	_debug('Questions:', 'action', action);
 
 	switch(action.operation) {
 
@@ -34,8 +34,7 @@ function topics(state = {
 	open: false
 }, action) {
 
-	console.log('reducer | topics');
-	console.log(action);
+	_debug('Topics:', 'action', action);
 
 	switch(action.operation) {
 

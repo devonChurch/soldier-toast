@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('curate');
+const _debug = require('debug')('Curate');
 const getFeed = require('./feed');
 const questionPath = require('./question-path');
 
@@ -15,7 +15,7 @@ const questionPath = require('./question-path');
  */
 function distillPath(path) {
 
-    debug('distillPath');
+    _debug('Disilling path');
 
     // Remove any query string references.
     const index = path.indexOf('?');
@@ -38,7 +38,7 @@ function distillPath(path) {
  */
 function mergeFeed(questions) {
 
-    debug('mergeFeed');
+    _debug('Merging Feed');
 
     const keys = Object.keys(questions);
     const merged = [];
@@ -58,7 +58,7 @@ function mergeFeed(questions) {
  */
 function extractQuestion(json, id) {
 
-    debug('extractQuestion');
+    _debug('Extracting relevant question');
 
     const match = json.splice(id, 1);
 
@@ -78,9 +78,7 @@ function extractQuestion(json, id) {
  */
 function matchQuestion(json, question) {
 
-    debug('matchQuestion');
-    debug('json', json);
-    debug('question', question);
+    _debug('Matching Question', 'JSON', json, 'Question', question);
 
     let id = null;
 
@@ -117,7 +115,7 @@ function matchQuestion(json, question) {
  */
 function extrapolatePath(steps, questions) {
 
-    debug('extrapolatePath');
+    _debug('Extrapolating path');
 
     if (steps.length === 1) {
 
@@ -143,7 +141,7 @@ function extrapolatePath(steps, questions) {
  */
 function extractJson(questions, topic) {
 
-    debug('extractJson');
+    _debug('Extracting JSON');
 
     return questions[topic] ? questions[topic] : mergeFeed(questions);
 
@@ -157,7 +155,7 @@ function extractJson(questions, topic) {
  */
 function distillFeed(feed) {
 
-    debug('distillFeed');
+    _debug('Distilling feed');
 
     const keys = Object.keys(feed.topics);
     let questions = {};
@@ -189,13 +187,13 @@ function defineParams(topic, question, open) {
  */
 function curate(path) {
 
-    debug('curate (questions)...');
+    _debug('Curating');
 
     const feed = getFeed();
     const questions = distillFeed(feed);
     const steps = distillPath(path);
     const {topic, question} = extrapolatePath(steps, questions);
-    debug('topic', topic, 'question', question);
+    _debug('topic', topic, 'question', question);
     const extracted = extractJson(questions, topic);
     const {json, open} = matchQuestion(extracted, question);
     const params = defineParams(topic, question, open);

@@ -9,19 +9,11 @@ class Faq extends React.Component {
 
 	constructor() {
 
-		console.log('** Faq (constructor)');
-
 		super();
-
 
 	}
 
 	render() {
-
-		// console.log(this);
-		console.log('render | faq');
-		console.log(this.props);
-		console.log(this.props.route.apple);
 
 		return (
 			<div>

@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('construct');
+const _debug = require('debug')('Construct');
 const {RouterContext} = require('react-router');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
@@ -16,7 +16,7 @@ const reducers = require('./reducers');
  */
 function constructState({json, open, topic}) {
 
-	debug('constructState');
+	_debug('Constrcuting state');
 
     return {
         questions: {
@@ -49,7 +49,7 @@ exports.constructState = constructState;
  */
 function createElement(passive) {
 
-	debug('createElement');
+	_debug('Creating element');
 
     return (Component, props) => {
 
@@ -74,7 +74,7 @@ function createElement(passive) {
  */
 function render(renderProps, passive, store) {
 
-    debug('render');
+    _debug('Rendering');
 
     const content = ReactDOMServer.renderToString(
         <Provider store={store}>
@@ -96,7 +96,7 @@ function render(renderProps, passive, store) {
  */
 function initialise(renderProps, passive, state) {
 
-    debug('initialise');
+    _debug('Initialising');
 
     let store = createStore(
         combineReducers(reducers), // Reducers.
@@ -104,9 +104,8 @@ function initialise(renderProps, passive, state) {
         // no need for Redux dev tools server side =)
     );
 
-	debug('renderProps.params', renderProps.params);
+	// _debug('renderProps.params', renderProps.params);
 
-	// renderProps.location.pathname = `/${state.comparison.after}`;
 	renderProps.params = passive.params;
 
     store.subscribe(() => render(renderProps, passive, store)); // Render on state change.

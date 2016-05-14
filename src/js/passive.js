@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('props');
+const _debug = require('debug')('Passive');
 const getFeed = require('./feed');
 
 /**
@@ -9,9 +9,9 @@ const getFeed = require('./feed');
  * @param {object} topics - Topic data from feed.json
  * @return {array} Extracted topic data.
  */
-function extractTopics(topics) {
+function curateTopics(topics) {
 
-    debug('extractTopics');
+    _debug('Curating topics');
 
     const keys = Object.keys(topics);
     let json = [];
@@ -38,11 +38,11 @@ function extractTopics(topics) {
  */
 function distillFeed({hero, topics}) {
 
-    debug('distillFeed');
+    _debug('Distilling');
 
     return {
         hero,
-        topics: extractTopics(topics)
+        topics: curateTopics(topics)
     };
 
 }
@@ -54,7 +54,7 @@ function distillFeed({hero, topics}) {
  */
 function extract({params}) {
 
-    debug('extract (passive props)...');
+    _debug('Extraction');
 
     const feed = getFeed();
     const json = distillFeed(feed);
