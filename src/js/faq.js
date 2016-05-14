@@ -2,6 +2,7 @@
 
 const React = require('react');
 const {Link} = require('react-router');
+const Hero = require('./hero');
 const Topics = require('./topics');
 const Questions = require('./questions');
 
@@ -17,7 +18,7 @@ class Faq extends React.Component {
 
 		return (
 			<div>
-				<h1>FAQ</h1>
+				<Hero {...this.props}/>
 				<nav>
 					<Topics {...this.props} />
 				</nav>

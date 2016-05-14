@@ -86,24 +86,24 @@ function mapDispatchToProps(dispatch) {
 
 	const updateLoader = () => {
 		dispatch({
-			type: 'questions', // State.
-			operation: UPDATE_LOADER, // Action.
-			status: true // Params.
+			type: 'questions',
+			operation: UPDATE_LOADER,
+			status: true
 		});
 	};
 
 	const toggleTopics = () => {
 		dispatch({
-			type: 'topics', // State.
-			operation: TOGGLE_TOPICS // Action.
+			type: 'topics',
+			operation: TOGGLE_TOPICS
 		});
 	};
 
 	const toggleQuestion = () => {
 		dispatch({
-			type: 'questions', // State.
-			operation: TOGGLE_QUESTION, // Action.
-			id: null // Params.
+			type: 'questions',
+			operation: TOGGLE_QUESTION,
+			id: null
 		});
 	};
 
