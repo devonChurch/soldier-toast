@@ -16,9 +16,18 @@
         color: color(blue);
         display: block;
         text-decoration: none;
+        transition: color speed(fast) ease(out);
+
+        &:hover {
+            color: color(blue, dark);
+        }
 
         &--open {
             color: color(pink);
+
+            &:hover {
+                color: color(pink, dark);
+            }
         }
     }
 

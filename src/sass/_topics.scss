@@ -12,14 +12,25 @@
     &__toggle {
         @include resetButton;
         color: color(blue);
+        cursor: pointer;
         font-size: 16px;
+        outline: 0;
         padding: {
             bottom: space(small);
             top: space(small);
         }
+        transition: color speed(fast) ease(out);
+
+        &:hover {
+            color: color(blue, dark);
+        }
 
         &--open {
             color: color(pink);
+
+            &:hover {
+                color: color(pink, dark);
+            }
         }
     }
 
@@ -70,12 +81,22 @@
         padding: space(small) 0;
     }
 
-    &__link {
+    &__link,
+    &__all {
         color: color(blue);
         text-decoration: none;
+        transition: color speed(fast) ease(out);
+
+        &:hover {
+            color: color(blue, dark);
+        }
 
         &--active {
             color: color(pink);
+
+            &:hover {
+                color: color(pink, dark);
+            }
         }
     }
 
@@ -94,14 +115,8 @@
     }
 
     &__all {
-        color: color(blue);
         display: inline-block;
         padding: space(small) 0;
-        text-decoration: none;
-
-        &--active {
-            color: color(pink);
-        }
     }
 
     &__active {
