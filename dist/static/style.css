@@ -97,6 +97,10 @@ body {
 
 .topics__description {
   margin: 0; }
+  .topics__link ~ .topics__description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
 
 .topics__all {
   color: #3EA8f4;

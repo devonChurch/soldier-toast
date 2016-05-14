@@ -32394,35 +32394,11 @@
 	var routes = React.createElement(
 		Route,
 		{ path: '/' },
-		React.createElement(IndexRoute, { component: Faq }),
 		React.createElement(Route, { path: '/:topic', component: Faq }),
 		React.createElement(Route, { path: '/:topic/:question', component: Faq })
 	);
 	
-	// const routes = (
-	// 	<Route>
-	// 		<Route path="/:topic" component={Faq} />
-	// 		<Route path="/:topic/:question" component={Faq} />
-	// 	</Route>
-	// );
-	
 	module.exports = routes;
-	
-	// <Route path="/">
-	// 	<IndexRoute component={HomePage} />
-	// 	<Route path="/:food" component={ShowPage} />
-	// 	<Route path="/:food/:variety" component={EpisodePage} />
-	// </Route>
-
-	// <Route path="/">
-	// 	<IndexRoute component={HomePage} />
-	// 	<Route path="fruit">
-	// 		<IndexRoute component={ShowPage} foo={'bar'}/>
-	// 		<Route path="banana">
-	// 			<IndexRoute component={EpisodePage} foo={'bar'}/>
-	// 		</Route>
-	// 	</Route>
-	// </Route>
 
 /***/ },
 /* 171 */

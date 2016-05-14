@@ -85,6 +85,12 @@
 
     &__description {
         margin: 0;
+
+        .topics__link ~ & {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 
     &__all {
