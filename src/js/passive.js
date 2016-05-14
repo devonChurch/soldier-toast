@@ -7,21 +7,21 @@ const getFeed = require('./feed');
  * Extract only the relevant passive topic data from the JSON. We also change
  * the data structure from an object into an array for easy looping with React.
  * @param {object} topics - Topic data from feed.json
- * @return {array} Extracted topic data.
+ * @return {object} Extracted topic data.
  */
 function curateTopics(topics) {
 
     _debug('Curating topics');
 
     const keys = Object.keys(topics);
-    let json = [];
+    let json = {};
 
     for (let key of keys) {
 
         const topic = topics[key];
         const data = {...topic.overview, url: `/${key}`, total: topic.questions.length};
 
-        json.push(data);
+        json[key] = data;
 
     }
 

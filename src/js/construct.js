@@ -11,8 +11,11 @@ const reducers = require('./reducers');
 
 /**
  * Construct the initial (base) state that the app needs to render out its first view instance.
- * @param {string} path - The express.js request path.
- * @return {object} The state data object.
+ * @param {object} obj - The object wrapper that we will access via destructuring.
+ * @param {object} obj.json - The curated JSON data.
+ * @param {number} open - References the current open question (null if not applicable)
+ * @param {string} topic - The current topic associated with the user request and curated data.
+ * @return {object} The state object.
  */
 function constructState({json, open, topic}) {
 
@@ -104,13 +107,15 @@ function initialise(renderProps, passive, state) {
         // no need for Redux dev tools server side =)
     );
 
-	// _debug('renderProps.params', renderProps.params);
-
+	// Update the React-router params to utilise the (potentially) adjusted
+	// version based on the users request URL relevance.
 	renderProps.params = passive.params;
 
-    store.subscribe(() => render(renderProps, passive, store)); // Render on state change.
+	// Render on state change.
+	store.subscribe(() => render(renderProps, passive, store));
 
-    return render(renderProps, passive, store); // Generate server side HTML.
+	// Generate server side HTML.
+    return render(renderProps, passive, store);
 
 }
 

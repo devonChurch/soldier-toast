@@ -19,9 +19,9 @@ class Hero extends React.Component {
 
 		return (
 			<div className="hero">
-				<div>
-					<h1>{heading}</h1>
-					<p>{description}</p>
+				<div className="hero__content">
+					<h1 className="hero__heading">{heading}</h1>
+					<p className="hero__description">{description}</p>
 				</div>
 			</div>
 		);

@@ -42,9 +42,13 @@ const {constructState, initialise} = require('./js/construct');
 
 const app = express();
 
-// Express middleware.
+// Express middleware that dictates where you static assets reside with in the
+// folder structure. With this approach instead if static/foo.jpg you can simply
+// reference foo.jpg
 app.use(express.static('static'));
 
+// Catch all requests to the server and use React-router rather than Express to
+// clarify the correct response.
 app.get('*', (req, res) => {
 
     match({routes, location: req.url}, (error, redirectLocation, renderProps) => {
@@ -55,13 +59,13 @@ app.get('*', (req, res) => {
 
         if (error) {
 
-            _debug('** error 500 **');
+            _debug('Error: 500');
 
             res.status(500).send(error.message);
 
         } else if (path.indexOf('/api') >= 0) {
 
-            _debug('** fetching api request **');
+            _debug('Fetching data from API request');
 
             const request = path.substr(4);
             const {json} = curate(request);
@@ -70,12 +74,10 @@ app.get('*', (req, res) => {
 
         } else if (renderProps && path !== '/favicon.ico') {
 
-            _debug('** rendering page **');
-            // _debug('renderProps', renderProps);
+            _debug('Rendering React application');
 
             const curated = curate(path);
             const passive = getPassive(curated);
-            _debug('passive', passive);
             const state = constructState(curated);
             const content = initialise(renderProps, passive, state);
             const html = scaffold({content, state, passive});
@@ -84,11 +86,12 @@ app.get('*', (req, res) => {
 
         } else {
 
-            _debug('** error 404 **');
+            _debug('Error: 404');
 
             res.status(404).send('Not found');
 
         }
+
     });
 
 });

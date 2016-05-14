@@ -19,9 +19,7 @@ class Faq extends React.Component {
 		return (
 			<div>
 				<Hero {...this.props}/>
-				<nav>
-					<Topics {...this.props} />
-				</nav>
+				<Topics {...this.props} />
 				<Questions {...this.props} />
 			</div>
 		);

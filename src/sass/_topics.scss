@@ -1,20 +1,107 @@
 .topics {
 
+    &__nav {
+        border: solid color(gray);
+        border-width: border(medium) 0;
+        position: relative;
+    }
+
+    &__content {
+        @include siteContent;
+    }
+
     &__toggle {
+        @include resetButton;
+        color: color(blue);
+        font-size: 16px;
+        padding: {
+            bottom: space(small);
+            top: space(small);
+        }
 
         &--open {
-            color: red;
+            color: color(pink);
         }
     }
 
     &__dropdown {
+        background: color(gray, light);
+        left: 0;
         max-height: 0px;
         overflow: hidden;
-        transition: max-height 0.2s ease-out;
+        position: absolute;
+        top: calc(100% + #{border(medium)});
+        transition: speed(fast) ease(out);
+        transition-property: border, max-height ;
+        width: 100%;
+        z-index: zIndex(navigation);
+
+        &:before {
+            background: color(gray);
+            bottom: 0;
+            content: '';
+            display: block;
+            height: border(medium);
+            position: absolute;
+            width: 100%;
+        }
 
         .topics__toggle--open ~ & {
             max-height: 1000px;
-    		transition: max-height 0.5s ease-in;
+    		transition: max-height speed() ease(in);
         }
+    }
+
+    &__options {
+        @include siteContent;
+        padding: {
+            bottom: space(small);
+            top: space(small);
+        };
+    }
+
+    &__list {
+        border-bottom: border(medium) solid color(gray);
+        list-style: none;
+        margin: 0 0 space(small);
+        padding: 0 0 space(small);
+    }
+
+    &__item {
+        padding: space(small) 0;
+    }
+
+    &__link {
+        color: color(blue);
+        text-decoration: none;
+
+        &--active {
+            color: color(pink);
+        }
+    }
+
+    &__heading {
+        margin: 0 0 space(small);
+    }
+
+    &__description {
+        margin: 0;
+    }
+
+    &__all {
+        color: color(blue);
+        display: inline-block;
+        padding: space(small) 0;
+        text-decoration: none;
+
+        &--active {
+            color: color(pink);
+        }
+    }
+
+    &__active {
+        background: color(gray, light);
+        border-bottom: border(medium) solid color(gray);
+        padding: space(large) 0;
     }
 }

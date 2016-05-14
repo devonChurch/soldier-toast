@@ -10,3 +10,9 @@
     border: 0;
     padding: 0;
 }
+
+@mixin siteContent {
+    max-width: 960px + (space(small) * 2);
+    margin: auto;
+    padding: 0 space(small);
+}

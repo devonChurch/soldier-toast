@@ -1,0 +1,25 @@
+.hero {
+    background: color(gray, light);
+
+    &__content {
+        @include siteContent;
+        padding: {
+            bottom: space(medium);
+            top: space(medium);
+        };
+    }
+
+    &__heading,
+    &__description {
+        margin: 0;
+        padding: space(small) 0;
+    }
+
+    &__heading {
+
+    }
+
+    &__description {
+
+    }
+}

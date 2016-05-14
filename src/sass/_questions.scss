@@ -1,20 +1,21 @@
 .questions {
 
     &__toggle {
+        color: color(blue);
 
         &--open {
-            color: red;
+            color: color(pink);
         }
     }
 
     &__dropdown {
         max-height: 0px;
         overflow: hidden;
-        transition: max-height 0.2s ease-out;
+        transition: max-height speed(fast) ease(out);
 
         .questions__toggle--open ~ & {
             max-height: 1000px;
-    		transition: max-height 0.5s ease-in;
+    		transition: max-height speed() ease(in);
         }
     }
 }

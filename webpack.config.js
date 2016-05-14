@@ -65,7 +65,8 @@ module.exports = [{
     },
     plugins: [
         new CopyWebpackPlugin([
-            { from:  './feed.json', to: './feed.json' }
+            { from:  './feed.json', to: './feed.json' },
+            { from:  './font', to: './static/font' }
         ])
     ],
     module: {

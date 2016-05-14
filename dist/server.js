@@ -57,22 +57,22 @@
 	
 	var routes = __webpack_require__(170);
 	var React = __webpack_require__(103);
-	var ReactDOMServer = __webpack_require__(332);
+	var ReactDOMServer = __webpack_require__(333);
 	
-	var _require2 = __webpack_require__(315);
+	var _require2 = __webpack_require__(316);
 	
 	var combineReducers = _require2.combineReducers;
 	var createStore = _require2.createStore;
 	
-	var _require3 = __webpack_require__(308);
+	var _require3 = __webpack_require__(309);
 	
 	var Provider = _require3.Provider;
 	
-	var curate = __webpack_require__(337);
-	var getPassive = __webpack_require__(339);
-	var scaffold = __webpack_require__(340);
+	var curate = __webpack_require__(338);
+	var getPassive = __webpack_require__(340);
+	var scaffold = __webpack_require__(341);
 	
-	var _require4 = __webpack_require__(341);
+	var _require4 = __webpack_require__(342);
 	
 	var constructState = _require4.constructState;
 	var initialise = _require4.initialise;
@@ -105,9 +105,13 @@
 	
 	var app = express();
 	
-	// Express middleware.
+	// Express middleware that dictates where you static assets reside with in the
+	// folder structure. With this approach instead if static/foo.jpg you can simply
+	// reference foo.jpg
 	app.use(express.static('static'));
 	
+	// Catch all requests to the server and use React-router rather than Express to
+	// clarify the correct response.
 	app.get('*', function (req, res) {
 	
 	    match({ routes: routes, location: req.url }, function (error, redirectLocation, renderProps) {
@@ -118,12 +122,12 @@
 	
 	        if (error) {
 	
-	            _debug('** error 500 **');
+	            _debug('Error: 500');
 	
 	            res.status(500).send(error.message);
 	        } else if (path.indexOf('/api') >= 0) {
 	
-	            _debug('** fetching api request **');
+	            _debug('Fetching data from API request');
 	
 	            var request = path.substr(4);
 	
@@ -135,12 +139,10 @@
 	            res.status(200).json(json);
 	        } else if (renderProps && path !== '/favicon.ico') {
 	
-	            _debug('** rendering page **');
-	            // _debug('renderProps', renderProps);
+	            _debug('Rendering React application');
 	
 	            var curated = curate(path);
 	            var passive = getPassive(curated);
-	            _debug('passive', passive);
 	            var state = constructState(curated);
 	            var content = initialise(renderProps, passive, state);
 	            var html = scaffold({ content: content, state: state, passive: passive });
@@ -148,7 +150,7 @@
 	            res.status(200).send(html);
 	        } else {
 	
-	            _debug('** error 404 **');
+	            _debug('Error: 404');
 	
 	            res.status(404).send('Not found');
 	        }
@@ -48793,9 +48795,9 @@
 	
 	var Link = _require.Link;
 	
-	var Hero = __webpack_require__(343);
-	var Topics = __webpack_require__(306);
-	var Questions = __webpack_require__(330);
+	var Hero = __webpack_require__(306);
+	var Topics = __webpack_require__(307);
+	var Questions = __webpack_require__(331);
 	
 	var Faq = function (_React$Component) {
 		_inherits(Faq, _React$Component);
@@ -48814,11 +48816,7 @@
 					'div',
 					null,
 					React.createElement(Hero, this.props),
-					React.createElement(
-						'nav',
-						null,
-						React.createElement(Topics, this.props)
-					),
+					React.createElement(Topics, this.props),
 					React.createElement(Questions, this.props)
 				);
 			}
@@ -48843,21 +48841,85 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var _debug = __webpack_require__(1)('Hero');
+	var React = __webpack_require__(103);
+	
+	var Hero = function (_React$Component) {
+		_inherits(Hero, _React$Component);
+	
+		function Hero() {
+			_classCallCheck(this, Hero);
+	
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Hero).call(this));
+		}
+	
+		_createClass(Hero, [{
+			key: 'render',
+			value: function render() {
+	
+				_debug(this.props);
+	
+				var _props$passive$hero = this.props.passive.hero;
+				var heading = _props$passive$hero.heading;
+				var description = _props$passive$hero.description;
+	
+	
+				return React.createElement(
+					'div',
+					{ className: 'hero' },
+					React.createElement(
+						'div',
+						{ className: 'hero__content' },
+						React.createElement(
+							'h1',
+							{ className: 'hero__heading' },
+							heading
+						),
+						React.createElement(
+							'p',
+							{ className: 'hero__description' },
+							description
+						)
+					)
+				);
+			}
+		}]);
+	
+		return Hero;
+	}(React.Component);
+	
+	module.exports = Hero;
+
+/***/ },
+/* 307 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
 	var _debug = __webpack_require__(1)('Topics');
-	var $ = __webpack_require__(307);
+	var $ = __webpack_require__(308);
 	var React = __webpack_require__(103);
 	
 	var _require = __webpack_require__(81);
 	
 	var Link = _require.Link;
 	
-	var _require2 = __webpack_require__(308);
+	var _require2 = __webpack_require__(309);
 	
 	var connect = _require2.connect;
 	
-	var _require3 = __webpack_require__(329);
+	var _require3 = __webpack_require__(330);
 	
 	var UPDATE_LOADER = _require3.UPDATE_LOADER;
+	var UPDATE_DATA = _require3.UPDATE_DATA;
 	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
 	var SELECT_TOPIC = _require3.SELECT_TOPIC;
 	var TOGGLE_TOPICS = _require3.TOGGLE_TOPICS;
@@ -48873,76 +48935,216 @@
 	
 		_createClass(Topics, [{
 			key: 'changeTopic',
-			value: function changeTopic(topic) {
+			value: function changeTopic(url) {
+				var _this2 = this;
 	
-				_debug('Changing topic');
+				if (!this.compare(url)) {
+	
+					_debug('Changing topic');
+	
+					this.props.selectTopic(url);
+					this.props.updateLoader(true);
+					this.props.toggleQuestion();
+					this.props.toggleTopics();
+	
+					// Wait for react-router to update its params.
+					setTimeout(function () {
+						return _this2.fetch();
+					}, 100);
+				}
+			}
+		}, {
+			key: 'generateUrl',
+			value: function generateUrl() {
+				var _props$routeParams = this.props.routeParams;
+				var topic = _props$routeParams.topic;
+				var _props$routeParams$qu = _props$routeParams.question;
+				var question = _props$routeParams$qu === undefined ? '' : _props$routeParams$qu;
+	
+	
+				return '/api/' + topic + '/' + question;
+			}
+		}, {
+			key: 'fetch',
+			value: function fetch() {
+				var _this3 = this;
+	
+				_debug('Fetching questions');
+	
+				var request = new XMLHttpRequest();
+				var url = this.generateUrl();
+	
+				_debug('- URL = ' + url);
+	
+				request.open('GET', url, true);
+				request.onload = function () {
+					return _this3.status(request);
+				};
+				request.onerror = function () {
+					return _this3.error();
+				};
+				request.send();
+			}
+		}, {
+			key: 'status',
+			value: function status(request) {
+	
+				_debug('- Fetch = query status');
+	
+				if (request.status >= 200 && request.status < 400) this.success(request.responseText);else this.error();
+			}
+		}, {
+			key: 'success',
+			value: function success(response) {
+	
+				_debug('- Fetch = success');
+	
+				var data = JSON.parse(response);
+	
+				_debug('- Returned data', data);
+	
+				this.props.updateData(data);
+				this.props.updateLoader(false);
+			}
+		}, {
+			key: 'error',
+			value: function error() {
+	
+				_debug('- Fetch = error');
+			}
+		}, {
+			key: 'compare',
+			value: function compare(url) {
 	
 				var current = '/' + this.props.routeParams.topic;
 	
-				if (topic !== current) {
+				return url === current;
+			}
+		}, {
+			key: 'modifier',
+			value: function modifier(query, base, _modifier) {
 	
-					_debug('- ' + topic + ' !== ' + current + ' | make the topic change');
+				return query ? base + ' ' + base + _modifier : base;
+			}
+		}, {
+			key: 'items',
+			value: function items() {
+				var _this4 = this;
 	
-					this.props.selectTopic(topic);
-					this.props.updateLoader();
-					this.props.toggleQuestion();
-				}
+				var topics = this.props.passive.topics;
+				var keys = Object.keys(topics);
+	
+				return keys.map(function (key, id) {
+	
+					var topic = topics[key];
+					var url = topic.url;
+					var linkClass = _this4.modifier(_this4.compare(url), 'topics__link', '--active');
+	
+					return React.createElement(
+						'li',
+						{ className: 'topics__item', key: id },
+						React.createElement(
+							Link,
+							{ className: linkClass, to: url, onClick: function onClick() {
+									return _this4.changeTopic(url);
+								} },
+							React.createElement(
+								'h2',
+								{ className: 'topics__heading' },
+								topic.heading
+							)
+						),
+						React.createElement(
+							'p',
+							{ className: 'topics__total' },
+							topic.total,
+							' questions'
+						),
+						React.createElement(
+							'p',
+							{ className: 'topics__description' },
+							topic.description
+						)
+					);
+				});
+			}
+		}, {
+			key: 'active',
+			value: function active() {
+	
+				var key = this.props.routeParams.topic;
+				var _props$passive$topics = this.props.passive.topics[key];
+				var heading = _props$passive$topics.heading;
+				var description = _props$passive$topics.description;
+	
+	
+				return React.createElement(
+					'div',
+					{ className: 'topics__active' },
+					React.createElement(
+						'div',
+						{ className: 'topics__content' },
+						React.createElement(
+							'h2',
+							{ className: 'topics__heading' },
+							heading
+						),
+						React.createElement(
+							'p',
+							{ className: 'topics__description' },
+							description
+						)
+					)
+				);
 			}
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this2 = this;
+				var _this5 = this;
 	
-				var toggleClassName = this.props.topics.open ? 'topics__toggle topics__toggle--open' : 'topics__toggle';
+				var toggleClass = this.modifier(this.props.topics.open, 'topics__toggle', '--open');
+				var allClass = this.modifier(this.compare('/all'), 'topics__all', '--active');
+				var active = this.compare('/all') ? '' : this.active();
 	
 				return React.createElement(
 					'div',
 					{ className: 'topics' },
 					React.createElement(
-						'button',
-						{ className: toggleClassName, onClick: function onClick() {
-								return _this2.props.toggleTopics();
-							} },
-						'Select topic'
-					),
-					React.createElement(
-						'div',
-						{ className: 'topics__dropdown' },
+						'nav',
+						{ className: 'topics__nav' },
 						React.createElement(
-							'ul',
-							{ className: 'topics__list' },
-							this.props.passive.topics.map(function (topic, id) {
-	
-								return React.createElement(
-									'li',
-									{ className: 'topics__item', key: id },
+							'div',
+							{ className: 'topics__content' },
+							React.createElement(
+								'button',
+								{ className: toggleClass, onClick: function onClick() {
+										return _this5.props.toggleTopics();
+									} },
+								'Select topic'
+							),
+							React.createElement(
+								'div',
+								{ className: 'topics__dropdown' },
+								React.createElement(
+									'div',
+									{ className: 'topics__options' },
 									React.createElement(
-										Link,
-										{ className: 'topics__link', to: topic.url, onClick: function onClick() {
-												return _this2.changeTopic(topic.url);
-											} },
-										React.createElement(
-											'h2',
-											{ className: 'topics__heading' },
-											topic.heading
-										)
+										'ul',
+										{ className: 'topics__list' },
+										this.items()
 									),
 									React.createElement(
-										'p',
-										{ className: 'topics__description' },
-										topic.description
+										Link,
+										{ className: allClass, to: '/all', onClick: function onClick() {
+												return _this5.changeTopic('all');
+											} },
+										'View all questions'
 									)
-								);
-							})
-						),
-						React.createElement(
-							Link,
-							{ className: 'topics__all', to: '/all', onClick: function onClick() {
-									return _this2.changeTopic('all');
-								} },
-							'View all questions'
+								)
+							)
 						)
-					)
+					),
+					active
 				);
 			}
 		}]);
@@ -48957,8 +49159,6 @@
 	
 	function mapDispatchToProps(dispatch) {
 	
-		// return bindActionCreators({UPDATE_LOADER}, dispatch);
-	
 		var selectTopic = function selectTopic(topic) {
 			dispatch({
 				type: 'topics', // State.
@@ -48967,11 +49167,19 @@
 			});
 		};
 	
-		var updateLoader = function updateLoader() {
+		var updateLoader = function updateLoader(status) {
 			dispatch({
 				type: 'questions',
 				operation: UPDATE_LOADER,
-				status: true
+				status: status
+			});
+		};
+	
+		var updateData = function updateData(data) {
+			dispatch({
+				type: 'questions',
+				operation: UPDATE_DATA,
+				data: data
 			});
 		};
 	
@@ -48990,13 +49198,13 @@
 			});
 		};
 	
-		return { selectTopic: selectTopic, updateLoader: updateLoader, toggleTopics: toggleTopics, toggleQuestion: toggleQuestion };
+		return { selectTopic: selectTopic, updateLoader: updateLoader, updateData: updateData, toggleTopics: toggleTopics, toggleQuestion: toggleQuestion };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);
 
 /***/ },
-/* 307 */
+/* 308 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -58978,7 +59186,7 @@
 
 
 /***/ },
-/* 308 */
+/* 309 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -58986,11 +59194,11 @@
 	exports.__esModule = true;
 	exports.connect = exports.Provider = undefined;
 	
-	var _Provider = __webpack_require__(309);
+	var _Provider = __webpack_require__(310);
 	
 	var _Provider2 = _interopRequireDefault(_Provider);
 	
-	var _connect = __webpack_require__(312);
+	var _connect = __webpack_require__(313);
 	
 	var _connect2 = _interopRequireDefault(_connect);
 	
@@ -59000,7 +59208,7 @@
 	exports.connect = _connect2["default"];
 
 /***/ },
-/* 309 */
+/* 310 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -59010,11 +59218,11 @@
 	
 	var _react = __webpack_require__(103);
 	
-	var _storeShape = __webpack_require__(310);
+	var _storeShape = __webpack_require__(311);
 	
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 	
-	var _warning = __webpack_require__(311);
+	var _warning = __webpack_require__(312);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
@@ -59083,7 +59291,7 @@
 	};
 
 /***/ },
-/* 310 */
+/* 311 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -59099,7 +59307,7 @@
 	});
 
 /***/ },
-/* 311 */
+/* 312 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -59128,7 +59336,7 @@
 	}
 
 /***/ },
-/* 312 */
+/* 313 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -59140,27 +59348,27 @@
 	
 	var _react = __webpack_require__(103);
 	
-	var _storeShape = __webpack_require__(310);
+	var _storeShape = __webpack_require__(311);
 	
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 	
-	var _shallowEqual = __webpack_require__(313);
+	var _shallowEqual = __webpack_require__(314);
 	
 	var _shallowEqual2 = _interopRequireDefault(_shallowEqual);
 	
-	var _wrapActionCreators = __webpack_require__(314);
+	var _wrapActionCreators = __webpack_require__(315);
 	
 	var _wrapActionCreators2 = _interopRequireDefault(_wrapActionCreators);
 	
-	var _warning = __webpack_require__(311);
+	var _warning = __webpack_require__(312);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
-	var _isPlainObject = __webpack_require__(317);
+	var _isPlainObject = __webpack_require__(318);
 	
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 	
-	var _hoistNonReactStatics = __webpack_require__(328);
+	var _hoistNonReactStatics = __webpack_require__(329);
 	
 	var _hoistNonReactStatics2 = _interopRequireDefault(_hoistNonReactStatics);
 	
@@ -59526,7 +59734,7 @@
 	}
 
 /***/ },
-/* 313 */
+/* 314 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -59557,7 +59765,7 @@
 	}
 
 /***/ },
-/* 314 */
+/* 315 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -59565,7 +59773,7 @@
 	exports.__esModule = true;
 	exports["default"] = wrapActionCreators;
 	
-	var _redux = __webpack_require__(315);
+	var _redux = __webpack_require__(316);
 	
 	function wrapActionCreators(actionCreators) {
 	  return function (dispatch) {
@@ -59574,7 +59782,7 @@
 	}
 
 /***/ },
-/* 315 */
+/* 316 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -59582,27 +59790,27 @@
 	exports.__esModule = true;
 	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
 	
-	var _createStore = __webpack_require__(316);
+	var _createStore = __webpack_require__(317);
 	
 	var _createStore2 = _interopRequireDefault(_createStore);
 	
-	var _combineReducers = __webpack_require__(323);
+	var _combineReducers = __webpack_require__(324);
 	
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 	
-	var _bindActionCreators = __webpack_require__(325);
+	var _bindActionCreators = __webpack_require__(326);
 	
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 	
-	var _applyMiddleware = __webpack_require__(326);
+	var _applyMiddleware = __webpack_require__(327);
 	
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 	
-	var _compose = __webpack_require__(327);
+	var _compose = __webpack_require__(328);
 	
 	var _compose2 = _interopRequireDefault(_compose);
 	
-	var _warning = __webpack_require__(324);
+	var _warning = __webpack_require__(325);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
@@ -59625,7 +59833,7 @@
 	exports.compose = _compose2["default"];
 
 /***/ },
-/* 316 */
+/* 317 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -59634,11 +59842,11 @@
 	exports.ActionTypes = undefined;
 	exports["default"] = createStore;
 	
-	var _isPlainObject = __webpack_require__(317);
+	var _isPlainObject = __webpack_require__(318);
 	
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 	
-	var _symbolObservable = __webpack_require__(321);
+	var _symbolObservable = __webpack_require__(322);
 	
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 	
@@ -59892,12 +60100,12 @@
 	}
 
 /***/ },
-/* 317 */
+/* 318 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getPrototype = __webpack_require__(318),
-	    isHostObject = __webpack_require__(319),
-	    isObjectLike = __webpack_require__(320);
+	var getPrototype = __webpack_require__(319),
+	    isHostObject = __webpack_require__(320),
+	    isObjectLike = __webpack_require__(321);
 	
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -59968,7 +60176,7 @@
 
 
 /***/ },
-/* 318 */
+/* 319 */
 /***/ function(module, exports) {
 
 	/* Built-in method references for those with the same name as other `lodash` methods. */
@@ -59989,7 +60197,7 @@
 
 
 /***/ },
-/* 319 */
+/* 320 */
 /***/ function(module, exports) {
 
 	/**
@@ -60015,7 +60223,7 @@
 
 
 /***/ },
-/* 320 */
+/* 321 */
 /***/ function(module, exports) {
 
 	/**
@@ -60050,17 +60258,17 @@
 
 
 /***/ },
-/* 321 */
+/* 322 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* global window */
 	'use strict';
 	
-	module.exports = __webpack_require__(322)(global || window || this);
+	module.exports = __webpack_require__(323)(global || window || this);
 
 
 /***/ },
-/* 322 */
+/* 323 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -60089,7 +60297,7 @@
 
 
 /***/ },
-/* 323 */
+/* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -60097,13 +60305,13 @@
 	exports.__esModule = true;
 	exports["default"] = combineReducers;
 	
-	var _createStore = __webpack_require__(316);
+	var _createStore = __webpack_require__(317);
 	
-	var _isPlainObject = __webpack_require__(317);
+	var _isPlainObject = __webpack_require__(318);
 	
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 	
-	var _warning = __webpack_require__(324);
+	var _warning = __webpack_require__(325);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
@@ -60221,7 +60429,7 @@
 	}
 
 /***/ },
-/* 324 */
+/* 325 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -60250,7 +60458,7 @@
 	}
 
 /***/ },
-/* 325 */
+/* 326 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -60306,7 +60514,7 @@
 	}
 
 /***/ },
-/* 326 */
+/* 327 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -60317,7 +60525,7 @@
 	
 	exports["default"] = applyMiddleware;
 	
-	var _compose = __webpack_require__(327);
+	var _compose = __webpack_require__(328);
 	
 	var _compose2 = _interopRequireDefault(_compose);
 	
@@ -60369,7 +60577,7 @@
 	}
 
 /***/ },
-/* 327 */
+/* 328 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -60414,7 +60622,7 @@
 	}
 
 /***/ },
-/* 328 */
+/* 329 */
 /***/ function(module, exports) {
 
 	/**
@@ -60460,7 +60668,7 @@
 
 
 /***/ },
-/* 329 */
+/* 330 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -60476,7 +60684,7 @@
 	module.exports = actions;
 
 /***/ },
-/* 330 */
+/* 331 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -60496,17 +60704,16 @@
 	
 	var Link = _require.Link;
 	
-	var _require2 = __webpack_require__(308);
+	var _require2 = __webpack_require__(309);
 	
 	var connect = _require2.connect;
 	
-	var _require3 = __webpack_require__(329);
+	var _require3 = __webpack_require__(330);
 	
-	var UPDATE_LOADER = _require3.UPDATE_LOADER;
 	var UPDATE_DATA = _require3.UPDATE_DATA;
 	var TOGGLE_QUESTION = _require3.TOGGLE_QUESTION;
 	
-	var questionPath = __webpack_require__(331);
+	var questionPath = __webpack_require__(332);
 	
 	var Questions = function (_React$Component) {
 		_inherits(Questions, _React$Component);
@@ -60518,73 +60725,8 @@
 		}
 	
 		_createClass(Questions, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-	
-				// this.fetch();
-	
-			}
-		}, {
-			key: 'componentWillUnmount',
-			value: function componentWillUnmount() {
-	
-				// FIX!
-				this.request.abort();
-			}
-		}, {
-			key: 'generateUrl',
-			value: function generateUrl() {
-				var _props$routeParams = this.props.routeParams;
-				var topic = _props$routeParams.topic;
-				var _props$routeParams$qu = _props$routeParams.question;
-				var question = _props$routeParams$qu === undefined ? '' : _props$routeParams$qu;
-	
-	
-				return '/api/' + topic + '/' + question;
-			}
-		}, {
-			key: 'fetch',
-			value: function fetch() {
-				var _this2 = this;
-	
-				_debug('Fetching questions');
-	
-				var request = new XMLHttpRequest();
-				var url = this.generateUrl();
-	
-				_debug('- URL = ' + url);
-	
-				request.open('GET', url, true);
-	
-				request.onload = function () {
-	
-					if (request.status >= 200 && request.status < 400) {
-	
-						_debug('- Fetch = success');
-	
-						var data = JSON.parse(request.responseText);
-	
-						_debug('- Returned data', data);
-	
-						_this2.props.updateData(data);
-						_this2.props.updateLoader(false);
-					} else {
-	
-						_debug('- Fetch = error');
-					}
-				};
-	
-				request.onerror = function () {
-					// There was a connection error of some sort
-				};
-	
-				request.send();
-			}
-		}, {
 			key: 'loader',
 			value: function loader() {
-	
-				this.fetch();
 	
 				return React.createElement(
 					'div',
@@ -60595,7 +60737,7 @@
 		}, {
 			key: 'compile',
 			value: function compile() {
-				var _this3 = this;
+				var _this2 = this;
 	
 				var topic = this.props.routeParams.topic;
 				var _props$questions = this.props.questions;
@@ -60616,7 +60758,7 @@
 						React.createElement(
 							Link,
 							{ className: toggleClassName, to: '/' + topic + '/' + path, onClick: function onClick() {
-									return _this3.props.toggleQuestion(id);
+									return _this2.props.toggleQuestion(id);
 								} },
 							heading
 						),
@@ -60666,24 +60808,6 @@
 	
 	function mapDispatchToProps(dispatch) {
 	
-		// return bindActionCreators({UPDATE_LOADER}, dispatch);
-	
-		var updateLoader = function updateLoader(status) {
-			dispatch({
-				type: 'questions', // State.
-				operation: UPDATE_LOADER, // Action.
-				status: status // Params.
-			});
-		};
-	
-		var updateData = function updateData(data) {
-			dispatch({
-				type: 'questions', // State.
-				operation: UPDATE_DATA, // Action.
-				data: data // Params.
-			});
-		};
-	
 		var toggleQuestion = function toggleQuestion(id) {
 			dispatch({
 				type: 'questions', // State.
@@ -60692,13 +60816,13 @@
 			});
 		};
 	
-		return { updateLoader: updateLoader, updateData: updateData, toggleQuestion: toggleQuestion };
+		return { toggleQuestion: toggleQuestion };
 	}
 	
 	module.exports = connect(mapStateToProps, mapDispatchToProps)(Questions);
 
 /***/ },
-/* 331 */
+/* 332 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -60711,16 +60835,16 @@
 	module.exports = generate;
 
 /***/ },
-/* 332 */
+/* 333 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(333);
+	module.exports = __webpack_require__(334);
 
 
 /***/ },
-/* 333 */
+/* 334 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -60737,7 +60861,7 @@
 	'use strict';
 	
 	var ReactDefaultInjection = __webpack_require__(176);
-	var ReactServerRendering = __webpack_require__(334);
+	var ReactServerRendering = __webpack_require__(335);
 	var ReactVersion = __webpack_require__(131);
 	
 	ReactDefaultInjection.inject();
@@ -60751,7 +60875,7 @@
 	module.exports = ReactDOMServer;
 
 /***/ },
-/* 334 */
+/* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -60770,8 +60894,8 @@
 	var ReactDefaultBatchingStrategy = __webpack_require__(267);
 	var ReactElement = __webpack_require__(109);
 	var ReactMarkupChecksum = __webpack_require__(298);
-	var ReactServerBatchingStrategy = __webpack_require__(335);
-	var ReactServerRenderingTransaction = __webpack_require__(336);
+	var ReactServerBatchingStrategy = __webpack_require__(336);
+	var ReactServerRenderingTransaction = __webpack_require__(337);
 	var ReactUpdates = __webpack_require__(193);
 	
 	var emptyObject = __webpack_require__(121);
@@ -60821,7 +60945,7 @@
 	};
 
 /***/ },
-/* 335 */
+/* 336 */
 /***/ function(module, exports) {
 
 	/**
@@ -60848,7 +60972,7 @@
 	module.exports = ReactServerBatchingStrategy;
 
 /***/ },
-/* 336 */
+/* 337 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -60922,7 +61046,7 @@
 	module.exports = ReactServerRenderingTransaction;
 
 /***/ },
-/* 337 */
+/* 338 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -60930,8 +61054,8 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	var _debug = __webpack_require__(1)('Curate');
-	var getFeed = __webpack_require__(338);
-	var questionPath = __webpack_require__(331);
+	var getFeed = __webpack_require__(339);
+	var questionPath = __webpack_require__(332);
 	
 	/**
 	 * Distills down the request URL into an array that we can utilise to access the
@@ -61176,7 +61300,7 @@
 	module.exports = curate;
 
 /***/ },
-/* 338 */
+/* 339 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -61197,7 +61321,7 @@
 	module.exports = feed;
 
 /***/ },
-/* 339 */
+/* 340 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -61205,20 +61329,20 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _debug = __webpack_require__(1)('Passive');
-	var getFeed = __webpack_require__(338);
+	var getFeed = __webpack_require__(339);
 	
 	/**
 	 * Extract only the relevant passive topic data from the JSON. We also change
 	 * the data structure from an object into an array for easy looping with React.
 	 * @param {object} topics - Topic data from feed.json
-	 * @return {array} Extracted topic data.
+	 * @return {object} Extracted topic data.
 	 */
 	function curateTopics(topics) {
 	
 	    _debug('Curating topics');
 	
 	    var keys = Object.keys(topics);
-	    var json = [];
+	    var json = {};
 	
 	    var _iteratorNormalCompletion = true;
 	    var _didIteratorError = false;
@@ -61232,7 +61356,7 @@
 	            var topic = topics[key];
 	            var data = _extends({}, topic.overview, { url: '/' + key, total: topic.questions.length });
 	
-	            json.push(data);
+	            json[key] = data;
 	        }
 	    } catch (err) {
 	        _didIteratorError = true;
@@ -61292,31 +61416,31 @@
 	module.exports = extract;
 
 /***/ },
-/* 340 */
+/* 341 */
 /***/ function(module, exports) {
 
 	'use strict';
 	
 	var scaffold = function scaffold(_ref) {
 		var _ref$title = _ref.title;
-		var title = _ref$title === undefined ? 'This is a title' : _ref$title;
+		var title = _ref$title === undefined ? 'FAQ section' : _ref$title;
 		var _ref$desc = _ref.desc;
-		var desc = _ref$desc === undefined ? 'This is a description' : _ref$desc;
+		var desc = _ref$desc === undefined ? 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' : _ref$desc;
 		var _ref$content = _ref.content;
-		var content = _ref$content === undefined ? 'error' : _ref$content;
+		var content = _ref$content === undefined ? 'Sorry, there has been an error' : _ref$content;
 		var _ref$state = _ref.state;
 		var state = _ref$state === undefined ? {} : _ref$state;
 		var _ref$passive = _ref.passive;
 		var passive = _ref$passive === undefined ? {} : _ref$passive;
 	
 	
-		return '<!DOCTYPE html>\n\t    <html>\n\t        <head>\n\t            <meta charset="utf-8">\n\t            <meta http-equiv="x-ua-compatible" content="ie=edge">\n\t            <title>' + title + '</title>\n\t            <meta name="description" content="' + desc + '">\n\t            <meta name="viewport" content="width=device-width, initial-scale=1">\n\t            <link rel="apple-touch-icon" href="apple-touch-icon.png">\n\t            <link rel="stylesheet" href="/style.css">\n\t\t\t\t<script>\n\t\t\t\t\twindow.__REDUX_STATE__ = ' + JSON.stringify(state) + ';\n\t\t\t\t\twindow.__PASSIVE_PROPS__ = ' + JSON.stringify(passive) + ';\n\t\t\t\t</script>\n\t        </head>\n\t        <body>\n\t            <div id="app" class="app">' + content + '</div>\n\t            <script src="/client.js"></script>\n\t        </body>\n\t    </html>';
+		return '<!DOCTYPE html>\n\t    <html>\n\t        <head>\n\t            <meta charset="utf-8">\n\t            <meta http-equiv="x-ua-compatible" content="ie=edge">\n\t            <title>' + title + '</title>\n\t            <meta name="description" content="' + desc + '">\n\t            <meta name="viewport" content="width=device-width, initial-scale=1">\n\t            <link rel="apple-touch-icon" href="apple-touch-icon.png">\n\t\t\t\t<link rel="stylesheet" href="/style.css">\n\t\t\t\t<script>\n\t\t\t\t\twindow.__REDUX_STATE__ = ' + JSON.stringify(state) + ';\n\t\t\t\t\twindow.__PASSIVE_PROPS__ = ' + JSON.stringify(passive) + ';\n\t\t\t\t</script>\n\t        </head>\n\t        <body>\n\t            <div id="app" class="app">' + content + '</div>\n\t            <script src="/client.js"></script>\n\t        </body>\n\t    </html>';
 	};
 	
 	module.exports = scaffold;
 
 /***/ },
-/* 341 */
+/* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -61330,24 +61454,27 @@
 	var RouterContext = _require.RouterContext;
 	
 	var React = __webpack_require__(103);
-	var ReactDOMServer = __webpack_require__(332);
+	var ReactDOMServer = __webpack_require__(333);
 	
-	var _require2 = __webpack_require__(315);
+	var _require2 = __webpack_require__(316);
 	
 	var combineReducers = _require2.combineReducers;
 	var createStore = _require2.createStore;
 	
-	var _require3 = __webpack_require__(308);
+	var _require3 = __webpack_require__(309);
 	
 	var Provider = _require3.Provider;
 	
-	var curate = __webpack_require__(337);
-	var reducers = __webpack_require__(342);
+	var curate = __webpack_require__(338);
+	var reducers = __webpack_require__(343);
 	
 	/**
 	 * Construct the initial (base) state that the app needs to render out its first view instance.
-	 * @param {string} path - The express.js request path.
-	 * @return {object} The state data object.
+	 * @param {object} obj - The object wrapper that we will access via destructuring.
+	 * @param {object} obj.json - The curated JSON data.
+	 * @param {number} open - References the current open question (null if not applicable)
+	 * @param {string} topic - The current topic associated with the user request and curated data.
+	 * @return {object} The state object.
 	 */
 	function constructState(_ref) {
 	    var json = _ref.json;
@@ -61438,21 +61565,23 @@
 	    // no need for Redux dev tools server side =)
 	    );
 	
-	    // _debug('renderProps.params', renderProps.params);
-	
+	    // Update the React-router params to utilise the (potentially) adjusted
+	    // version based on the users request URL relevance.
 	    renderProps.params = passive.params;
 	
+	    // Render on state change.
 	    store.subscribe(function () {
 	        return render(renderProps, passive, store);
-	    }); // Render on state change.
+	    });
 	
-	    return render(renderProps, passive, store); // Generate server side HTML.
+	    // Generate server side HTML.
+	    return render(renderProps, passive, store);
 	}
 	
 	exports.initialise = initialise;
 
 /***/ },
-/* 342 */
+/* 343 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -61461,7 +61590,7 @@
 	
 	var _debug = __webpack_require__(1)('Reducers');
 	
-	var _require = __webpack_require__(329);
+	var _require = __webpack_require__(330);
 	
 	var UPDATE_LOADER = _require.UPDATE_LOADER;
 	var UPDATE_DATA = _require.UPDATE_DATA;
@@ -61523,69 +61652,6 @@
 	}
 	
 	module.exports = { questions: questions, topics: topics };
-
-/***/ },
-/* 343 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var _debug = __webpack_require__(1)('Hero');
-	var React = __webpack_require__(103);
-	
-	var Hero = function (_React$Component) {
-		_inherits(Hero, _React$Component);
-	
-		function Hero() {
-			_classCallCheck(this, Hero);
-	
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(Hero).call(this));
-		}
-	
-		_createClass(Hero, [{
-			key: 'render',
-			value: function render() {
-	
-				_debug(this.props);
-	
-				var _props$passive$hero = this.props.passive.hero;
-				var heading = _props$passive$hero.heading;
-				var description = _props$passive$hero.description;
-	
-	
-				return React.createElement(
-					'div',
-					{ className: 'hero' },
-					React.createElement(
-						'div',
-						null,
-						React.createElement(
-							'h1',
-							null,
-							heading
-						),
-						React.createElement(
-							'p',
-							null,
-							description
-						)
-					)
-				);
-			}
-		}]);
-	
-		return Hero;
-	}(React.Component);
-	
-	module.exports = Hero;
 
 /***/ }
 /******/ ]);
