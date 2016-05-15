@@ -1,6 +1,6 @@
 # Soldier Toast
 
-A universal React app giving your an SEO friendly application by utilising the majority of your code on both the server and client.
+A universal React app giving you an SEO friendly application by utilising the majority of your code on both the server and client.
 
 ## Installation
 
