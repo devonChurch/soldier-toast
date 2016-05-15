@@ -15,6 +15,10 @@
   },
   "keywords": [
     "React",
+    "Redux",
+    "React Router",
+    "Universal App",
+    "SPA",
     "ES6"
   ],
   "author": "Devon Church",
@@ -26,7 +30,7 @@
   "devDependencies": {
     "autoprefixer": "^6.3.5",
     "babel-core": "^6.5.2",
-    "babel-eslint": "^6.0.3",
+    "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.3",
     "babel-preset-es2015": "^6.5.0",
     "babel-preset-react": "^6.5.0",
@@ -35,9 +39,10 @@
     "copy-webpack-plugin": "^1.1.1",
     "css-loader": "^0.23.1",
     "debug": "^2.2.0",
-    "eslint": "^2.2.0",
+    "eslint": "^2.10.1",
     "eslint-loader": "^1.3.0",
     "eslint-plugin-babel": "^3.1.0",
+    "eslint-plugin-react": "^5.1.1",
     "express": "^4.13.4",
     "extract-text-webpack-plugin": "^1.0.1",
     "install": "^0.4.4",
@@ -53,7 +58,6 @@
   },
   "dependencies": {
     "deep-freeze": "0.0.1",
-    "jquery": "^3.0.0-beta1",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
     "react-redux": "^4.4.5",

@@ -1,0 +1,18 @@
+.hero {
+    background: color(gray, dark);
+
+    &__content {
+        @include siteContent;
+        padding: {
+            bottom: space(medium);
+            top: space(medium);
+        };
+    }
+
+    &__heading,
+    &__description {
+        color: white;
+        margin: 0;
+        padding: space(small) 0;
+    }
+}

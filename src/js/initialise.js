@@ -1,6 +1,11 @@
 'use strict';
 
-const debug = require('debug')('initialise');
+/**
+ * Initialise app (client side).
+ * @module ./initialiser
+ */
+
+const _debug = require('debug')('Initialise');
 const React = require('react');
 const ReactDOM = require('react-dom');
 const {combineReducers, createStore} = require('redux');
@@ -8,23 +13,18 @@ const {Provider} = require('react-redux');
 const {Router, Route, IndexRoute, Redirect, Link, IndexLink, browserHistory} = require('react-router');
 const routes = require('./routes');
 const reducers = require('./reducers');
-// let store;
-
-
-// Renderer
-// Router
-// redux
-
 
 /**
- *
+ * Before we initialise React, Redux or React-router we replace the current URL
+ * with a rendition that matches the curated data i.e. ‘/‘ becomes ‘/all’ and
+ * ‘/topic/broken-question’ becomes ‘/topic’.
  */
 function replaceUrl() {
 
-	console.log('replaceUrl');
-
 	const {topic, question} = rehydrate.props().params;
-	console.log('topic', topic, 'question', question);
+	_debug('Replacing URL:');
+	_debug(`- Topic = ${topic}`);
+	_debug(`- Question = ${question}`);
 	const path = question ? `/${topic}/${question}` : `/${topic}`;
 
 	history.replaceState( {} , '', path);
@@ -32,7 +32,8 @@ function replaceUrl() {
 }
 
 /**
- *
+ * Pull either the server side generated Redux state or React props out of the
+ * window object.
  */
 const rehydrate = {
 
@@ -42,7 +43,10 @@ const rehydrate = {
 };
 
 /**
- *
+ * This follows the same methodology as mentioned in the ./construct.js documentation.
+ * @see {@link ./construct createElement}
+ * @param {class} Component - The react-router component class
+ * @param {object} props - The react-router props
  */
 function createElement(Component, props) {
 
@@ -54,16 +58,13 @@ function createElement(Component, props) {
 }
 
 /**
- *
+ * Renders the entire app and leverages the Redux Provider and React-router
+ * functionality.
+ * @param {object} store - The Redux store.
  */
 function render(store) {
 
-	console.log(' * - - - - - - - - - - * ');
-	console.log('render');
-	console.log(store.getState());
-	console.log(' * - - - - - - - - - - * ');
-
-	debug(store.getState());
+	_debug(store.getState());
 
 	ReactDOM.render(
 		<Provider store={store}>
@@ -85,7 +86,8 @@ function devTools() {
 }
 
 /**
- *
+ * Starts the entire client side sequence that picks up where the server side
+ * rendition off the app left off.
  */
 function initialise() {
 
@@ -103,4 +105,6 @@ function initialise() {
 
 }
 
-module.exports = initialise;
+/** Initialise app (client side). */
+// Note: That the initialiser function in executing itself when exporting.
+module.exports = initialise();

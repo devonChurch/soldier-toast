@@ -9,5 +9,11 @@ html {
 }
 
 body {
+    color: color(gray, dark);
+    font: {
+        family: font(base), sans-serif;
+        size: 16px;
+        weight: 300;
+    }
     margin: 0;
 }

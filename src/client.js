@@ -1,2 +1,2 @@
 require('./sass/style.scss');
-require('./js/app');
+require('./js/initialise');

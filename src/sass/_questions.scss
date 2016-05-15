@@ -1,20 +1,56 @@
 .questions {
+    padding: space() 0;
+
+    &__list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &__item {
+        padding: space(tiny) 0;
+    }
 
     &__toggle {
+        @include siteContent;
+        color: color(blue);
+        display: block;
+        text-decoration: none;
+        transition: color speed(fast) ease(out);
+
+        &:hover {
+            color: color(blue, dark);
+        }
 
         &--open {
-            color: red;
+            color: color(pink);
+
+            &:hover {
+                color: color(pink, dark);
+            }
         }
     }
 
     &__dropdown {
         max-height: 0px;
         overflow: hidden;
-        transition: max-height 0.2s ease-out;
+        position: relative;
+        transition: max-height speed(fast) ease(out);
 
         .questions__toggle--open ~ & {
             max-height: 1000px;
-    		transition: max-height 0.5s ease-in;
+    		transition: max-height speed() ease(in);
         }
+    }
+
+    &__spacing {
+        border: solid color(gray);
+        border-width: border() 0;
+        margin: space() 0;
+        padding: space() 0;
+    }
+
+    &__content {
+        @include siteContent;
     }
 }

@@ -1,15 +1,33 @@
 'use strict';
 
-const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
+/**
+ * Redux reducers.
+ * @module ./routes
+ */
 
+const _debug = require('debug')('Reducers');
+const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
+const deepFreeze = require('deep-freeze');
+
+// We are using Deep Freeze to ensue that the modifications to our state are done
+// via immutable methods. This way we can utilise Redux in its most performant
+// fashion as well as utilise it’s dev tools to step through our apps ‘action’ timeline.
+
+/**
+ * The Redux actions attributed to the questions component.
+ * @param {object} state - The current state of the app (with base fallback).
+ * @param {object} action - The redux action object.
+ * @return {object} The updated state.
+ */
 function questions(state = {
 	loading: true,
 	open: null,
 	data: []
 }, action) {
 
-	console.log('reducer | questions');
-	console.log(action);
+	deepFreeze(state);
+
+	_debug('Questions:', 'action', action);
 
 	switch(action.operation) {
 
@@ -29,13 +47,20 @@ function questions(state = {
 
 }
 
+/**
+ * The Redux actions attributed to the topics component.
+ * @param {object} state - The current state of the app (with base fallback).
+ * @param {object} action - The redux action object.
+ * @return {object} The updated state.
+ */
 function topics(state = {
 	current: 'all',
 	open: false
 }, action) {
 
-	console.log('reducer | topics');
-	console.log(action);
+	deepFreeze(state);
+
+	_debug('Topics:', 'action', action);
 
 	switch(action.operation) {
 
@@ -52,4 +77,5 @@ function topics(state = {
 
 }
 
+/** Redux reducers. */
 module.exports = {questions, topics};

@@ -1,6 +1,11 @@
 'use strict';
 
-const debug = require('debug')('construct');
+/**
+ * Construct app (server side).
+ * @module ./construct
+ */
+
+const _debug = require('debug')('Construct');
 const {RouterContext} = require('react-router');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
@@ -11,12 +16,15 @@ const reducers = require('./reducers');
 
 /**
  * Construct the initial (base) state that the app needs to render out its first view instance.
- * @param {string} path - The express.js request path.
- * @return {object} The state data object.
+ * @param {object} obj - The object wrapper that we will access via destructuring.
+ * @param {object} obj.json - The curated JSON data.
+ * @param {number} open - References the current open question (null if not applicable)
+ * @param {string} topic - The current topic associated with the user request and curated data.
+ * @return {object} The state object.
  */
 function constructState({json, open, topic}) {
 
-	debug('constructState');
+	_debug('Constrcuting state');
 
     return {
         questions: {
@@ -49,7 +57,7 @@ exports.constructState = constructState;
  */
 function createElement(passive) {
 
-	debug('createElement');
+	_debug('Creating element');
 
     return (Component, props) => {
 
@@ -66,15 +74,16 @@ function createElement(passive) {
  * The render function that will generate our server side SEO friendly HTML markup
  * for our React app. Utilising the React renderer Redux Provider and React Router
  * functionality that we use client side with a slight server side twist.
- * @param {object} renderProps - The props generated from the react router “match”
+ * @param {object} obj - The object wrapper that we will access via destructuring.
+ * @param {object} obj.renderProps - The props generated from the react router “match”
  * setup in the server.js file.
- * @param {object} passive - Our React app’s passive props.
- * @param {object} store - The Redux store.
+ * @param {object} obj.passive - Our React app’s passive props.
+ * @param {object} obj.store - The Redux store.
  * @return {string} The HTML representation of our app.
  */
 function render(renderProps, passive, store) {
 
-    debug('render');
+    _debug('Rendering');
 
     const content = ReactDOMServer.renderToString(
         <Provider store={store}>
@@ -96,7 +105,7 @@ function render(renderProps, passive, store) {
  */
 function initialise(renderProps, passive, state) {
 
-    debug('initialise');
+    _debug('Initialising');
 
     let store = createStore(
         combineReducers(reducers), // Reducers.
@@ -104,15 +113,17 @@ function initialise(renderProps, passive, state) {
         // no need for Redux dev tools server side =)
     );
 
-	debug('renderProps.params', renderProps.params);
-
-	// renderProps.location.pathname = `/${state.comparison.after}`;
+	// Update the React-router params to utilise the (potentially) adjusted
+	// version based on the users request URL relevance.
 	renderProps.params = passive.params;
 
-    store.subscribe(() => render(renderProps, passive, store)); // Render on state change.
+	// Render on state change.
+	store.subscribe(() => render(renderProps, passive, store));
 
-    return render(renderProps, passive, store); // Generate server side HTML.
+	// Generate server side HTML.
+    return render(renderProps, passive, store);
 
 }
 
+/** Construct app (server side). */
 exports.initialise = initialise;

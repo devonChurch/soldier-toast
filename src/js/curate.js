@@ -1,6 +1,11 @@
 'use strict';
 
-const debug = require('debug')('curate');
+/**
+ * Curate feed.
+ * @module ./curate
+ */
+
+const _debug = require('debug')('Curate');
 const getFeed = require('./feed');
 const questionPath = require('./question-path');
 
@@ -15,7 +20,7 @@ const questionPath = require('./question-path');
  */
 function distillPath(path) {
 
-    debug('distillPath');
+    _debug('Disilling path');
 
     // Remove any query string references.
     const index = path.indexOf('?');
@@ -33,12 +38,12 @@ function distillPath(path) {
 /**
  * If no applicable topic is provided then we merge all topics into a
  * single array to represent the /all status.
- * @param {array} keys - The topic names that we will extract from questions.JSON
+ * @param {object} questions - The question JSON data
  * @return {array} The merged questions data into a single array.
  */
 function mergeFeed(questions) {
 
-    debug('mergeFeed');
+    _debug('Merging Feed');
 
     const keys = Object.keys(questions);
     const merged = [];
@@ -58,7 +63,7 @@ function mergeFeed(questions) {
  */
 function extractQuestion(json, id) {
 
-    debug('extractQuestion');
+    _debug('Extracting relevant question');
 
     const match = json.splice(id, 1);
 
@@ -78,9 +83,7 @@ function extractQuestion(json, id) {
  */
 function matchQuestion(json, question) {
 
-    debug('matchQuestion');
-    debug('json', json);
-    debug('question', question);
+    _debug('Matching Question', 'JSON', json, 'Question', question);
 
     let id = null;
 
@@ -117,7 +120,7 @@ function matchQuestion(json, question) {
  */
 function extrapolatePath(steps, questions) {
 
-    debug('extrapolatePath');
+    _debug('Extrapolating path');
 
     if (steps.length === 1) {
 
@@ -143,7 +146,7 @@ function extrapolatePath(steps, questions) {
  */
 function extractJson(questions, topic) {
 
-    debug('extractJson');
+    _debug('Extracting JSON');
 
     return questions[topic] ? questions[topic] : mergeFeed(questions);
 
@@ -157,7 +160,7 @@ function extractJson(questions, topic) {
  */
 function distillFeed(feed) {
 
-    debug('distillFeed');
+    _debug('Distilling feed');
 
     const keys = Object.keys(feed.topics);
     let questions = {};
@@ -169,11 +172,12 @@ function distillFeed(feed) {
 }
 
 /**
- *
+ * Refine the relevant params based on the original path request. This will be
+ * used to update the augment react-router params and augment the URL on client
+ * side initialisation.
+ * @return {object} The router params.
  */
 function defineParams(topic, question, open) {
-
-    // return open === 0 ? `/${topic}/${question}` : `/${topic}`;
 
     return open === 0 ? {topic, question} : {topic};
 
@@ -185,17 +189,17 @@ function defineParams(topic, question, open) {
  * rather than a nasty 404 if the query is not relevant then package up the relating
  * content for injection via our React system.
  * @param {string} path - The raw request URL sent through from our Express.js server.
- * @return {array} the curated JSON data.
+ * @return {object} the curated JSON data in addition to the datas relevant attributes.
  */
 function curate(path) {
 
-    debug('curate (questions)...');
+    _debug('Curating');
 
     const feed = getFeed();
     const questions = distillFeed(feed);
     const steps = distillPath(path);
     const {topic, question} = extrapolatePath(steps, questions);
-    debug('topic', topic, 'question', question);
+    _debug('topic', topic, 'question', question);
     const extracted = extractJson(questions, topic);
     const {json, open} = matchQuestion(extracted, question);
     const params = defineParams(topic, question, open);
@@ -204,4 +208,5 @@ function curate(path) {
 
 }
 
+/** Curate feed. */
 module.exports = curate;
