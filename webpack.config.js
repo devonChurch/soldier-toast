@@ -17,12 +17,7 @@ var loaderJs = {
     test: /\.js$/,
     exclude: /node_modules/,
     // Automatically generates source maps without the sourceMaps config
-    loader: 'babel',
-    query: {
-        // Activating extra Babel stages to access the spread operator on objects
-        // for our immutable augmentation of the Redux state.
-        presets: ['react', 'es2015', 'stage-2', 'stage-3']
-    }
+    loader: 'babel'
 };
 
 var loaderJson = {

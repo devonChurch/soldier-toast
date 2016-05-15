@@ -1,5 +1,13 @@
 {
     "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true,
+            "experimentalObjectRestSpread": true
+        }
+    },
     "rules": {
         "linebreak-style": [2, "unix"],
         "no-console": 1,
