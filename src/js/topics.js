@@ -1,20 +1,32 @@
 'use strict';
 
+/**
+ * Topics component.
+ * @module ./topics
+ */
+
 const _debug = require('debug')('Topics');
-const $ = require('jquery');
 const React = require('react');
 const {Link} = require('react-router');
 const {connect} = require('react-redux');
 const {UPDATE_LOADER, UPDATE_DATA, TOGGLE_QUESTION, SELECT_TOPIC, TOGGLE_TOPICS} = require('./actions');
 
+/** Class representing the Topics component. */
 class Topics extends React.Component {
 
+	/** Create a new component instance */
 	constructor() {
 
 		super();
 
 	}
 
+	/**
+	 * When a new topic is selected we first query is it differs to the current
+	 * topic displayed in the app and if so we run through a series of Redux
+	 * actions that are sent to the dispatcher and finally fetch the relevant
+	 * data attributed to the new topic choice.
+	 */
 	changeTopic(url) {
 
 		if (!this.compare(url)) {
@@ -33,14 +45,24 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * Generate the URL that will be sent to our API on the Node server. We are
+	 * only interested in the topic not question when making client side requests
+	 * to the curation script on the server.
+	 * @return {string} The generated URL.
+	 */
 	generateUrl() {
 
-		const {topic, question = ''} = this.props.routeParams;
+		const {topic} = this.props.routeParams;
 
-		return `/api/${topic}/${question}`;
+		return `/api/${topic}`;
 
 	}
 
+	/**
+	 * Makes the call to the Node API to obtain the new topic data. The request
+	 * then handles the success / error status accordingly.
+	 */
 	fetch() {
 
 		_debug('Fetching questions');
@@ -57,6 +79,11 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * Checks the request status on the returned data and runs the appropriate
+	 * handler.
+	 * @param {object} request - The request object from the fetch request.
+	 */
 	status(request) {
 
 		_debug('- Fetch = query status');
@@ -66,6 +93,11 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * Runs the success handler once the data has been successfully returned
+	 * from the fetch request.
+	 * @param {string} response - The fetched data.
+	 */
 	success(response) {
 
 		_debug('- Fetch = success');
@@ -79,12 +111,21 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * Runs the error handler if there was a complication with fetching the data.
+	 */
 	error() {
 
 		_debug('- Fetch = error');
 
 	}
 
+	/**
+	 * Compares the current topic URL attributed to the present data on display
+	 * to another URL option.
+	 * @param {string} url - The URL in which to compare.
+	 * @return {boolean} The status of the match.
+	 */
 	compare(url) {
 
 		const current = `/${this.props.routeParams.topic}`;
@@ -93,12 +134,25 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * This function decides if a given element needs it modifier to be added in
+	 * i.e. if a dropdown is open then we need to append —open to the class.
+	 * @param {boolean} query - The result of a query to ascertain the modifiers
+	 * relevance.
+	 * @param {string} base - The base class name of the element.
+	 * @param {string} modifier - The modifier to append onto the base class name.
+	 * @return {string} The complete class name sequence for the element.
+	 */
 	modifier(query, base, modifier) {
 
 		return query ? `${base} ${base}${modifier}` : base;
 
 	}
 
+	/**
+	 * Loops through the passive topic prop data and generates the nave items.
+	 * @returns {jsx} The rendered topic items content.
+	 */
 	items() {
 
 		const topics = this.props.passive.topics;
@@ -124,6 +178,11 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * Adds in a extra module relating to the chosen topic. Note - that this will
+	 * no all ear if the current topic option is ‘all’.
+	 * @returns {jsx} The rendered active topic content.
+	 */
 	active() {
 
 		const key = this.props.routeParams.topic;
@@ -140,6 +199,10 @@ class Topics extends React.Component {
 
 	}
 
+	/**
+	 * Generate the component markup as part of the React render sequence.
+	 * @return {jsx} The rendered component.
+	 */
 	render() {
 
 		const toggleClass = this.modifier(this.props.topics.open, 'topics__toggle', '--open');
@@ -169,12 +232,23 @@ class Topics extends React.Component {
 
 }
 
+/**
+ * Connect this component to the Redux state for instance access to it properties
+ * rather than obtaining then via a series for inheritance from parent components.
+ * @return {object} The Redux state.
+ */
 function mapStateToProps(state) {
 
 	return state;
 
 }
 
+/**
+ * Connect this component to the Redux action dispatcher so that we can easily
+ * update the global Redux state and promo the app to re-render to reflect the
+ * updated state.
+ * @return {object} The Redux dispatcher actions.
+ */
 function mapDispatchToProps(dispatch) {
 
 	const selectTopic = (topic) => {
@@ -220,4 +294,7 @@ function mapDispatchToProps(dispatch) {
 
 }
 
+/**
+ * The Topics component connected to both the Redux state and action dispatcher.
+ */
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Topics);

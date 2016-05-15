@@ -16,8 +16,11 @@ var loaderSass = {
 var loaderJs = {
     test: /\.js$/,
     exclude: /node_modules/,
-    loader: 'babel', // Automatically generates source maps without the sourceMaps config
+    // Automatically generates source maps without the sourceMaps config
+    loader: 'babel',
     query: {
+        // Activating extra Babel stages to access the spread operator on objects
+        // for our immutable augmentation of the Redux state.
         presets: ['react', 'es2015', 'stage-2', 'stage-3']
     }
 };
@@ -32,6 +35,9 @@ var eslintWarnings = {
     failOnError: false
 };
 
+// We are creating two entry points, one for the server and one for the client.
+// This segregation allows us to construct the basis for the universal React app.
+// We can differentiate their targets and run their respective tasks independently.
 module.exports = [{
     name: 'client',
     target: 'web',

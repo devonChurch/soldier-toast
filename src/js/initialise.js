@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Initialise app (client side).
+ * @module ./initialiser
+ */
+
 const _debug = require('debug')('Initialise');
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -10,7 +15,9 @@ const routes = require('./routes');
 const reducers = require('./reducers');
 
 /**
- *
+ * Before we initialise React, Redux or React-router we replace the current URL
+ * with a rendition that matches the curated data i.e. ‘/‘ becomes ‘/all’ and
+ * ‘/topic/broken-question’ becomes ‘/topic’.
  */
 function replaceUrl() {
 
@@ -25,7 +32,8 @@ function replaceUrl() {
 }
 
 /**
- *
+ * Pull either the server side generated Redux state or React props out of the
+ * window object.
  */
 const rehydrate = {
 
@@ -35,7 +43,10 @@ const rehydrate = {
 };
 
 /**
- *
+ * This follows the same methodology as mentioned in the ./construct.js documentation.
+ * @see {@link ./construct createElement}
+ * @param {class} Component - The react-router component class
+ * @param {object} props - The react-router props
  */
 function createElement(Component, props) {
 
@@ -47,7 +58,9 @@ function createElement(Component, props) {
 }
 
 /**
- *
+ * Renders the entire app and leverages the Redux Provider and React-router
+ * functionality.
+ * @param {object} store - The Redux store.
  */
 function render(store) {
 
@@ -73,7 +86,8 @@ function devTools() {
 }
 
 /**
- *
+ * Starts the entire client side sequence that picks up where the server side
+ * rendition off the app left off.
  */
 function initialise() {
 
@@ -91,4 +105,6 @@ function initialise() {
 
 }
 
-module.exports = initialise;
+/** Initialise app (client side). */
+// Note: That the initialiser function in executing itself when exporting.
+module.exports = initialise();

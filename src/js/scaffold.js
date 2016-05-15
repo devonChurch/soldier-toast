@@ -1,3 +1,20 @@
+'use strict';
+
+/**
+ * Site scaffold.
+ * @module ./scaffold
+ */
+
+/**
+ * Generates the sites base Dom structure and injects the critical app data
+ * structure that the client side will rehydrate with to continue the user
+ * experience seamlessly.
+ * @param {string} title - The app title.
+ * @param {string} desc - The app description.
+ * @param {string} content - The complete rendered React app.
+ * @param {object} state - The final server side Redux state.
+ * @param {object} passive - The final server side React passive props.
+ */
 const scaffold = ({
 	title = 'FAQ section',
 	desc = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -31,4 +48,5 @@ const scaffold = ({
 
 };
 
+/** Site scaffold. */
 module.exports = scaffold;

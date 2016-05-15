@@ -1,19 +1,27 @@
 'use strict';
 
-const _debug = require('debug')('Hero');
+/**
+ * Hero component.
+ * @module ./hero
+ */
+
 const React = require('react');
 
+/** Class representing the Hero component. */
 class Hero extends React.Component {
 
+	/** Create a new component instance */
 	constructor() {
 
 		super();
 
 	}
 
+	/**
+	 * Generate the component markup as part of the React render sequence.
+	 * @return {jsx} The rendered component.
+	 */
 	render() {
-
-		_debug(this.props);
 
 		const {heading, description} = this.props.passive.hero;
 
@@ -30,4 +38,5 @@ class Hero extends React.Component {
 
 }
 
+/** Hero component */
 module.exports = Hero;

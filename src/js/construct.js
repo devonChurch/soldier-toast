@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Construct app (server side).
+ * @module ./construct
+ */
+
 const _debug = require('debug')('Construct');
 const {RouterContext} = require('react-router');
 const React = require('react');
@@ -69,10 +74,11 @@ function createElement(passive) {
  * The render function that will generate our server side SEO friendly HTML markup
  * for our React app. Utilising the React renderer Redux Provider and React Router
  * functionality that we use client side with a slight server side twist.
- * @param {object} renderProps - The props generated from the react router “match”
+ * @param {object} obj - The object wrapper that we will access via destructuring.
+ * @param {object} obj.renderProps - The props generated from the react router “match”
  * setup in the server.js file.
- * @param {object} passive - Our React app’s passive props.
- * @param {object} store - The Redux store.
+ * @param {object} obj.passive - Our React app’s passive props.
+ * @param {object} obj.store - The Redux store.
  * @return {string} The HTML representation of our app.
  */
 function render(renderProps, passive, store) {
@@ -119,4 +125,5 @@ function initialise(renderProps, passive, state) {
 
 }
 
+/** Construct app (server side). */
 exports.initialise = initialise;

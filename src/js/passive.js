@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Passive props.
+ * @module ./passive
+ */
+
 const _debug = require('debug')('Passive');
 const getFeed = require('./feed');
 
@@ -50,6 +55,8 @@ function distillFeed({hero, topics}) {
 /**
  * Extracts the passive props (will not change during the executions duration)
  * from feed.json
+ * @param {object} curated - The curated feed data.
+ * @param {object} curated.params - The params data nested inside the curated data.
  * @return {object} The extracted JSON.
  */
 function extract({params}) {
@@ -59,8 +66,12 @@ function extract({params}) {
     const feed = getFeed();
     const json = distillFeed(feed);
 
+    // The params are added into the passive props and will be used to update
+    // the augment react-router params and augment the URL on client side
+    // initialisation.
     return {...json, params};
 
 }
 
+/** Passive props. */
 module.exports = extract;

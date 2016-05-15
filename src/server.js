@@ -1,3 +1,10 @@
+'use strict';
+
+/**
+ * Server.
+ * @module ./server
+ */
+
 const _debug = require('debug')('Server');
 const express = require('express');
 const port = 8000;
@@ -11,35 +18,6 @@ const curate = require('./js/curate');
 const getPassive = require('./js/passive');
 const scaffold = require('./js/scaffold');
 const {constructState, initialise} = require('./js/construct');
-
-
-// A URL is pinged
-
-// We have the following as categories...
-// /all (replaces / )
-// /apple
-// /banana
-// /orange
-
-// If there is no URL match to our JSON file...
-// Redirect the user back to /all and give them a message
-
-// SERVER:
-// Get the raw json file FS (async request with promice)
-// Sort out the Topic / Question params (could change based on retrived data)
-// Curate the RAW JSON
-// Order the curated JSON
-// Move applicable question to top of the stack
-// Start construction
-
-
-// TODO:
-// Order
-// Load more + slice ?from=0
-// Redirect
-// - The section "foo" does not exist - redirecting you to show "all" section questions
-// - The question "bar" does not exist - now showing question inside the "baz" section
-
 const app = express();
 
 // Express middleware that dictates where you static assets reside with in the
@@ -72,6 +50,7 @@ app.get('*', (req, res) => {
 
             res.status(200).json(json);
 
+        // Ignore the annoying favicon request in this POC
         } else if (renderProps && path !== '/favicon.ico') {
 
             _debug('Rendering React application');

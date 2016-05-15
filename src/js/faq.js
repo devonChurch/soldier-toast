@@ -1,19 +1,29 @@
 'use strict';
 
+/**
+ * FAQ component.
+ * @module ./faq
+ */
+
 const React = require('react');
-const {Link} = require('react-router');
 const Hero = require('./hero');
 const Topics = require('./topics');
 const Questions = require('./questions');
 
+/** Class representing the FAQ component. */
 class Faq extends React.Component {
 
+	/** Create a new component instance */
 	constructor() {
 
 		super();
 
 	}
 
+	/**
+	 * Generate the component markup as part of the React render sequence.
+	 * @return {jsx} The rendered component.
+	 */
 	render() {
 
 		return (
@@ -28,4 +38,5 @@ class Faq extends React.Component {
 
 }
 
+/** FAQ component */
 module.exports = Faq;
