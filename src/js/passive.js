@@ -6,7 +6,6 @@
  */
 
 const _debug = require('debug')('Passive');
-const getFeed = require('./feed');
 
 /**
  * Extract only the relevant passive topic data from the JSON. We also change
@@ -59,11 +58,10 @@ function distillFeed({hero, topics}) {
  * @param {object} curated.params - The params data nested inside the curated data.
  * @return {object} The extracted JSON.
  */
-function extract({params}) {
+function extract(feed, {params}) {
 
     _debug('Extraction');
 
-    const feed = getFeed();
     const json = distillFeed(feed);
 
     // The params are added into the passive props and will be used to update

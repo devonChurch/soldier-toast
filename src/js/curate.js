@@ -6,7 +6,6 @@
  */
 
 const _debug = require('debug')('Curate');
-const getFeed = require('./feed');
 const questionPath = require('./question-path');
 
 /**
@@ -191,11 +190,10 @@ function defineParams(topic, question, open) {
  * @param {string} path - The raw request URL sent through from our Express.js server.
  * @return {object} the curated JSON data in addition to the datas relevant attributes.
  */
-function curate(path) {
+function curate(feed, path) {
 
     _debug('Curating');
 
-    const feed = getFeed();
     const questions = distillFeed(feed);
     const steps = distillPath(path);
     const {topic, question} = extrapolatePath(steps, questions);

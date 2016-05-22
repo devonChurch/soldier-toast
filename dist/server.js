@@ -73,7 +73,8 @@
 	
 	var Provider = _require3.Provider;
 	
-	var curate = __webpack_require__(340);
+	var getFeed = __webpack_require__(340);
+	var curate = __webpack_require__(341);
 	var getPassive = __webpack_require__(342);
 	var scaffold = __webpack_require__(343);
 	
@@ -108,27 +109,41 @@
 	
 	            _debug('Fetching data from API request');
 	
-	            var request = path.substr(4);
+	            var fetch = getFeed();
 	
-	            var _curate = curate(request);
+	            fetch.then(function (feed) {
 	
-	            var json = _curate.json;
+	                _debug('Got feed');
+	
+	                var request = path.substr(4);
+	
+	                var _curate = curate(feed, request);
+	
+	                var json = _curate.json;
 	
 	
-	            res.status(200).json(json);
+	                res.status(200).json(json);
+	            });
 	
 	            // Ignore the annoying favicon request in this POC
 	        } else if (renderProps && path !== '/favicon.ico') {
 	
 	                _debug('Rendering React application');
 	
-	                var curated = curate(path);
-	                var passive = getPassive(curated);
-	                var state = constructState(curated);
-	                var content = initialise(renderProps, passive, state);
-	                var html = scaffold({ content: content, state: state, passive: passive });
+	                var _fetch = getFeed();
 	
-	                res.status(200).send(html);
+	                _fetch.then(function (feed) {
+	
+	                    _debug('Got feed');
+	
+	                    var curated = curate(feed, path);
+	                    var passive = getPassive(feed, curated);
+	                    var state = constructState(curated);
+	                    var content = initialise(renderProps, passive, state);
+	                    var html = scaffold({ content: content, state: state, passive: passive });
+	
+	                    res.status(200).send(html);
+	                });
 	            } else {
 	
 	                _debug('Error: 404');
@@ -51462,6 +51477,40 @@
 
 	'use strict';
 	
+	var _debug = __webpack_require__(1)('Feed');
+	var fs = __webpack_require__(6);
+	
+	/**
+	 * Fetches in the static feed.json file from the server. We are creating an async
+	 * request to retrieve the feed data. Rather that populate server.js with nested
+	 * callback we are using a promise setup to resolve the fetch request.
+	 * @return {object} Parsed JSON data.
+	 */
+	function getFeed() {
+	
+	    var promise = new Promise(function (resolve, reject) {
+	
+	        _debug('Creating promise');
+	
+	        fs.readFile('./feed.json', function (err, data) {
+	
+	            _debug('Retrieved feed');
+	
+	            if (err) reject();else resolve(JSON.parse(data));
+	        });
+	    });
+	
+	    return promise;
+	}
+	
+	module.exports = getFeed;
+
+/***/ },
+/* 341 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
 	/**
 	 * Curate feed.
 	 * @module ./curate
@@ -51470,7 +51519,6 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	var _debug = __webpack_require__(1)('Curate');
-	var getFeed = __webpack_require__(341);
 	var questionPath = __webpack_require__(334);
 	
 	/**
@@ -51688,11 +51736,10 @@
 	 * @param {string} path - The raw request URL sent through from our Express.js server.
 	 * @return {object} the curated JSON data in addition to the datas relevant attributes.
 	 */
-	function curate(path) {
+	function curate(feed, path) {
 	
 	    _debug('Curating');
 	
-	    var feed = getFeed();
 	    var questions = distillFeed(feed);
 	    var steps = distillPath(path);
 	
@@ -51718,27 +51765,6 @@
 	module.exports = curate;
 
 /***/ },
-/* 341 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var fs = __webpack_require__(6);
-	
-	/**
-	 * Pulls in the static feed.json file from the server.
-	 * @return {object} Parsed JSON data.
-	 */
-	function feed() {
-	
-	  var raw = fs.readFileSync('./feed.json');
-	
-	  return JSON.parse(raw);
-	}
-	
-	module.exports = feed;
-
-/***/ },
 /* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -51752,7 +51778,6 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _debug = __webpack_require__(1)('Passive');
-	var getFeed = __webpack_require__(341);
 	
 	/**
 	 * Extract only the relevant passive topic data from the JSON. We also change
@@ -51826,13 +51851,12 @@
 	 * @param {object} curated.params - The params data nested inside the curated data.
 	 * @return {object} The extracted JSON.
 	 */
-	function extract(_ref2) {
+	function extract(feed, _ref2) {
 	    var params = _ref2.params;
 	
 	
 	    _debug('Extraction');
 	
-	    var feed = getFeed();
 	    var json = distillFeed(feed);
 	
 	    // The params are added into the passive props and will be used to update
@@ -51916,7 +51940,7 @@
 	
 	var Provider = _require3.Provider;
 	
-	var curate = __webpack_require__(340);
+	var curate = __webpack_require__(341);
 	var reducers = __webpack_require__(345);
 	
 	/**
