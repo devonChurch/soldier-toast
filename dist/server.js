@@ -58,30 +58,17 @@
 	var _require = __webpack_require__(81);
 	
 	var match = _require.match;
-	var RouterContext = _require.RouterContext;
 	
 	var routes = __webpack_require__(173);
-	var React = __webpack_require__(83);
-	var ReactDOMServer = __webpack_require__(335);
-	
-	var _require2 = __webpack_require__(319);
-	
-	var combineReducers = _require2.combineReducers;
-	var createStore = _require2.createStore;
-	
-	var _require3 = __webpack_require__(312);
-	
-	var Provider = _require3.Provider;
-	
 	var getFeed = __webpack_require__(340);
 	var curate = __webpack_require__(341);
 	var getPassive = __webpack_require__(342);
 	var scaffold = __webpack_require__(343);
 	
-	var _require4 = __webpack_require__(344);
+	var _require2 = __webpack_require__(344);
 	
-	var constructState = _require4.constructState;
-	var initialise = _require4.initialise;
+	var constructState = _require2.constructState;
+	var initialise = _require2.initialise;
 	
 	var app = express();
 	
@@ -32602,17 +32589,10 @@
 	 */
 	
 	var React = __webpack_require__(83);
-	var ReactDOM = __webpack_require__(174);
 	
 	var _require = __webpack_require__(81);
 	
-	var Router = _require.Router;
 	var Route = _require.Route;
-	var IndexRoute = _require.IndexRoute;
-	var Redirect = _require.Redirect;
-	var Link = _require.Link;
-	var IndexLink = _require.IndexLink;
-	var browserHistory = _require.browserHistory;
 	
 	var Faq = __webpack_require__(309);
 	
@@ -32630,124 +32610,8 @@
 	module.exports = routes;
 
 /***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	module.exports = __webpack_require__(175);
-
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactDOM
-	 */
-	
-	/* globals __REACT_DEVTOOLS_GLOBAL_HOOK__*/
-	
-	'use strict';
-	
-	var ReactDOMComponentTree = __webpack_require__(176);
-	var ReactDefaultInjection = __webpack_require__(179);
-	var ReactMount = __webpack_require__(299);
-	var ReactPerf = __webpack_require__(199);
-	var ReactReconciler = __webpack_require__(200);
-	var ReactUpdates = __webpack_require__(196);
-	var ReactVersion = __webpack_require__(112);
-	
-	var findDOMNode = __webpack_require__(306);
-	var getNativeComponentFromComposite = __webpack_require__(307);
-	var renderSubtreeIntoContainer = __webpack_require__(308);
-	var warning = __webpack_require__(91);
-	
-	ReactDefaultInjection.inject();
-	
-	var render = ReactPerf.measure('React', 'render', ReactMount.render);
-	
-	var React = {
-	  findDOMNode: findDOMNode,
-	  render: render,
-	  unmountComponentAtNode: ReactMount.unmountComponentAtNode,
-	  version: ReactVersion,
-	
-	  /* eslint-disable camelcase */
-	  unstable_batchedUpdates: ReactUpdates.batchedUpdates,
-	  unstable_renderSubtreeIntoContainer: renderSubtreeIntoContainer
-	};
-	
-	// Inject the runtime into a devtools global hook regardless of browser.
-	// Allows for debugging when the hook is injected on the page.
-	/* eslint-enable camelcase */
-	if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.inject === 'function') {
-	  __REACT_DEVTOOLS_GLOBAL_HOOK__.inject({
-	    ComponentTree: {
-	      getClosestInstanceFromNode: ReactDOMComponentTree.getClosestInstanceFromNode,
-	      getNodeFromInstance: function (inst) {
-	        // inst is an internal instance (but could be a composite)
-	        if (inst._renderedComponent) {
-	          inst = getNativeComponentFromComposite(inst);
-	        }
-	        if (inst) {
-	          return ReactDOMComponentTree.getNodeFromInstance(inst);
-	        } else {
-	          return null;
-	        }
-	      }
-	    },
-	    Mount: ReactMount,
-	    Reconciler: ReactReconciler
-	  });
-	}
-	
-	if (process.env.NODE_ENV !== 'production') {
-	  var ExecutionEnvironment = __webpack_require__(189);
-	  if (ExecutionEnvironment.canUseDOM && window.top === window.self) {
-	
-	    // First check if devtools is not installed
-	    if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined') {
-	      // If we're in Chrome or Firefox, provide a download link if not installed.
-	      if (navigator.userAgent.indexOf('Chrome') > -1 && navigator.userAgent.indexOf('Edge') === -1 || navigator.userAgent.indexOf('Firefox') > -1) {
-	        // Firefox does not have the issue with devtools loaded over file://
-	        var showFileUrlMessage = window.location.protocol.indexOf('http') === -1 && navigator.userAgent.indexOf('Firefox') === -1;
-	        console.debug('Download the React DevTools ' + (showFileUrlMessage ? 'and use an HTTP server (instead of a file: URL) ' : '') + 'for a better development experience: ' + 'https://fb.me/react-devtools');
-	      }
-	    }
-	
-	    var testFunc = function testFn() {};
-	    process.env.NODE_ENV !== 'production' ? warning((testFunc.name || testFunc.toString()).indexOf('testFn') !== -1, 'It looks like you\'re using a minified copy of the development build ' + 'of React. When deploying React apps to production, make sure to use ' + 'the production build which skips development warnings and is faster. ' + 'See https://fb.me/react-minification for more details.') : void 0;
-	
-	    // If we're in IE8, check to see if we are in compatibility mode and provide
-	    // information on preventing compatibility mode
-	    var ieCompatibilityMode = document.documentMode && document.documentMode < 8;
-	
-	    process.env.NODE_ENV !== 'production' ? warning(!ieCompatibilityMode, 'Internet Explorer is running in compatibility mode; please add the ' + 'following tag to your HTML to prevent this from happening: ' + '<meta http-equiv="X-UA-Compatible" content="IE=edge" />') : void 0;
-	
-	    var expectedFeatures = [
-	    // shims
-	    Array.isArray, Array.prototype.every, Array.prototype.forEach, Array.prototype.indexOf, Array.prototype.map, Date.now, Function.prototype.bind, Object.keys, String.prototype.split, String.prototype.trim];
-	
-	    for (var i = 0; i < expectedFeatures.length; i++) {
-	      if (!expectedFeatures[i]) {
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'One or more ES5 shims expected by React are not available: ' + 'https://fb.me/react-warning-polyfills') : void 0;
-	        break;
-	      }
-	    }
-	  }
-	}
-	
-	module.exports = React;
-
-/***/ },
+/* 174 */,
+/* 175 */,
 /* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -48921,123 +48785,9 @@
 	module.exports = performance || {};
 
 /***/ },
-/* 306 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule findDOMNode
-	 */
-	
-	'use strict';
-	
-	var ReactCurrentOwner = __webpack_require__(90);
-	var ReactDOMComponentTree = __webpack_require__(176);
-	var ReactInstanceMap = __webpack_require__(259);
-	
-	var getNativeComponentFromComposite = __webpack_require__(307);
-	var invariant = __webpack_require__(88);
-	var warning = __webpack_require__(91);
-	
-	/**
-	 * Returns the DOM node rendered by this element.
-	 *
-	 * @param {ReactComponent|DOMElement} componentOrElement
-	 * @return {?DOMElement} The root node of this element.
-	 */
-	function findDOMNode(componentOrElement) {
-	  if (process.env.NODE_ENV !== 'production') {
-	    var owner = ReactCurrentOwner.current;
-	    if (owner !== null) {
-	      process.env.NODE_ENV !== 'production' ? warning(owner._warnedAboutRefsInRender, '%s is accessing findDOMNode inside its render(). ' + 'render() should be a pure function of props and state. It should ' + 'never access something that requires stale data from the previous ' + 'render, such as refs. Move this logic to componentDidMount and ' + 'componentDidUpdate instead.', owner.getName() || 'A component') : void 0;
-	      owner._warnedAboutRefsInRender = true;
-	    }
-	  }
-	  if (componentOrElement == null) {
-	    return null;
-	  }
-	  if (componentOrElement.nodeType === 1) {
-	    return componentOrElement;
-	  }
-	
-	  var inst = ReactInstanceMap.get(componentOrElement);
-	  if (inst) {
-	    inst = getNativeComponentFromComposite(inst);
-	    return inst ? ReactDOMComponentTree.getNodeFromInstance(inst) : null;
-	  }
-	
-	  if (typeof componentOrElement.render === 'function') {
-	     true ? process.env.NODE_ENV !== 'production' ? invariant(false, 'findDOMNode was called on an unmounted component.') : invariant(false) : void 0;
-	  } else {
-	     true ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Element appears to be neither ReactComponent nor DOMNode (keys: %s)', Object.keys(componentOrElement)) : invariant(false) : void 0;
-	  }
-	}
-	
-	module.exports = findDOMNode;
-
-/***/ },
-/* 307 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule getNativeComponentFromComposite
-	 */
-	
-	'use strict';
-	
-	var ReactNodeTypes = __webpack_require__(260);
-	
-	function getNativeComponentFromComposite(inst) {
-	  var type;
-	
-	  while ((type = inst._renderedNodeType) === ReactNodeTypes.COMPOSITE) {
-	    inst = inst._renderedComponent;
-	  }
-	
-	  if (type === ReactNodeTypes.NATIVE) {
-	    return inst._renderedComponent;
-	  } else if (type === ReactNodeTypes.EMPTY) {
-	    return null;
-	  }
-	}
-	
-	module.exports = getNativeComponentFromComposite;
-
-/***/ },
-/* 308 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	* @providesModule renderSubtreeIntoContainer
-	*/
-	
-	'use strict';
-	
-	var ReactMount = __webpack_require__(299);
-	
-	module.exports = ReactMount.renderSubtreeIntoContainer;
-
-/***/ },
+/* 306 */,
+/* 307 */,
+/* 308 */,
 /* 309 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -51253,12 +51003,25 @@
 
 	'use strict';
 	
-	function generate(path) {
+	/**
+	 * Question path.
+	 * @module ./question-path
+	 */
 	
-		return path.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
+	/**
+	 * Transforms the heading from each feed question into an applicable portion of the URL path.
+	 * @example ‘This is a Heading!’ => ‘this-is-a-heading’
+	 * @param {string} raw - The original question heading.
+	 * @return {string} The transformed heading.
+	 */
+	
+	function transform(raw) {
+	
+	  return raw.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
 	}
 	
-	module.exports = generate;
+	/** Question path. */
+	module.exports = transform;
 
 /***/ },
 /* 335 */
@@ -51940,7 +51703,6 @@
 	
 	var Provider = _require3.Provider;
 	
-	var curate = __webpack_require__(341);
 	var reducers = __webpack_require__(345);
 	
 	/**

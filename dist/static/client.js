@@ -87,11 +87,6 @@
 	var _require3 = __webpack_require__(198);
 	
 	var Router = _require3.Router;
-	var Route = _require3.Route;
-	var IndexRoute = _require3.IndexRoute;
-	var Redirect = _require3.Redirect;
-	var Link = _require3.Link;
-	var IndexLink = _require3.IndexLink;
 	var browserHistory = _require3.browserHistory;
 	
 	var routes = __webpack_require__(257);
@@ -27744,17 +27739,10 @@
 	 */
 	
 	var React = __webpack_require__(9);
-	var ReactDOM = __webpack_require__(41);
 	
 	var _require = __webpack_require__(198);
 	
-	var Router = _require.Router;
 	var Route = _require.Route;
-	var IndexRoute = _require.IndexRoute;
-	var Redirect = _require.Redirect;
-	var Link = _require.Link;
-	var IndexLink = _require.IndexLink;
-	var browserHistory = _require.browserHistory;
 	
 	var Faq = __webpack_require__(258);
 	
@@ -28554,12 +28542,25 @@
 
 	'use strict';
 	
-	function generate(path) {
+	/**
+	 * Question path.
+	 * @module ./question-path
+	 */
 	
-		return path.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
+	/**
+	 * Transforms the heading from each feed question into an applicable portion of the URL path.
+	 * @example ‘This is a Heading!’ => ‘this-is-a-heading’
+	 * @param {string} raw - The original question heading.
+	 * @return {string} The transformed heading.
+	 */
+	
+	function transform(raw) {
+	
+	  return raw.toLowerCase().replace(/([^a-z ])/g, '').replace(/ /g, '-');
 	}
 	
-	module.exports = generate;
+	/** Question path. */
+	module.exports = transform;
 
 /***/ },
 /* 264 */

@@ -6,8 +6,7 @@
  */
 
 const React = require('react');
-const ReactDOM = require('react-dom');
-const {Router, Route, IndexRoute, Redirect, Link, IndexLink, browserHistory} = require('react-router');
+const {Route} = require('react-router');
 const Faq = require('./faq');
 
 // Note: The routes must be declared outside of React render() function and

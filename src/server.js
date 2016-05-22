@@ -8,12 +8,8 @@
 const _debug = require('debug')('Server');
 const express = require('express');
 const port = 8000;
-const {match, RouterContext} = require('react-router');
+const {match} = require('react-router');
 const routes = require('./js/routes');
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const {combineReducers, createStore} = require('redux');
-const {Provider} = require('react-redux');
 const getFeed = require('./js/get-feed');
 const curate = require('./js/curate');
 const getPassive = require('./js/passive');

@@ -11,7 +11,6 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const {combineReducers, createStore} = require('redux');
 const {Provider} = require('react-redux');
-const curate = require('./curate');
 const reducers = require('./reducers');
 
 /**
