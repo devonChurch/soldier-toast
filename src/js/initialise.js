@@ -10,7 +10,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const {combineReducers, createStore} = require('redux');
 const {Provider} = require('react-redux');
-const {Router, Route, IndexRoute, Redirect, Link, IndexLink, browserHistory} = require('react-router');
+const {Router, browserHistory} = require('react-router');
 const routes = require('./routes');
 const reducers = require('./reducers');
 

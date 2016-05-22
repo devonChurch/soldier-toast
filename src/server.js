@@ -8,12 +8,9 @@
 const _debug = require('debug')('Server');
 const express = require('express');
 const port = 8000;
-const {match, RouterContext} = require('react-router');
+const {match} = require('react-router');
 const routes = require('./js/routes');
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const {combineReducers, createStore} = require('redux');
-const {Provider} = require('react-redux');
+const getFeed = require('./js/get-feed');
 const curate = require('./js/curate');
 const getPassive = require('./js/passive');
 const scaffold = require('./js/scaffold');
@@ -45,23 +42,39 @@ app.get('*', (req, res) => {
 
             _debug('Fetching data from API request');
 
-            const request = path.substr(4);
-            const {json} = curate(request);
+            const fetch = getFeed();
 
-            res.status(200).json(json);
+            fetch.then((feed) => {
+
+                _debug('Got feed');
+
+                const request = path.substr(4);
+                const {json} = curate(feed, request);
+
+                res.status(200).json(json);
+
+            });
 
         // Ignore the annoying favicon request in this POC
         } else if (renderProps && path !== '/favicon.ico') {
 
             _debug('Rendering React application');
 
-            const curated = curate(path);
-            const passive = getPassive(curated);
-            const state = constructState(curated);
-            const content = initialise(renderProps, passive, state);
-            const html = scaffold({content, state, passive});
+            const fetch = getFeed();
 
-            res.status(200).send(html);
+            fetch.then((feed) => {
+
+                _debug('Got feed');
+
+                const curated = curate(feed, path);
+                const passive = getPassive(feed, curated);
+                const state = constructState(curated);
+                const content = initialise(renderProps, passive, state);
+                const html = scaffold({content, state, passive});
+
+                res.status(200).send(html);
+
+            });
 
         } else {
 
